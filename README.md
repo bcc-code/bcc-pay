@@ -2,7 +2,7 @@
 Core components for a multi-provider payment gateway for BCC
 
 - [ ] Core API
-- [ ] Configuration framework
+- [ ] Tenant configuration framework
 - [ ] Plugin / adapter framework
 - [ ] Core UI Components
 
