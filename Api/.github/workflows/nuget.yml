@@ -1,0 +1,44 @@
+name: Push Nuget Packages to GitHub Package Registry
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  BUILD_CONFIGURATION: "Release"
+  DOTNET_VERSION: "5.0.x"
+  GITHUB_PACKAGE_REGISTRY_URL: https://api.nuget.org/v3/index.json
+
+jobs:
+  gpr-build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      
+      - name: Generate build number
+        id: build_number
+        uses: paulhatch/semantic-version@v4.0.2
+        with:
+          tag_prefix: "v"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          source-url: ${{ env.GITHUB_PACKAGE_REGISTRY_URL }}
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: dotnet build and publish
+        run: |
+          dotnet restore
+          dotnet build -c ${{ env.BUILD_CONFIGURATION }}
+          dotnet pack -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+
+      - name: nuget publish
+        run: |
+          dotnet nuget push Bcc.Pay.Core.Domain/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+          dotnet nuget push Bcc.Pay.Core.Infrastructure/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
