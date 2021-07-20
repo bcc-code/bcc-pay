@@ -11,21 +11,20 @@ namespace Bcc.Pay.Core.Sample.Extensions
         public static IApplicationBuilder WarmUpRavenDatabase(this IApplicationBuilder app)
         {
             var docStore = app.ApplicationServices.GetRequiredService<IDocumentStore>();
+            // IndexCreation.CreateIndexes(typeof(/*IndexName*/).Assembly, docStore); // Indexes location
 
-            //IndexCreation.CreateIndexes(typeof(IndexName).Assembly, docStore); // Indexes location
-            //
-            //try
-            //{
-            //    using var dbSession = docStore.OpenSession();
-            //    _ = dbSession.Query<EntityName>().Take(0).ToList(); // Entities location                
-            //}
-            //catch (Raven.Client.Exceptions.Database.DatabaseDoesNotExistException)
-            //{
-            docStore.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord
+            try
             {
-                DatabaseName = docStore.Database
-            }));
-            //}
+                using var dbSession = docStore.OpenSession();
+                //_ = dbSession.Query</*EntityName*/>().Take(0).ToList(); // Entities location                
+            }
+            catch (Raven.Client.Exceptions.Database.DatabaseDoesNotExistException)
+            {
+                docStore.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord
+                {
+                    DatabaseName = docStore.Database
+                }));
+            }
 
             return app;
         }
