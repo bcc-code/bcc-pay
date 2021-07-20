@@ -4,9 +4,9 @@
     <TargetFramework>net5.0</TargetFramework>
     <RepositoryUrl>https://github.com/bcc-code/bcc-pay</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <Authors>bcc-code</Authors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company>bcc-code</Company>
-    <PackageId>Bcc.Pay.Core</PackageId>
+    <Authors>bcc-code</Authors>
   </PropertyGroup>
 
   <ItemGroup>

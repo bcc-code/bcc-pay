@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bcc.Pay.Core.Sample", "Bcc.Pay.Core.Sample\Bcc.Pay.Core.Sample.csproj", "{B6C78AA3-48D2-4844-96D1-BE78CDAEB99A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BccPay.Core.Sample", "BccPay.Core.Sample\BccPay.Core.Sample.csproj", "{B6C78AA3-48D2-4844-96D1-BE78CDAEB99A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bcc.Pay.Core.Domain", "Bcc.Pay.Core.Domain\Bcc.Pay.Core.Domain.csproj", "{3FB23D1D-A776-4A0F-99C2-A2ABFF3CB3D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BccPay.Core.Domain", "BccPay.Core.Domain\BccPay.Core.Domain.csproj", "{3FB23D1D-A776-4A0F-99C2-A2ABFF3CB3D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bcc.Pay.Core.Infrastructure", "Bcc.Pay.Core.Infrastructure\Bcc.Pay.Core.Infrastructure.csproj", "{E357BFA0-B99D-4CBD-AC47-01D5953CB990}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BccPay.Core.Infrastructure", "BccPay.Core.Infrastructure\BccPay.Core.Infrastructure.csproj", "{E357BFA0-B99D-4CBD-AC47-01D5953CB990}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

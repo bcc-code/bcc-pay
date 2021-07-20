@@ -3,7 +3,7 @@ using Raven.DependencyInjection;
 using System;
 using System.Security.Cryptography.X509Certificates;
 
-namespace Bcc.Pay.Core.Infrastructure.Extensions
+namespace BccPay.Core.Infrastructure.Extensions
 {
     public static class RavenDbConfigurationServiceCollectionExtension
     {

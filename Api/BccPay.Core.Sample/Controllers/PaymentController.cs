@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Bcc.Pay.Core.Sample.Controllers
+namespace BccPay.Core.Sample.Controllers
 {
     [ApiController]
     [Route("[controller]")]

@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>a00b492c-26f9-4d12-beb8-9e06cc7c90e7</UserSecretsId>
-    <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bcc.Pay.Core.Domain\Bcc.Pay.Core.Domain.csproj" />
-    <ProjectReference Include="..\Bcc.Pay.Core.Infrastructure\Bcc.Pay.Core.Infrastructure.csproj" />
+    <ProjectReference Include="..\BccPay.Core.Domain\BccPay.Core.Domain.csproj" />
+    <ProjectReference Include="..\BccPay.Core.Infrastructure\BccPay.Core.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

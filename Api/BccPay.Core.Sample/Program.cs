@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace Bcc.Pay.Core.Sample
+namespace BccPay.Core.Sample
 {
     public class Program
     {

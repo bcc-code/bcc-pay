@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Bcc.Pay.Core.Sample": {
+    "BccPay.Core.Sample": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

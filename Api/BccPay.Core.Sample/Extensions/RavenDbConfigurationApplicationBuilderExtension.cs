@@ -4,7 +4,7 @@ using Raven.Client.Documents;
 using Raven.Client.ServerWide;
 using Raven.Client.ServerWide.Operations;
 
-namespace Bcc.Pay.Core.Sample.Extensions
+namespace BccPay.Core.Sample.Extensions
 {
     public static class RavenDbConfigurationApplicationBuilderExtension
     {
