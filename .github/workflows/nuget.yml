@@ -34,9 +34,12 @@ jobs:
 
       - name: dotnet build and publish
         run: |
-          dotnet restore Api/Bcc.Pay.Core.Sample/Bcc.Pay.Core.Sample.csproj
-          dotnet build Api/Bcc.Pay.Core.Sample/Bcc.Pay.Core.Sample.csproj -c ${{ env.BUILD_CONFIGURATION }}
-          dotnet pack Api/Bcc.Pay.Core.Sample/Bcc.Pay.Core.Sample.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+          dotnet restore Api/Bcc.Pay.Core.Domain/Bcc.Pay.Core.Domain.csproj
+          dotnet restore Api/Bcc.Pay.Core.Infrastructure/Bcc.Pay.Core.Infrastructure.csproj
+          dotnet build Api/Bcc.Pay.Core.Domain/Bcc.Pay.Core.Domain.csproj -c ${{ env.BUILD_CONFIGURATION }}
+          dotnet build Api/Bcc.Pay.Core.Infrastructure/Bcc.Pay.Core.Infrastructure.csproj -c ${{ env.BUILD_CONFIGURATION }}
+          dotnet pack Api/Bcc.Pay.Core.Domain/Bcc.Pay.Core.Domain.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+          dotnet pack Api/Bcc.Pay.Core.Infrastructure/Bcc.Pay.Core.Infrastructure.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
 
       - name: nuget publish
         run: |
