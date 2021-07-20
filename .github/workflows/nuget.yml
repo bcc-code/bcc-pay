@@ -1,4 +1,4 @@
-name: Push Nuget Packages to GitHub Package Registry
+name: Push Nuget Packages to NuGet Package Registry
 
 on:
   push:
@@ -35,10 +35,9 @@ jobs:
 
       - name: dotnet build and publish
         run: |
-          dotnet restore Api/Bcc.Pay.Core.Domain/Bcc.Pay.Core.Domain.csproj
-          dotnet restore Api/Bcc.Pay.Core.Infrastructure/Bcc.Pay.Core.Infrastructure.csproj
-          dotnet build Api/Bcc.Pay.Core.Domain/Bcc.Pay.Core.Domain.csproj -c ${{ env.BUILD_CONFIGURATION }}
-          dotnet build Api/Bcc.Pay.Core.Infrastructure/Bcc.Pay.Core.Infrastructure.csproj -c ${{ env.BUILD_CONFIGURATION }}
+          dotnet restore Api/Bcc.Pay.Core.sln
+          dotnet build Api/Bcc.Pay.Core.Domain/Bcc.Pay.Core.Domain.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+          dotnet build Api/Bcc.Pay.Core.Infrastructure/Bcc.Pay.Core.Infrastructure.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
           dotnet pack Api/Bcc.Pay.Core.Domain/Bcc.Pay.Core.Domain.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
           dotnet pack Api/Bcc.Pay.Core.Infrastructure/Bcc.Pay.Core.Infrastructure.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
 
