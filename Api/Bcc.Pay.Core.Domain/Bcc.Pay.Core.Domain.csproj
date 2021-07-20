@@ -4,7 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <RepositoryUrl>https://github.com/bcc-code/bcc-pay</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageId>Bcc.Payment.V2.Core.Domain</PackageId>
+    <PackageId>Bcc.Payment.Core.Domain</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
