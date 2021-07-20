@@ -5,8 +5,8 @@ const routes: Routes = [
   {
     path: 'list',
     loadChildren: () =>
-      import('./modules/list-transactions/list-transactions.module').then(
-        (m) => m.ListTransactionsModule
+      import('./modules/transactions-list/transactions-list.module').then(
+        (m) => m.TransactionsListModule
       ),
   },
 ];
