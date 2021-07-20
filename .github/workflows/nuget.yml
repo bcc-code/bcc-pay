@@ -41,4 +41,4 @@ jobs:
 
       - name: nuget publish
         run: |
-          dotnet nuget push Api/Bcc.Pay.Core.Infrastructure/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }}         
+          dotnet nuget push Api/Bcc.Pay.Core.Infrastructure/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
