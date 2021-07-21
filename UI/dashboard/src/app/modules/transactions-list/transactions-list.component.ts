@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 export interface Transaction {
   id: string;
   email: string;
@@ -64,13 +66,13 @@ const TRANSACTIONS_DATA: Transaction[] = [
   templateUrl: './transactions-list.component.html',
   styleUrls: ['./transactions-list.component.scss'],
 })
-export class TransactionsListComponent implements OnInit {
+export class TransactionsListComponent implements AfterViewInit {
   displayedColumns: string[] = ['id', 'email', 'amount', 'currency', 'country'];
-  dataSource = TRANSACTIONS_DATA;
+  dataSource = new MatTableDataSource<Transaction>(TRANSACTIONS_DATA);
 
-  constructor() {}
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  ngOnInit(): void {
-    console.log('Init transaction list');
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
   }
 }
