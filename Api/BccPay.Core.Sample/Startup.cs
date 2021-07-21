@@ -1,13 +1,12 @@
 using BccPay.Core.Infrastructure.Extensions;
-using BccPay.Core.Infrastructure.IndexesTEST;
+using BccPay.Core.Infrastructure.Payments.Extensions;
+using BccPay.Core.Sample.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
-using System.Reflection;
 
 namespace BccPay.Core.Sample
 {
@@ -23,6 +22,9 @@ namespace BccPay.Core.Sample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRavenDatabaseDocumentStore();
+
+            services.AddRefitClients();
+            services.AddBccPaymentServices();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -51,9 +53,7 @@ namespace BccPay.Core.Sample
                 endpoints.MapControllers();
             });
 
-            app.WarmUpIndexesInRavenDatabase(new List<Assembly> {
-                typeof(PaymentsIndex).Assembly,
-            });
+            //app.WarmUpIndexesInRavenDatabase();
         }
     }
 }
