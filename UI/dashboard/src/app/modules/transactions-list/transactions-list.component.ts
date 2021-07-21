@@ -13,7 +13,7 @@ export interface Transaction {
 const TRANSACTIONS_DATA: Transaction[] = [
   {
     id: '0aaa4d10',
-    email: 'test@test.no',
+    email: 'test0@test.no',
     amount: 50,
     currency: 'NOK',
     country: 'NO',
@@ -27,14 +27,14 @@ const TRANSACTIONS_DATA: Transaction[] = [
   },
   {
     id: '6baa4d10',
-    email: 'test@test.no',
+    email: 't@test.no',
     amount: 55,
     currency: 'NOK',
     country: 'NO',
   },
   {
     id: '5be837dbc8ad',
-    email: 'test@test.no',
+    email: 'test1@test.no',
     amount: 1,
     currency: 'BTC',
     country: 'ES',
