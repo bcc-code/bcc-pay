@@ -75,4 +75,8 @@ export class TransactionsListComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
   }
+
+  public applyFilter = (value: string) => {
+    this.dataSource.filter = value.trim().toLocaleLowerCase();
+  };
 }

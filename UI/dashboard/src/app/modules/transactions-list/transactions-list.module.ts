@@ -4,7 +4,9 @@ import { CommonModule } from '@angular/common';
 import { TransactionsListRoutingModule } from './transactions-list-routing.module';
 import { TransactionsListComponent } from './transactions-list.component';
 import { MatTableModule } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @NgModule({
   declarations: [TransactionsListComponent],
@@ -13,6 +15,8 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
     TransactionsListRoutingModule,
     MatTableModule,
     MatPaginatorModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
 })
 export class TransactionsListModule {}
