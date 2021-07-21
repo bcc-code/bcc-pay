@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 export interface Transaction {
   id: string;
@@ -11,51 +12,51 @@ export interface Transaction {
 
 const TRANSACTIONS_DATA: Transaction[] = [
   {
-    id: '6aaa4d10',
+    id: '0aaa4d10',
     email: 'test@test.no',
     amount: 50,
+    currency: 'NOK',
+    country: 'NO',
+  },
+  {
+    id: '52e837dbc8ad',
+    email: 'test@test.no',
+    amount: 40,
+    currency: 'NOK',
+    country: 'NO',
+  },
+  {
+    id: '6baa4d10',
+    email: 'test@test.no',
+    amount: 55,
     currency: 'NOK',
     country: 'NO',
   },
   {
     id: '5be837dbc8ad',
     email: 'test@test.no',
-    amount: 50,
+    amount: 1,
+    currency: 'BTC',
+    country: 'ES',
+  },
+  {
+    id: '3aaa4d10',
+    email: 'test@test.no',
+    amount: 30,
     currency: 'NOK',
     country: 'NO',
   },
   {
-    id: '6aaa4d10',
-    email: 'test@test.no',
-    amount: 50,
-    currency: 'NOK',
-    country: 'NO',
+    id: '5ce837dbc8ad',
+    email: 'test2@test.no',
+    amount: 10,
+    currency: 'USD',
+    country: 'US',
   },
   {
-    id: '5be837dbc8ad',
+    id: '6faa4d10',
     email: 'test@test.no',
-    amount: 50,
-    currency: 'NOK',
-    country: 'NO',
-  },
-  {
-    id: '6aaa4d10',
-    email: 'test@test.no',
-    amount: 50,
-    currency: 'NOK',
-    country: 'NO',
-  },
-  {
-    id: '5be837dbc8ad',
-    email: 'test@test.no',
-    amount: 50,
-    currency: 'NOK',
-    country: 'NO',
-  },
-  {
-    id: '6aaa4d10',
-    email: 'test@test.no',
-    amount: 50,
+    amount: 60,
     currency: 'NOK',
     country: 'NO',
   },
@@ -70,9 +71,11 @@ export class TransactionsListComponent implements AfterViewInit {
   displayedColumns: string[] = ['id', 'email', 'amount', 'currency', 'country'];
   dataSource = new MatTableDataSource<Transaction>(TRANSACTIONS_DATA);
 
+  @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   ngAfterViewInit() {
+    this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
   }
 
