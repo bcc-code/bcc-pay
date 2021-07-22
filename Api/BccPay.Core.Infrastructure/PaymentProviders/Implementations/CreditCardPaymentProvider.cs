@@ -1,4 +1,5 @@
-﻿using BccPay.Core.Infrastructure.Constants;
+﻿using BccPay.Core.Enums;
+using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.PaymentProviders.RefitClients;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -9,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 {
-    public class NetsProvider : IPaymentProvider
+    public class CreditCardPaymentProvider : IPaymentProvider
     {
         private readonly INetsClient _netsClient;
         private readonly IConfiguration _configuration;
         private readonly IDictionary<string, string> _headers;
 
-        public NetsProvider(INetsClient netsClient,
+        public CreditCardPaymentProvider(INetsClient netsClient,
             IConfiguration configuration)
         {
             _netsClient = netsClient
@@ -28,6 +29,8 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                 {"content-type", MediaTypeNames.Application.Json }
             };
         }
+
+        public string PaymentMethod => PaymentMethods.CreditCard.ToString();
 
         public async Task<string> CreatePayment()
         {
