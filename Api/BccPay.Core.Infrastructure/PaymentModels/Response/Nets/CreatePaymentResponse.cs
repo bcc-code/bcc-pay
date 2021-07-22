@@ -1,4 +1,4 @@
-﻿namespace BccPay.Core.Infrastructure.Payments.Implementations.Providers.Nets.ResponseModels
+﻿namespace BccPay.Core.Infrastructure.PaymentModels.Response.Nets
 {
     public class CreatePaymentResponse
     {

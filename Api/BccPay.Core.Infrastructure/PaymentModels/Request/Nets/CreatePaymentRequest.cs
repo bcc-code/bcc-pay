@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace BccPay.Core.Infrastructure.Payments.Implementations.Providers.Nets.RequestModels
+namespace BccPay.Core.Infrastructure.PaymentModels.Request.Nets
 {
     public class CreatePaymentRequest
     {

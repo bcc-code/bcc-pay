@@ -24,7 +24,6 @@ namespace BccPay.Core.Sample
             services.AddRavenDatabaseDocumentStore();
 
             services.AddRefitClients();
-            services.AddBccPaymentServices();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

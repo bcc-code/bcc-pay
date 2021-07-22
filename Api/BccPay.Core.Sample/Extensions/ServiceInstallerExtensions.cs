@@ -1,6 +1,4 @@
-﻿using BccPay.Core.Infrastructure.Payments;
-using BccPay.Core.Infrastructure.Payments.Implementations;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -9,12 +7,12 @@ namespace BccPay.Core.Sample.Extensions
 {
     public static class ServiceInstallerExtensions
     {
-        public static IServiceCollection AddBccPaymentServices(this IServiceCollection services)
-        {
-            services.AddSingleton<IPaymentHandler, CommonPaymentHandler>();
-
-            return RegisterAllTypes<IPaymentProvider>(services, new[] { typeof(ServiceInstallerExtensions).Assembly });
-        }
+        //public static IServiceCollection AddBccPaymentServices(this IServiceCollection services)
+        //{
+        //    services.AddSingleton<IPaymentHandler, CommonPaymentHandler>();
+        //
+        //    return RegisterAllTypes<IPaymentProvider>(services, new[] { typeof(ServiceInstallerExtensions).Assembly });
+        //}
 
         private static IServiceCollection RegisterAllTypes<T>(this IServiceCollection services, Assembly[] assemblies,
             ServiceLifetime lifetime = ServiceLifetime.Transient)

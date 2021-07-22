@@ -1,7 +1,7 @@
-﻿using BccPay.Core.Infrastructure.Payments.Implementations.Providers.Nets.RequestModels;
+﻿using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
 using System.Collections.Generic;
 
-namespace BccPay.Core.Infrastructure.Payments.Implementations.Providers.Nets.ResponseModels
+namespace BccPay.Core.Infrastructure.PaymentModels.Response.Nets
 {
     public class RetrievePaymentResponse
     {
