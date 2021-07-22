@@ -3,30 +3,36 @@
   "tags": [
     {
       "name": "bcc-pay",
-      "description": "A component with a title and an action counter",
+      "description": "Bcc pay component to receive payments",
       "properties": [
         {
-          "name": "title",
+          "name": "item",
           "type": "String",
-          "description": "The title of your component",
-          "default": "Hey there"
+          "description": "Item what user is paying",
+          "default": "Subscription"
         },
         {
-          "name": "counter",
+          "name": "cost",
           "type": "Number",
-          "description": "An action counter",
+          "description": "Cost of an item",
           "default": 0
+        },
+        {
+          "name": "currency",
+          "type": "String",
+          "description": "Actual currency",
+          "default": "NOK"
+        },
+        {
+          "name": "server",
+          "type": "String",
+          "description": "Bcc pay API",
+          "default": "http://localhost:3000/"
         }
       ],
       "events": [],
       "slots": [],
-      "cssProperties": [
-        {
-          "name": "--bcc-pay-text-color",
-          "description": "Main Text Color",
-          "type": "Color"
-        }
-      ]
+      "cssProperties": []
     }
   ]
 }

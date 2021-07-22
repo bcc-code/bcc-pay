@@ -5,9 +5,10 @@ export default {
   title: 'BccPay',
   component: 'bcc-pay',
   argTypes: {
-    title: { control: 'text' },
-    counter: { control: 'number' },
-    textColor: { control: 'color' },
+    item: { control: 'text' },
+    cost: { control: 'number' },
+    currency: { control: 'text' },
+    server: { control: 'text' },
   },
 };
 
@@ -18,23 +19,21 @@ interface Story<T> {
 }
 
 interface ArgTypes {
-  title?: string;
-  counter?: number;
-  textColor?: string;
+  item?: string;
+  cost?: number;
+  currency?: string;
+  server?: string;
   slot?: TemplateResult;
 }
 
 const Template: Story<ArgTypes> = ({
-  title = 'Hello world',
-  counter = 5,
-  textColor,
+  item = 'Subscription',
+  cost = 5,
+  currency = 'NOK',
+  server = 'http://localhost:3000',
   slot,
 }: ArgTypes) => html`
-  <bcc-pay
-    style="--bcc-pay-text-color: ${textColor || 'black'}"
-    .title=${title}
-    .counter=${counter}
-  >
+  <bcc-pay .item=${item} .cost=${cost} .currency=${currency} .server=${server}>
     ${slot}
   </bcc-pay>
 `;
@@ -43,12 +42,7 @@ export const Regular = Template.bind({});
 
 export const CustomTitle = Template.bind({});
 CustomTitle.args = {
-  title: 'My title',
-};
-
-export const CustomCounter = Template.bind({});
-CustomCounter.args = {
-  counter: 123456,
+  item: 'New item',
 };
 
 export const SlottedContent = Template.bind({});
