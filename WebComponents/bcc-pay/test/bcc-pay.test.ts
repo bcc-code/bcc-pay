@@ -7,23 +7,21 @@ describe('BccPay', () => {
   it('has a default title "Hey there" and counter 5', async () => {
     const el = await fixture<BccPay>(html`<bcc-pay></bcc-pay>`);
 
-    expect(el.title).to.equal('Hey there');
-    expect(el.counter).to.equal(5);
+    expect(el.item).to.equal('Subscription');
+    expect(el.cost).to.equal(5);
   });
 
   it('increases the counter on button click', async () => {
     const el = await fixture<BccPay>(html`<bcc-pay></bcc-pay>`);
     el.shadowRoot!.querySelector('button')!.click();
 
-    expect(el.counter).to.equal(6);
+    expect(el.cost).to.equal(6);
   });
 
   it('can override the title via attribute', async () => {
-    const el = await fixture<BccPay>(
-      html`<bcc-pay title="attribute title"></bcc-pay>`
-    );
+    const el = await fixture<BccPay>(html`<bcc-pay currency="USD"></bcc-pay>`);
 
-    expect(el.title).to.equal('attribute title');
+    expect(el.title).to.equal('USD');
   });
 
   it('passes the a11y audit', async () => {
