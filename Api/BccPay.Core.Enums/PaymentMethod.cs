@@ -1,6 +1,6 @@
 ﻿namespace BccPay.Core.Enums
 {
-    public enum PaymentMethods
+    public enum PaymentMethod
     {
         CreditCard
     }

@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BccPay.Core.Cqrs", "BccPay.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BccPay.Core.Enums", "BccPay.Core.Enums\BccPay.Core.Enums.csproj", "{CFB2F315-68EF-40F5-924C-0554A0073821}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BccPay.Core.Contracts", "BccPay.Core.Contracts\BccPay.Core.Contracts.csproj", "{C26117AD-1AA6-4E5E-80A4-493B600FB898}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BccPay.Core.Public", "BccPay.Core.Public", "{088542F1-5AC6-418B-ACC8-A6D3060BC52F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,9 +43,17 @@ Global
 		{CFB2F315-68EF-40F5-924C-0554A0073821}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFB2F315-68EF-40F5-924C-0554A0073821}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFB2F315-68EF-40F5-924C-0554A0073821}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C26117AD-1AA6-4E5E-80A4-493B600FB898}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C26117AD-1AA6-4E5E-80A4-493B600FB898}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C26117AD-1AA6-4E5E-80A4-493B600FB898}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C26117AD-1AA6-4E5E-80A4-493B600FB898}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CFB2F315-68EF-40F5-924C-0554A0073821} = {088542F1-5AC6-418B-ACC8-A6D3060BC52F}
+		{C26117AD-1AA6-4E5E-80A4-493B600FB898} = {088542F1-5AC6-418B-ACC8-A6D3060BC52F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DA9AE924-2575-424F-81FE-9D07A543D210}

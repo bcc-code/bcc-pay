@@ -1,6 +1,5 @@
 using BccPay.Core.Infrastructure.Extensions;
 using BccPay.Core.Infrastructure.Payments.Extensions;
-using BccPay.Core.Sample.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

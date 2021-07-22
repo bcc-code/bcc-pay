@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders
 {
     internal class PaymentProviderFactory : IPaymentProviderFactory
     {
-        private readonly IEnumerable<IPaymentProvider> paymentProviders;
+        private readonly IEnumerable<IPaymentProvider> _paymentProviders;
 
         public PaymentProviderFactory(IEnumerable<IPaymentProvider> paymentProviders)
         {
-            this.paymentProviders = paymentProviders;
+            _paymentProviders = paymentProviders;
         }
 
         public IPaymentProvider GetPaymentProvider(string paymentMethod)
         {
-            return this.paymentProviders.First(x => x.PaymentMethod == paymentMethod);
+            return _paymentProviders.First(x => x.PaymentMethod == paymentMethod);
         }
     }
 }

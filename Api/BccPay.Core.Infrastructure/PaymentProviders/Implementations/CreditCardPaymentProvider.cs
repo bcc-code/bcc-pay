@@ -30,7 +30,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
             };
         }
 
-        public string PaymentMethod => PaymentMethods.CreditCard.ToString();
+        public string PaymentMethod => Enums.PaymentMethod.CreditCard.ToString();
 
         public async Task<string> CreatePayment()
         {

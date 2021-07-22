@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BccPay.Core.Contracts.Requests;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BccPay.Core.Sample.Controllers
 {
@@ -8,5 +10,10 @@ namespace BccPay.Core.Sample.Controllers
     {
         [HttpGet("test")]
         public IActionResult Test() => Ok(new { TestConnection = true });
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CreatePaymentRequest))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult CreatePayment([FromBody] CreatePaymentRequest request) => Ok(request);
     }
 }
