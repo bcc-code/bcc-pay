@@ -1,6 +1,4 @@
 using BccPay.Core.Cqrs.Commands;
-using BccPay.Core.Infrastructure.Extensions;
-using BccPay.Core.Infrastructure.Payments.Extensions;
 using BccPay.Core.Sample.Controllers;
 using FluentValidation.AspNetCore;
 using MediatR;
