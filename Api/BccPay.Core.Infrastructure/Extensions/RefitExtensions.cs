@@ -10,7 +10,7 @@ namespace BccPay.Core.Infrastructure.Payments.Extensions
         public static IServiceCollection AddRefitClients(this IServiceCollection services)
         {
             services.AddRefitClient<INetsClient>()
-                .ConfigureHttpClient(client => client.BaseAddress = new Uri("https://test.api.dibspayment.eu/v1/payments")); // TODO: ADD AuthHeaderHandler to set up headers
+                .ConfigureHttpClient(client => client.BaseAddress = new Uri("https://test.api.dibspayment.eu")); // TODO: ADD AuthHeaderHandler to set up headers
 
             return services;
         }

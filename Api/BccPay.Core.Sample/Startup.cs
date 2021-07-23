@@ -1,5 +1,8 @@
+using BccPay.Core.Cqrs.Commands;
 using BccPay.Core.Infrastructure.Extensions;
 using BccPay.Core.Infrastructure.Payments.Extensions;
+using BccPay.Core.Sample.Controllers;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +26,8 @@ namespace BccPay.Core.Sample
             services.AddRavenDatabaseDocumentStore();
 
             services.AddRefitClients();
+            services.ConfigureBccPayInfrastructure();
+            services.AddMediatR(typeof(BaseController).Assembly, typeof(CreatePaymentCommand).Assembly);
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

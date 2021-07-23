@@ -1,7 +1,8 @@
-﻿namespace BccPay.Core.Infrastructure.PaymentModels.Response.Nets
+﻿using BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
+using System.Collections.Generic;
+
+namespace BccPay.Core.Infrastructure.PaymentModels.Response.Nets
 {
-    using BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
-    using System.Collections.Generic;
     public class RetrievePaymentResponse
     {
         public string PaymentId { get; set; }

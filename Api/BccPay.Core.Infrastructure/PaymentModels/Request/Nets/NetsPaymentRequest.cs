@@ -1,10 +1,10 @@
-﻿namespace BccPay.Core.Infrastructure.PaymentModels.Request.Nets
-{
-    using BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
-    using System.Collections.Generic;
-    using System.Text.Json.Serialization;
+﻿using BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
-    public class CreatePaymentRequest
+namespace BccPay.Core.Infrastructure.PaymentModels.Request.Nets
+{
+    public class NetsPaymentRequest
     {
         [JsonPropertyName("order")]
         public Order Order { get; set; }

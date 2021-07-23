@@ -8,7 +8,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection ConfigureBccPayInfrastructure(this IServiceCollection services)
         {
             services.AddScoped<IPaymentProvider, CreditCardPaymentProvider>();
-            services.AddSingleton<IPaymentProviderFactory, PaymentProviderFactory>();
+            services.AddScoped<IPaymentProviderFactory, PaymentProviderFactory>();
 
             return services;
         }

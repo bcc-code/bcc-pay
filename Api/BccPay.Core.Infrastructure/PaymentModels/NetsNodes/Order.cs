@@ -15,7 +15,7 @@
             /// The amount of the order must match the sum of the specified order items.
             /// </summary>
             [JsonPropertyName("amount")]
-            public int Amount { get; set; }
+            public decimal Amount { get; set; }
 
             [JsonPropertyName("currency")]
             public string Currency { get; set; }

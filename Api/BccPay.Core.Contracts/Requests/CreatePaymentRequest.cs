@@ -1,14 +1,14 @@
-﻿using BccPay.Core.Contracts.Requests.Nodes;
+﻿using System;
 
 namespace BccPay.Core.Contracts.Requests
 {
-    /// <summary>
-    /// Only required properties and webhooks
-    /// </summary>
     public class CreatePaymentRequest
     {
-        public OrderRequest Order { get; set; }
-        public CheckoutRequest CheckoutRequest { get; set; }
-        public NotificationRequest Notification { get; set; }
+        public Guid PayerId { get; set; }
+        public string Currency { get; set; }
+        public string Country { get; set; }
+        public decimal Amount { get; set; }
+
+        public string PaymentMethod { get; set; }
     }
 }

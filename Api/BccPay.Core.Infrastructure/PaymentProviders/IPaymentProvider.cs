@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using BccPay.Core.Infrastructure.Dtos;
+using System.Threading.Tasks;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders
 {
@@ -6,6 +7,8 @@ namespace BccPay.Core.Infrastructure.PaymentProviders
     {
         public string PaymentMethod { get; }
 
-        Task<string> CreatePayment();
+        Task<string> CreatePayment(PaymentRequestDto paymentRequest);
+
+        //Task<PaymentResponse> GetPayment(string paymentId);
     }
 }

@@ -38,10 +38,10 @@
 
         [Required]
         [JsonPropertyName("netTotalAmount")]
-        public int NetTotalAmount { get; set; }
+        public decimal NetTotalAmount { get; set; }
 
         [Required]
         [JsonPropertyName("grossTotalAmount")]
-        public int GrossTotalAmount { get; set; }
+        public decimal GrossTotalAmount { get; set; }
     }
 }
