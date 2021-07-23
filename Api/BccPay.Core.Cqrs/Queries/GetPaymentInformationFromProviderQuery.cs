@@ -13,26 +13,28 @@ namespace BccPay.Core.Cqrs.Queries
             PaymentId = paymentId;
         }
 
-        public string PaymentId { get; set; }
+        public string PaymentId { get; }
+    }
 
-        public class GetPaymentInformationFromProviderQueryHandler : IRequestHandler<GetPaymentInformationFromProviderQuery, string>
+    public class GetPaymentInformationFromProviderQueryHandler : IRequestHandler<GetPaymentInformationFromProviderQuery, string>
+    {
+        private readonly IPaymentProviderFactory _paymentProviderFactory;
+
+        public GetPaymentInformationFromProviderQueryHandler(IPaymentProviderFactory paymentProviderFactory)
         {
-            private readonly IPaymentProviderFactory _paymentProviderFactory;
+            _paymentProviderFactory = paymentProviderFactory
+                ?? throw new ArgumentNullException(nameof(paymentProviderFactory));
+        }
 
-            public GetPaymentInformationFromProviderQueryHandler(IPaymentProviderFactory paymentProviderFactory)
-            {
-                _paymentProviderFactory = paymentProviderFactory
-                    ?? throw new ArgumentNullException(nameof(paymentProviderFactory));
-            }
+        public async Task<string> Handle(GetPaymentInformationFromProviderQuery request, CancellationToken cancellationToken)
+        {
+            // NOTE: Probably it will works only after checkout, Because it contains information, mostly, from checkout;
+            // TODO: 
+            // var provider = _paymentProviderFactory.GetPaymentProvider("CreditCard"); // MOCK
+            // await provider.GetPayment(request.PaymentId);
 
-            public async Task<string> Handle(GetPaymentInformationFromProviderQuery request, CancellationToken cancellationToken)
-            {
-                // TODO: 
-                // var provider = _paymentProviderFactory.GetPaymentProvider("CreditCard"); // MOCK
-                // await provider.GetPayment(request.PaymentId);
-
-                throw new System.NotImplementedException();
-            }
+            await Task.Delay(100, cancellationToken);
+            throw new System.NotImplementedException();
         }
     }
 }

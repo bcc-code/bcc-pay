@@ -4,7 +4,6 @@ using Raven.Client.Documents;
 using Raven.Client.Documents.Indexes;
 using Raven.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 
@@ -34,7 +33,7 @@ namespace BccPay.Core.Infrastructure.Extensions
             return app;
         }
 
-        public static IApplicationBuilder WarmUpIndexesInRavenDatabase(this IApplicationBuilder app, List<Assembly> assembliesWithIndexes)
+        public static IApplicationBuilder WarmUpIndexesInRavenDatabase(this IApplicationBuilder app, Assembly[] assembliesWithIndexes)
         {
             var docStore = app.ApplicationServices.GetRequiredService<IDocumentStore>();
 

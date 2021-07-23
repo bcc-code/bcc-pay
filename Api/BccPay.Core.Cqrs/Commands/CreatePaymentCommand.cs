@@ -5,6 +5,7 @@ using FluentValidation;
 using MediatR;
 using Raven.Client.Documents.Session;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,6 +36,7 @@ namespace BccPay.Core.Cqrs.Commands
         {
             public CreatePaymentCommandValidator()
             {
+                // TODO: Depend on payment provider
                 RuleFor(x => new { x.Country, x.Currency })
                     .Must(x => IsCountryCodeValid(x.Country) && IsCurrencyCodeValid(x.Currency))
                     .WithMessage("Not valid length");
@@ -46,7 +48,8 @@ namespace BccPay.Core.Cqrs.Commands
                 // TODO: Active payments for payer ID
             }
 
-            /// TODO: country list check
+            /// TODO: country list check 
+            /// From nets https://developers.nets.eu/nets-easy/en-EU/api/#country-codes-and-phone-prefixes
             private bool IsCountryCodeValid(string countryCode)
             {
                 return countryCode.Length == 3;
@@ -75,21 +78,30 @@ namespace BccPay.Core.Cqrs.Commands
 
             public async Task<string> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
             {
-                var provider = _paymentProviderFactory.GetPaymentProvider(request.PaymentMethod.ToString());
-
-                var paymentId = await provider.CreatePayment(new Infrastructure.Dtos.PaymentRequestDto
+                try
                 {
-                    Amount = request.Amount,
-                    Country = request.Country,
-                    Currency = request.Currency
-                });
+                    var provider = _paymentProviderFactory.GetPaymentProvider(request.PaymentMethod.ToString());
 
-                var payment = new Payment();
-                payment.Create(paymentId, request.PayerId, request.Currency, request.Amount, request.Country, request.PaymentMethod);
-                await _documentSession.StoreAsync(payment, cancellationToken);
-                await _documentSession.SaveChangesAsync(cancellationToken);
+                    var paymentId = await provider.CreatePayment(new Infrastructure.Dtos.PaymentRequestDto
+                    {
+                        Amount = request.Amount,
+                        Country = request.Country,
+                        Currency = request.Currency
+                    });
 
-                return payment.PaymentIdForCheckoutForm;
+                    var payment = new Payment();
+                    payment.Create(paymentId, request.PayerId, request.Currency, request.Amount, request.Country, request.PaymentMethod);
+
+                    await _documentSession.StoreAsync(payment, cancellationToken);
+                    await _documentSession.SaveChangesAsync(cancellationToken);
+
+                    return payment.PaymentIdForCheckoutForm;
+                }
+                catch (Exception exception)
+                {
+                    Trace.WriteLine(exception);
+                    throw;
+                }
             }
         }
     }

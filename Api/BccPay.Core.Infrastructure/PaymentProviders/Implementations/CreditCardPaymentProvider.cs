@@ -45,9 +45,28 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                         IntegrationType = "EmbeddedCheckout",
                         Charge = false,
                         MerchantHandlesConsumerData = false,
-                        Url = "https://localhost:5001/Payment/Callback",
-                        TermsUrl = "https://localhost:5001/Payment/Terms"
+                        Url = "https://localhost:5001/Payment/Callback", // TODO: Specifies where the checkout will be loaded if using an embedded checkout page. See also the integrationType property.
+                        TermsUrl = "https://localhost:5001/Payment/Terms" // TODO: terms link is required
                     },
+                    Order = new Order
+                    {
+                        Amount = paymentRequest.Amount,// + n // The total amount of the order including VAT, if any. (Sum of all grossTotalAmounts in the order.)
+                        Currency = paymentRequest.Currency,
+                        Items = new List<Item> // A list of order items. At least one item must be specified.
+                        {
+                            new Item
+                            {
+                                Reference = "reference-name", // A reference to recognize the product, usually the SKU (stock keeping unit) of the product. For convenience in the case of refunds or modifications of placed orders, the reference should be unique for each variation of a product item (size, color, etc).
+                                Name = "donate-1500",
+                                Quantity = 1, // static  
+                                Unit = "money", // The defined unit of measurement for the product, for example pcs, liters, or kg.
+                                UnitPrice = paymentRequest.Amount, // The price per unit excluding VAT.
+                                GrossTotalAmount = paymentRequest.Amount, //The total amount including VAT (netTotalAmount + taxAmount).
+                                NetTotalAmount = paymentRequest.Amount //The total amount excluding VAT (unitPrice * quantity).
+                            }
+                        }
+                    }
+
                     // TODO: WEBHOOKS
                     // Notifications = new Notifications
                     // {
@@ -61,24 +80,6 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                     //         }
                     //     }
                     // },
-                    Order = new Order
-                    {
-                        Amount = paymentRequest.Amount,
-                        Currency = paymentRequest.Currency,
-                        Items = new List<Item>
-                        {
-                            new Item
-                            {
-                                Reference = "reference-name",
-                                Name = "donate-1500",
-                                Unit = "currency",
-                                UnitPrice = paymentRequest.Amount,
-                                GrossTotalAmount = paymentRequest.Amount,
-                                NetTotalAmount = paymentRequest.Amount,
-                                Quantity = 1 // static                                 
-                            }
-                        }
-                    }
 
                 });
 

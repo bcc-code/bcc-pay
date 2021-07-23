@@ -23,7 +23,7 @@ namespace BccPay.Core.Domain.Entities
         public DateTime Updated { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
-        public PaymentDetails PaymentDetails { get; set; }
+        public PaymentDetails PaymentDetails { get; set; } // TODO:
 
         public void Create(string providerPaymentId,
             Guid payerId,

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BccPay.Core.Infrastructure.Dtos
+﻿namespace BccPay.Core.Infrastructure.Dtos
 {
     public class PaymentRequestDto
     {
