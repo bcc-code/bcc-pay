@@ -1,11 +1,9 @@
-﻿namespace BccPay.Core.Infrastructure.PaymentModels.NetsNodes
-{
-    using System.Collections.Generic;
-    using System.Text.Json.Serialization;
+﻿using System.Collections.Generic;
 
+namespace BccPay.Core.Infrastructure.PaymentModels.NetsNodes
+{
     public class Notifications
-        {
-            [JsonPropertyName("webhooks")]
-            public List<Webhook> Webhooks { get; set; }
-        }
+    {
+        public List<Webhook> Webhooks { get; set; }
+    }
 }
