@@ -13,11 +13,11 @@ namespace BccPay.Core.Domain.Entities
         public string Id => GetPaymentId(PaymentId);
 
         public Guid PaymentId { get; private set; }
-        public string ProviderPaymentId { get; set; }
+        public string PaymentIdForCheckoutForm { get; set; }
         public Guid PayerId { get; set; }
-        public string Currency { get; set; }
+        public string CurrencyCode { get; set; }
         public decimal Amount { get; set; }
-        public string Country { get; set; }
+        public string CountryCode { get; set; }
 
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
@@ -33,16 +33,17 @@ namespace BccPay.Core.Domain.Entities
             PaymentMethod paymentMethod)
         {
             PaymentId = Guid.NewGuid();
-            ProviderPaymentId = providerPaymentId;
+            PaymentIdForCheckoutForm = providerPaymentId;
             PayerId = payerId;
-            Currency = currency;
+            CurrencyCode = currency;
             Amount = amount;
-            Country = country;
+            CountryCode = country;
             PaymentMethod = paymentMethod;
             PaymentStatus = PaymentStatus.Draft;
             Created = DateTime.Now;
             Updated = DateTime.Now;
         }
+
         public void Update(string providerPaymentId,
             string currency,
             decimal amount,
@@ -50,10 +51,10 @@ namespace BccPay.Core.Domain.Entities
             PaymentMethod paymentMethod,
             PaymentStatus paymentStatus)
         {
-            ProviderPaymentId = providerPaymentId;
-            Currency = currency;
+            PaymentIdForCheckoutForm = providerPaymentId;
+            CurrencyCode = currency;
             Amount = amount;
-            Country = country;
+            CountryCode = country;
             PaymentMethod = paymentMethod;
             PaymentStatus = paymentStatus;
             Updated = DateTime.Now;

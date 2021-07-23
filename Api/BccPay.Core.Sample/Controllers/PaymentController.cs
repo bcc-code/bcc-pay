@@ -16,7 +16,7 @@ namespace BccPay.Core.Sample.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentRequest request)
         {
-            CreatePaymentCommand command = new(request.PayerId, "NOK", request.Amount, "NOR", Enums.PaymentMethod.CreditCard);
+            CreatePaymentCommand command = new(request.PayerId, request.Currency, request.Amount, request.Country, Enums.PaymentMethod.CreditCard);
 
             var result = await Mediator.Send(command);
 
