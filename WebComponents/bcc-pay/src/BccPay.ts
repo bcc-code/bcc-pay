@@ -77,23 +77,48 @@ export class BccPay extends LitElement {
     this.cost += 1;
   }
 
+  startNetsPayment() {
+    const firstScreenElement = this.shadowRoot?.getElementById(
+      'first-screen'
+    ) as HTMLElement;
+    firstScreenElement.style.display = 'none';
+
+    const netsScreenElement = this.shadowRoot?.getElementById(
+      'nets-payment-screen'
+    ) as HTMLElement;
+    netsScreenElement.style.display = 'block';
+  }
+
   render() {
     return html`
       <div class="card-square">
-        <div class="card-square__sub">
-          <h5>you are paying for</h5>
+        <div id="first-screen">
+          <div class="card-square__sub">
+            <h5>you are paying for</h5>
+          </div>
+          <div class="card-square__title">
+            <h3>${this.item}</h3>
+          </div>
+          <div class="card-square__price">
+            <span class="card-square__tag">Price</span>
+            <span class="card-square__cost"
+              >${this.cost} ${this.currency}
+            </span>
+          </div>
+          <button class="card-square__btn" @click=${this.startNetsPayment}>
+            PAY WITH NETS
+          </button>
         </div>
-        <div class="card-square__title">
-          <h3>${this.item}</h3>
+        <div id="nets-payment-screen" style="display: none">
+          NETS PAYMENT:
+
+          <h1>Checkout</h1>
+          <div id="checkout-container-div">
+            <!-- checkout iframe will be embedded here -->
+          </div>
+          <script src="https://test.checkout.dibspayment.eu/v1/checkout.js?v=1"></script>
+          <script src="nets.js"></script>
         </div>
-        <div class="card-square__price">
-          <span class="card-square__tag">Price</span>
-          <span class="card-square__cost">${this.cost} ${this.currency} </span>
-        </div>
-        <button class="card-square__btn" @click=${this.__increment}>
-          PAY MORE
-        </button>
-        <a href="#" class="card-square__link">Learn More</a>
       </div>
     `;
   }
