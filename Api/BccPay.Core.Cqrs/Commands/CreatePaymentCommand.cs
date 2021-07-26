@@ -17,7 +17,7 @@ namespace BccPay.Core.Cqrs.Commands
     {
         public CreatePaymentCommand(Guid payerId,
             string currency,
-            decimal amount,
+            int amount,
             string country,
             PaymentMethod paymentMethod)
         {
@@ -30,7 +30,7 @@ namespace BccPay.Core.Cqrs.Commands
 
         public Guid PayerId { get; set; }
         public string Currency { get; set; }
-        public decimal Amount { get; set; }
+        public int Amount { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
 
         public string Email { get; set; }
@@ -63,13 +63,13 @@ namespace BccPay.Core.Cqrs.Commands
                     .EmailAddress();
 
                 RuleFor(x => x.PhoneNumberPrefix)
-                    .Matches(new Regex(@"^\(?(\+[0-9]{2})|(\+[0-9]{3})\)"));
+                    .Matches(new Regex(@"^(\+[0-9]{1,3})$"));
 
                 RuleFor(x => x.PostalCode)
-                    .Matches(new Regex(@"^\(?([0-9])"));
+                    .Matches(new Regex(@"^([0-9]{1,9})$"));
 
                 RuleFor(x => x.PhoneNumberBody)
-                    .Matches(new Regex(@"^\(?([0-9])"));
+                    .Matches(new Regex(@"^([0-9]{9})$"));
                 // TODO: Active payments for payer ID
             }
 

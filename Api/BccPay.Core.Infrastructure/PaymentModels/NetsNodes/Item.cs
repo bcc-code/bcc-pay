@@ -14,10 +14,10 @@
 
         public int TaxRate { get; set; }
 
-        public decimal TaxAmount { get; set; }
+        public int TaxAmount { get; set; }
 
-        public decimal NetTotalAmount { get; set; }
+        public int NetTotalAmount { get; set; }
 
-        public decimal GrossTotalAmount { get; set; }
+        public int GrossTotalAmount { get; set; }
     }
 }
