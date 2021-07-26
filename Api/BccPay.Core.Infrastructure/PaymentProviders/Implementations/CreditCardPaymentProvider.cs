@@ -24,11 +24,13 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
             _netsClient = netsClient
                 ?? throw new ArgumentNullException(nameof(netsClient));
 
-            _configuration = configuration;
+            _configuration = configuration
+                ?? throw new ArgumentNullException(nameof(configuration));
+
             _headers = new Dictionary<string, string>
             {
-                {"Authorization", _configuration[PaymentProviderConstants.NetsSecretKey] }, // TODO: move to azure secrets
-                {"content-type", MediaTypeNames.Application.Json }
+                { PaymentProviderConstants.AuthorizationHeader, _configuration[PaymentProviderConstants.Nets.SecretKey] }, // TODO: move to azure secrets
+                { PaymentProviderConstants.ContentType, MediaTypeNames.Application.Json }
             };
         }
 
@@ -42,11 +44,11 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                 {
                     Checkout = new CheckoutOnCreate
                     {
-                        IntegrationType = "EmbeddedCheckout",
+                        IntegrationType = PaymentProviderConstants.Nets.IntegrationType,
                         Charge = false,
                         MerchantHandlesConsumerData = false,
-                        Url = "https://localhost:5001/Payment/Callback", // TODO: Specifies where the checkout will be loaded if using an embedded checkout page. See also the integrationType property.
-                        TermsUrl = "https://localhost:5001/Payment/Terms" // TODO: terms link is required
+                        Url = PaymentProviderConstants.Nets.CheckoutPageUrl, // TODO: Specifies where the checkout will be loaded if using an embedded checkout page. See also the integrationType property.
+                        TermsUrl = PaymentProviderConstants.Nets.TermsUrl // TODO: terms link is required
                     },
                     Order = new Order
                     {
@@ -56,10 +58,10 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                         {
                             new Item
                             {
-                                Reference = "reference-name", // A reference to recognize the product, usually the SKU (stock keeping unit) of the product. For convenience in the case of refunds or modifications of placed orders, the reference should be unique for each variation of a product item (size, color, etc).
-                                Name = "donate-1500",
+                                Reference = PaymentProviderConstants.Nets.ItemReference, // A reference to recognize the product, usually the SKU (stock keeping unit) of the product. For convenience in the case of refunds or modifications of placed orders, the reference should be unique for each variation of a product item (size, color, etc).
+                                Name = $"DONATION-{paymentRequest.Amount}",
                                 Quantity = 1, // static  
-                                Unit = "money", // The defined unit of measurement for the product, for example pcs, liters, or kg.
+                                Unit = PaymentProviderConstants.Nets.ItemUnit, // The defined unit of measurement for the product, for example pcs, liters, or kg.
                                 UnitPrice = paymentRequest.Amount, // The price per unit excluding VAT.
                                 GrossTotalAmount = paymentRequest.Amount, //The total amount including VAT (netTotalAmount + taxAmount).
                                 NetTotalAmount = paymentRequest.Amount //The total amount excluding VAT (unitPrice * quantity).
@@ -75,8 +77,8 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                     //         new Webhook
                     //         {
                     //             Authorization = "TOKEN",
-                    //             EventName = "payment.created",
-                    //             Url = "api/v1/samvirk/callback"
+                    //             EventName = PaymentProviderConstants.Nets.WebHookEventName,
+                    //             Url = PaymentProviderConstants.Nets.WebHookUrl
                     //         }
                     //     }
                     // },

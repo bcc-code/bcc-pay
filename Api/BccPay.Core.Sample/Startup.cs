@@ -1,5 +1,7 @@
 using BccPay.Core.Cqrs.Commands;
 using BccPay.Core.Sample.Controllers;
+using BccPay.Core.Sample.Mappers;
+using BccPay.Core.Sample.Middleware;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -33,6 +35,8 @@ namespace BccPay.Core.Sample
             services.AddValidation(new[] { typeof(CreatePaymentCommandValidator).Assembly });
             services.AddMvc().AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(new[] { typeof(CreatePaymentCommandValidator).Assembly }));
 
+            services.AddAutoMapper(typeof(PaymentProfile).Assembly);
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -48,6 +52,7 @@ namespace BccPay.Core.Sample
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BccPay.Core.Sample v1"));
             }
+            app.UseMiddleware<ErrorHandlingMiddleware>();
 
             app.UseHttpsRedirection();
 

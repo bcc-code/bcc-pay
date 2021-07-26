@@ -28,8 +28,8 @@ namespace BccPay.Core.Cqrs.Commands
 
         public Guid PayerId { get; set; }
         public string Currency { get; set; }
-        public decimal Amount { get; set; }
         public string Country { get; set; }
+        public decimal Amount { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
 
         public class CreatePaymentCommandValidator : AbstractValidator<CreatePaymentCommand>
