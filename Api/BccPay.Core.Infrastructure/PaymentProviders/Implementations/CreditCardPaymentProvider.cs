@@ -46,9 +46,31 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                     {
                         IntegrationType = PaymentProviderConstants.Nets.IntegrationType,
                         Charge = false,
-                        MerchantHandlesConsumerData = false,
+                        MerchantHandlesConsumerData = true,
                         Url = PaymentProviderConstants.Nets.CheckoutPageUrl, // TODO: Specifies where the checkout will be loaded if using an embedded checkout page. See also the integrationType property.
-                        TermsUrl = PaymentProviderConstants.Nets.TermsUrl // TODO: terms link is required
+                        TermsUrl = PaymentProviderConstants.Nets.TermsUrl, // TODO: terms link is required
+                        Consumer = new ConsumerOnCreate
+                        {
+                            Email = paymentRequest.Email,
+                            PhoneNumber = new PhoneNumber
+                            {
+                                Prefix = paymentRequest.PhoneNumberPrefix,
+                                Number = paymentRequest.PhoneNumberBody
+                            },
+                            PrivatePerson = new PrivatePersonOnCreate
+                            {
+                                FirstName = paymentRequest.FirstName,
+                                LastName = paymentRequest.LastName
+                            },
+                            ShippingAddress = new Address
+                            {
+                                AddressLine1 = paymentRequest.Address.AddressLine1,
+                                AddressLine2 = paymentRequest.Address.AddressLine2,
+                                City = paymentRequest.Address.City,
+                                Country = paymentRequest.Address.Country,
+                                PostalCode = paymentRequest.Address.PostalCode
+                            }
+                        }
                     },
                     Order = new Order
                     {

@@ -8,8 +8,8 @@ namespace BccPay.Core.Contracts.Requests
         public string Currency { get; set; }
         public string Country { get; set; }
         public decimal Amount { get; set; }
-        /// <example>CreditCard</example>
         public string PaymentMethod { get; set; }
 
+        public CreatePaymentPrivatePersonRequest PrivatePerson { get; set; }
     }
 }

@@ -1,11 +1,13 @@
 ﻿using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
+using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentProviders;
 using FluentValidation;
 using MediatR;
 using Raven.Client.Documents.Session;
 using System;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,9 +30,20 @@ namespace BccPay.Core.Cqrs.Commands
 
         public Guid PayerId { get; set; }
         public string Currency { get; set; }
-        public string Country { get; set; }
         public decimal Amount { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
+
+        public string Email { get; set; }
+        public string PhoneNumberPrefix { get; set; }
+        public string PhoneNumberBody { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+
+        public string Country { get; set; }
+        public string City { get; set; }
+        public string AddressLine1 { get; set; }
+        public string AddressLine2 { get; set; }
+        public string PostalCode { get; set; }
 
         public class CreatePaymentCommandValidator : AbstractValidator<CreatePaymentCommand>
         {
@@ -45,6 +58,18 @@ namespace BccPay.Core.Cqrs.Commands
                     .GreaterThan(0)
                     .NotEmpty()
                     .WithMessage("Invalid amount, must be greater than 0");
+
+                RuleFor(x => x.Email)
+                    .EmailAddress();
+
+                RuleFor(x => x.PhoneNumberPrefix)
+                    .Matches(new Regex(@"^\(?(\+[0-9]{2})|(\+[0-9]{3})\)"));
+
+                RuleFor(x => x.PostalCode)
+                    .Matches(new Regex(@"^\(?([0-9])"));
+
+                RuleFor(x => x.PhoneNumberBody)
+                    .Matches(new Regex(@"^\(?([0-9])"));
                 // TODO: Active payments for payer ID
             }
 
@@ -82,10 +107,22 @@ namespace BccPay.Core.Cqrs.Commands
                 {
                     var provider = _paymentProviderFactory.GetPaymentProvider(request.PaymentMethod.ToString());
 
-                    var paymentId = await provider.CreatePayment(new Infrastructure.Dtos.PaymentRequestDto
+                    var paymentId = await provider.CreatePayment(new PaymentRequestDto
                     {
                         Amount = request.Amount,
-                        Country = request.Country,
+                        Address = new AddressDto
+                        {
+                            Country = request.Country,
+                            City = request.City,
+                            AddressLine1 = request.AddressLine1,
+                            AddressLine2 = request.AddressLine2,
+                            PostalCode = request.PostalCode
+                        },
+                        Email = request.Email,
+                        FirstName = request.FirstName,
+                        LastName = request.LastName,
+                        PhoneNumberBody = request.PhoneNumberBody,
+                        PhoneNumberPrefix = request.PhoneNumberPrefix,
                         Currency = request.Currency
                     });
 

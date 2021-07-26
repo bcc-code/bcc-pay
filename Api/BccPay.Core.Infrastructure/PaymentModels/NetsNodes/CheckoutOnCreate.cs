@@ -17,5 +17,6 @@
         public ConsumerType ConsumerType { get; set; }
 
         public string Url { get; set; }
+        public ConsumerOnCreate Consumer { get; set; }
     }
 }
