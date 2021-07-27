@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BccPay.Core.Domain\BccPay.Core.Domain.csproj" />
+    <ProjectReference Include="..\BccPay.Core.Infrastructure\BccPay.Core.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
