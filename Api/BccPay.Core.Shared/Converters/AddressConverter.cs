@@ -1,6 +1,6 @@
 ﻿using BccPay.Core.Shared.Helpers;
 using Bia.Countries.Iso3166;
-using System.Diagnostics;
+using System;
 
 namespace BccPay.Core.Shared.Converters
 {
@@ -38,8 +38,7 @@ namespace BccPay.Core.Shared.Converters
             }
             catch
             {
-                Trace.WriteLine("Unable to identify country");
-                throw;
+                throw new Exception($"Unable to identify country by {inputValue}");
             }
         }
     }

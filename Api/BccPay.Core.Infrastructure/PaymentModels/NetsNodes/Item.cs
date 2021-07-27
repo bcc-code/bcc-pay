@@ -10,7 +10,7 @@
 
         public string Unit { get; set; }
 
-        public decimal UnitPrice { get; set; }
+        public int UnitPrice { get; set; }
 
         public int TaxRate { get; set; }
 

@@ -1,5 +1,4 @@
 ﻿using BccPay.Core.Cqrs.Commands;
-using BccPay.Core.Infrastructure.Validation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 

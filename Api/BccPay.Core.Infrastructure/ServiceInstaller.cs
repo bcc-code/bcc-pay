@@ -14,19 +14,27 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceInstaller
     {
-        public static IServiceCollection ConfigureBccPayInfrastructure(this IServiceCollection services)
+        public static IServiceCollection ConfigureBccPayInfrastructure(
+            this IServiceCollection services,
+            Action<PaymentProviderOptions> configuration)
         {
-            services.AddScoped<IPaymentProvider, CreditCardPaymentProvider>();
+            var defaultOptions = new PaymentProviderOptions();
+            configuration(defaultOptions);
+
+            services.AddScoped<IPaymentProvider, CreditCardPaymentProvider>(implementationFactory =>
+            {
+                return new CreditCardPaymentProvider(implementationFactory.GetRequiredService<INetsClient>(),
+                    defaultOptions.Nets);
+            });
+
             services.AddScoped<IPaymentProviderFactory, PaymentProviderFactory>();
 
-
             services.AddRefitClient<INetsClient>()
-                .ConfigureHttpClient(client => client.BaseAddress = new Uri("https://test.api.dibspayment.eu"));
+                .ConfigureHttpClient(client => client.BaseAddress = new Uri(defaultOptions.Nets.BaseAddress));
 
             return services;
         }
 
-        #region RavenDB
         public static IServiceCollection AddRavenDatabaseDocumentStore(this IServiceCollection services)
         {
 
@@ -41,16 +49,9 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        public static IApplicationBuilder WarmUpIndexesInRavenDatabase(this IApplicationBuilder app, Assembly assemblyWithIndexes)
-        {
-            var docStore = app.ApplicationServices.GetRequiredService<IDocumentStore>();
-
-            IndexCreation.CreateIndexes(assemblyWithIndexes, docStore);
-
-            return app;
-        }
-
-        public static IApplicationBuilder WarmUpIndexesInRavenDatabase(this IApplicationBuilder app, Assembly[] assembliesWithIndexes)
+        public static IApplicationBuilder WarmUpIndexesInRavenDatabase(
+            this IApplicationBuilder app, Assembly[]
+            assembliesWithIndexes)
         {
             var docStore = app.ApplicationServices.GetRequiredService<IDocumentStore>();
 
@@ -61,6 +62,5 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return app;
         }
-        #endregion
     }
 }

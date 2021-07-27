@@ -7,7 +7,6 @@ using FluentValidation;
 using MediatR;
 using Raven.Client.Documents.Session;
 using System;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -102,43 +101,36 @@ namespace BccPay.Core.Cqrs.Commands
 
             public async Task<string> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
             {
-                try
-                {
-                    var (phonePrefix, phoneBody) = PhoneNumberConverter.ParsePhoneNumberWithPrefixAndBody(request.PhoneNumber, request.Country);
-                    var provider = _paymentProviderFactory.GetPaymentProvider(request.PaymentMethod.ToString());
+                var (phonePrefix, phoneBody) = PhoneNumberConverter.GetNationalNumber(request.PhoneNumber, request.Country);
 
-                    var paymentId = await provider.CreatePayment(new PaymentRequestDto
+                var provider = _paymentProviderFactory.GetPaymentProvider(request.PaymentMethod.ToString());
+
+                var paymentId = await provider.CreatePayment(new PaymentRequestDto
+                {
+                    Amount = request.Amount,
+                    Address = new AddressDto
                     {
-                        Amount = request.Amount,
-                        Address = new AddressDto
-                        {
-                            Country = AddressConverter.ConvertCountry(request.Country),
-                            City = request.City,
-                            AddressLine1 = request.AddressLine1,
-                            AddressLine2 = request.AddressLine2,
-                            PostalCode = request.PostalCode
-                        },
-                        Email = request.Email,
-                        FirstName = request.FirstName,
-                        LastName = request.LastName,
-                        PhoneNumberBody = phoneBody,
-                        PhoneNumberPrefix = phonePrefix,
-                        Currency = request.Currency
-                    });
+                        Country = AddressConverter.ConvertCountry(request.Country.ToUpper()),
+                        City = request.City,
+                        AddressLine1 = request.AddressLine1,
+                        AddressLine2 = request.AddressLine2,
+                        PostalCode = request.PostalCode
+                    },
+                    Email = request.Email,
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    PhoneNumberBody = phoneBody,
+                    PhoneNumberPrefix = phonePrefix,
+                    Currency = request.Currency
+                });
 
-                    var payment = new Payment();
-                    payment.Create(paymentId, request.PayerId, request.Currency, request.Amount, request.Country, request.PaymentMethod);
+                var payment = new Payment();
+                payment.Create(paymentId, request.PayerId, request.Currency, request.Amount, request.Country, request.PaymentMethod);
 
-                    await _documentSession.StoreAsync(payment, cancellationToken);
-                    await _documentSession.SaveChangesAsync(cancellationToken);
+                await _documentSession.StoreAsync(payment, cancellationToken);
+                await _documentSession.SaveChangesAsync(cancellationToken);
 
-                    return payment.PaymentIdForCheckoutForm;
-                }
-                catch (Exception exception)
-                {
-                    Trace.WriteLine(exception);
-                    throw;
-                }
+                return payment.PaymentIdForCheckoutForm;
             }
         }
     }

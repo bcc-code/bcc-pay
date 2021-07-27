@@ -25,7 +25,14 @@ namespace BccPay.Core.Sample
         {
             services.AddRavenDatabaseDocumentStore();
 
-            services.ConfigureBccPayInfrastructure();
+            services.ConfigureBccPayInfrastructure(options =>
+            {
+                options.Nets.BaseAddress = "https://test.api.dibspayment.eu";
+                options.Nets.CheckoutPageUrl = "https://localhost:4000/";
+                options.Nets.TermsUrl = "https://localhost:4000/";
+                options.Nets.SecretKey = Configuration["SecretKey"];
+            });
+
             services.ConfigureBccCoreCqrs();
 
 

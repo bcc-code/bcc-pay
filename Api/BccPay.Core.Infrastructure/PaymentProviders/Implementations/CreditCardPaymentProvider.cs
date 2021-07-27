@@ -1,12 +1,13 @@
 ﻿using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Dtos;
+using BccPay.Core.Infrastructure.Exceptions;
 using BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
 using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
 using BccPay.Core.Infrastructure.PaymentProviders.RefitClients;
-using Microsoft.Extensions.Configuration;
+using Refit;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
 
@@ -15,21 +16,19 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
     internal class CreditCardPaymentProvider : IPaymentProvider
     {
         private readonly INetsClient _netsClient;
-        private readonly IConfiguration _configuration;
+        private readonly NetsProviderOptions _options;
         private readonly IDictionary<string, string> _headers;
 
-        public CreditCardPaymentProvider(INetsClient netsClient,
-            IConfiguration configuration)
+        public CreditCardPaymentProvider(INetsClient netsClient, NetsProviderOptions options)
         {
             _netsClient = netsClient
                 ?? throw new ArgumentNullException(nameof(netsClient));
 
-            _configuration = configuration
-                ?? throw new ArgumentNullException(nameof(configuration));
+            _options = options;
 
             _headers = new Dictionary<string, string>
             {
-                { PaymentProviderConstants.AuthorizationHeader, _configuration[PaymentProviderConstants.Nets.SecretKey] }, // TODO: move to azure secrets
+                { PaymentProviderConstants.AuthorizationHeader, _options.SecretKey },
                 { PaymentProviderConstants.ContentType, MediaTypeNames.Application.Json }
             };
         }
@@ -47,8 +46,8 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                         IntegrationType = PaymentProviderConstants.Nets.IntegrationType,
                         Charge = false,
                         MerchantHandlesConsumerData = true,
-                        Url = PaymentProviderConstants.Nets.CheckoutPageUrl, // TODO: Specifies where the checkout will be loaded if using an embedded checkout page. See also the integrationType property.
-                        TermsUrl = PaymentProviderConstants.Nets.TermsUrl, // TODO: terms link is required
+                        Url = _options.CheckoutPageUrl,
+                        TermsUrl = _options.TermsUrl,
                         Consumer = new ConsumerOnCreate
                         {
                             Email = paymentRequest.Email,
@@ -109,10 +108,9 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 
                 return result.PaymentId;
             }
-            catch (Exception exception)
+            catch (ApiException exception)
             {
-                Trace.WriteLine(exception);
-                throw;
+                throw new ExternalApiCallException(HttpStatusCode.BadRequest, exception?.Content);
             }
         }
     }
