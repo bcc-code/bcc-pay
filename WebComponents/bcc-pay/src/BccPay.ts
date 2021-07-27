@@ -1,4 +1,5 @@
 import { html, css, LitElement, property } from 'lit-element';
+
 export class BccPay extends LitElement {
   static styles = css`
     * {
@@ -87,7 +88,10 @@ export class BccPay extends LitElement {
     ) as HTMLElement;
     netsScreenElement.style.display = 'block';
 
-    await initNetsPayment();
+    const paymentId = await initNetsPayment();
+    console.log('Payment id is: ' + paymentId);
+
+    processNetsPayment(paymentId);
   }
 
   render() {
@@ -112,20 +116,16 @@ export class BccPay extends LitElement {
         </div>
         <div id="nets-payment-screen" style="display: none">
           NETS PAYMENT:
-
-          <h1>Checkout</h1>
-          <div id="checkout-container-div">
-            <!-- checkout iframe will be embedded here -->
-          </div>
           <script src="https://test.checkout.dibspayment.eu/v1/checkout.js?v=1"></script>
-          <script src="nets.js"></script>
+          <h1>Checkout</h1>
+          <div id="checkout-container-div">CHECKOUT DIV</div>
         </div>
       </div>
     `;
   }
 }
 
-export async function initNetsPayment() {
+export async function initNetsPayment(): Promise<string> {
   const body = {
     payerId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
     currency: 'NOK',
@@ -145,13 +145,39 @@ export async function initNetsPayment() {
     },
   };
 
+  let paymentId: string = '';
   const res = await fetch('https://localhost:5001/Payment', {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
       'Content-Type': 'application/json',
     },
-  });
+  })
+    .then(response => response.json())
+    .then(json => {
+      console.log('parsed json', json);
+      paymentId = json.paymentId;
+    });
+  return paymentId;
+}
 
-  console.log('Response is: ' + JSON.stringify(res));
+export async function processNetsPayment(paymentId: string) {
+  if (paymentId) {
+    const checkoutOptions = {
+      checkoutKey: 'test-checkout-key-0aecada8c3a04286ac9afa8c123b6034',
+      paymentId: paymentId,
+      containerId: 'checkout-container-div',
+    };
+    document.scripts
+    // @ts-ignore
+    const checkout = new Dibs.Checkout(checkoutOptions);
+    checkout.on('payment-completed', function (response: any) {
+      // window.location = 'completed.html';
+      console.log('Completed!' + response);
+    });
+  } else {
+    console.log('Expected a paymentId'); // No paymentId provided,
+    // window.location = 'cart.html'; // go back to cart.html
+    console.log('Not completed!');
+  }
 }
