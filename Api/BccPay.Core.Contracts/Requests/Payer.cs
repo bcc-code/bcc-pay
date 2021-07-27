@@ -1,6 +1,6 @@
 ﻿namespace BccPay.Core.Contracts.Requests
 {
-    public class CreatePaymentPrivatePersonRequest
+    public class Payer
     {
         public string Email { get; set; }
         public string PhoneNumber { get; set; }

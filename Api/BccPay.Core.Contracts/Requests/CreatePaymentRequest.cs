@@ -18,6 +18,6 @@ namespace BccPay.Core.Contracts.Requests
         public int Amount { get; set; }
         public string PaymentMethod { get; set; }
 
-        public CreatePaymentPrivatePersonRequest PrivatePerson { get; set; }
+        public Payer Payer { get; set; }
     }
 }
