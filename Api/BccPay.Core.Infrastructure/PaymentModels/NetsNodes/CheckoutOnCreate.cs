@@ -1,7 +1,5 @@
 ﻿namespace BccPay.Core.Infrastructure.PaymentModels.NetsNodes
 {
-    using System.Text.Json.Serialization;
-
     public class CheckoutOnCreate
     {
         public string TermsUrl { get; set; }

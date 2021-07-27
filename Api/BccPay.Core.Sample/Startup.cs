@@ -1,7 +1,7 @@
 using BccPay.Core.Cqrs;
-using BccPay.Core.Infrastructure.Validation;
 using BccPay.Core.Sample.Mappers;
 using BccPay.Core.Sample.Middleware;
+using BccPay.Core.Sample.Validation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
