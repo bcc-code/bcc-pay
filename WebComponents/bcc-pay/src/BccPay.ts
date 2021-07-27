@@ -1,5 +1,4 @@
 import { html, css, LitElement, property } from 'lit-element';
-
 export class BccPay extends LitElement {
   static styles = css`
     * {
@@ -77,7 +76,7 @@ export class BccPay extends LitElement {
     this.cost += 1;
   }
 
-  startNetsPayment() {
+  async startNetsPayment() {
     const firstScreenElement = this.shadowRoot?.getElementById(
       'first-screen'
     ) as HTMLElement;
@@ -87,6 +86,8 @@ export class BccPay extends LitElement {
       'nets-payment-screen'
     ) as HTMLElement;
     netsScreenElement.style.display = 'block';
+
+    await initNetsPayment();
   }
 
   render() {
@@ -122,4 +123,35 @@ export class BccPay extends LitElement {
       </div>
     `;
   }
+}
+
+export async function initNetsPayment() {
+  const body = {
+    payerId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+    currency: 'NOK',
+    country: 'NOR',
+    amount: 1000,
+    paymentMethod: 'CreditCard',
+    privatePerson: {
+      email: 'test@test.no',
+      phoneNumberPrefix: '+47',
+      phoneNumberBody: '661626839',
+      firstName: 'TestName',
+      lastName: 'TestLastName',
+      addressLine1: 'TestAddressLine1',
+      addressLine2: 'TestAddressLine2',
+      city: 'Oslo',
+      postalCode: '0001',
+    },
+  };
+
+  const res = await fetch('https://localhost:5001/Payment', {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  console.log('Response is: ' + JSON.stringify(res));
 }
