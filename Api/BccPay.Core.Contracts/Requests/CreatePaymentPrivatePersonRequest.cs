@@ -3,8 +3,7 @@
     public class CreatePaymentPrivatePersonRequest
     {
         public string Email { get; set; }
-        public string PhoneNumberPrefix { get; set; }
-        public string PhoneNumberBody { get; set; }
+        public string PhoneNumber { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
 

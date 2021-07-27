@@ -1,8 +1,7 @@
-using BccPay.Core.Cqrs.Commands;
-using BccPay.Core.Sample.Controllers;
+using BccPay.Core.Cqrs;
+using BccPay.Core.Infrastructure.Validation;
 using BccPay.Core.Sample.Mappers;
 using BccPay.Core.Sample.Middleware;
-using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using static BccPay.Core.Cqrs.Commands.CreatePaymentCommand;
 
 namespace BccPay.Core.Sample
 {
@@ -27,14 +25,11 @@ namespace BccPay.Core.Sample
         {
             services.AddRavenDatabaseDocumentStore();
 
-            services.AddRefitClients();
             services.ConfigureBccPayInfrastructure();
+            services.ConfigureBccCoreCqrs();
 
-            // TODO: move to service installer
-            services.AddMediatR(typeof(BaseController).Assembly, typeof(CreatePaymentCommand).Assembly);
-            services.AddValidation(new[] { typeof(CreatePaymentCommandValidator).Assembly });
-            services.AddMvc().AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(new[] { typeof(CreatePaymentCommandValidator).Assembly }));
 
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
             services.AddAutoMapper(typeof(PaymentProfile).Assembly);
 
             services.AddControllers();

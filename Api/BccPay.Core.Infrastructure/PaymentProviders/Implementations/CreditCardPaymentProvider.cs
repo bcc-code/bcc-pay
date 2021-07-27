@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 {
-    public class CreditCardPaymentProvider : IPaymentProvider
+    internal class CreditCardPaymentProvider : IPaymentProvider
     {
         private readonly INetsClient _netsClient;
         private readonly IConfiguration _configuration;

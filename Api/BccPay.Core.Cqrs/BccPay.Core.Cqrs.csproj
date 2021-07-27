@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BccPay.Core.Domain\BccPay.Core.Domain.csproj" />
     <ProjectReference Include="..\BccPay.Core.Infrastructure\BccPay.Core.Infrastructure.csproj" />
+    <ProjectReference Include="..\BccPay.Core.Shared\BccPay.Core.Shared.csproj" />
   </ItemGroup>
 
 </Project>

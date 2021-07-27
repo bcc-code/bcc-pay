@@ -19,10 +19,8 @@ namespace BccPay.Core.Sample.Mappers
                     options => options.MapFrom(source => source.PrivatePerson.LastName))
                 .ForMember(destination => destination.Email,
                     options => options.MapFrom(source => source.PrivatePerson.Email))
-                .ForMember(destination => destination.PhoneNumberBody,
-                    options => options.MapFrom(source => source.PrivatePerson.PhoneNumberBody))
-                .ForMember(destination => destination.PhoneNumberPrefix,
-                    options => options.MapFrom(source => source.PrivatePerson.PhoneNumberPrefix))
+                .ForMember(destination => destination.PhoneNumber,
+                    options => options.MapFrom(source => source.PrivatePerson.PhoneNumber))
                 .ForMember(destination => destination.AddressLine1,
                     options => options.MapFrom(source => source.PrivatePerson.AddressLine1))
                 .ForMember(destination => destination.AddressLine2,

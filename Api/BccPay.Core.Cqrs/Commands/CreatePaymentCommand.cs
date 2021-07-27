@@ -2,6 +2,7 @@
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentProviders;
+using BccPay.Core.Shared.Converters;
 using FluentValidation;
 using MediatR;
 using Raven.Client.Documents.Session;
@@ -34,8 +35,7 @@ namespace BccPay.Core.Cqrs.Commands
         public PaymentMethod PaymentMethod { get; set; }
 
         public string Email { get; set; }
-        public string PhoneNumberPrefix { get; set; }
-        public string PhoneNumberBody { get; set; }
+        public string PhoneNumber { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
@@ -50,8 +50,13 @@ namespace BccPay.Core.Cqrs.Commands
             public CreatePaymentCommandValidator()
             {
                 // TODO: Depend on payment provider
-                RuleFor(x => new { x.Country, x.Currency })
-                    .Must(x => IsCountryCodeValid(x.Country) && IsCurrencyCodeValid(x.Currency))
+                RuleFor(x => x.Country)
+                    .MinimumLength(2)
+                    .MaximumLength(3)
+                    .WithMessage("Wrong country code");
+
+                RuleFor(x => x.Currency)
+                    .Must(x => IsCurrencyCodeValid(x))
                     .WithMessage("Not valid length");
 
                 RuleFor(x => x.Amount)
@@ -62,23 +67,17 @@ namespace BccPay.Core.Cqrs.Commands
                 RuleFor(x => x.Email)
                     .EmailAddress();
 
-                RuleFor(x => x.PhoneNumberPrefix)
-                    .Matches(new Regex(@"^(\+[0-9]{1,3})$"));
-
                 RuleFor(x => x.PostalCode)
                     .Matches(new Regex(@"^([0-9]{1,9})$"));
 
-                RuleFor(x => x.PhoneNumberBody)
-                    .Matches(new Regex(@"^([0-9]{9})$"));
+                RuleFor(x => x.PhoneNumber)
+                    .MinimumLength(10)
+                    .MaximumLength(15);
                 // TODO: Active payments for payer ID
             }
 
             /// TODO: country list check 
             /// From nets https://developers.nets.eu/nets-easy/en-EU/api/#country-codes-and-phone-prefixes
-            private bool IsCountryCodeValid(string countryCode)
-            {
-                return countryCode.Length == 3;
-            }
 
             /// TODO: currency list check
             private bool IsCurrencyCodeValid(string countryCode)
@@ -105,6 +104,7 @@ namespace BccPay.Core.Cqrs.Commands
             {
                 try
                 {
+                    var (phonePrefix, phoneBody) = PhoneNumberConverter.ParsePhoneNumberWithPrefixAndBody(request.PhoneNumber, request.Country);
                     var provider = _paymentProviderFactory.GetPaymentProvider(request.PaymentMethod.ToString());
 
                     var paymentId = await provider.CreatePayment(new PaymentRequestDto
@@ -112,7 +112,7 @@ namespace BccPay.Core.Cqrs.Commands
                         Amount = request.Amount,
                         Address = new AddressDto
                         {
-                            Country = request.Country,
+                            Country = AddressConverter.ConvertCountry(request.Country),
                             City = request.City,
                             AddressLine1 = request.AddressLine1,
                             AddressLine2 = request.AddressLine2,
@@ -121,8 +121,8 @@ namespace BccPay.Core.Cqrs.Commands
                         Email = request.Email,
                         FirstName = request.FirstName,
                         LastName = request.LastName,
-                        PhoneNumberBody = request.PhoneNumberBody,
-                        PhoneNumberPrefix = request.PhoneNumberPrefix,
+                        PhoneNumberBody = phoneBody,
+                        PhoneNumberPrefix = phonePrefix,
                         Currency = request.Currency
                     });
 

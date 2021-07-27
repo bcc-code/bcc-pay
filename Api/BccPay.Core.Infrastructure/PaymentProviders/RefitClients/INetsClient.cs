@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.RefitClients
 {
-    public interface INetsClient
+    internal interface INetsClient
     {
         [Post("/v1/payments")]
         Task<CreatePaymentResponse> CreatePaymentAsync([HeaderCollection] IDictionary<string, string> headers, [Body] NetsPaymentRequest payment);
