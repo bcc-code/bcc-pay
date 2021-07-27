@@ -22,5 +22,11 @@ jobs:
 
       - name: dotnet build
         run: |
-          dotnet restore
-          dotnet build --configuration ${{ env.BUILD_CONFIGURATION }}
+          dotnet restore Api/BccPay.Core.sln
+          dotnet build Api/BccPay.Core.Domain/BccPay.Core.Domain.csproj -c ${{ env.BUILD_CONFIGURATION }}
+
+      - name: Frontend build
+        run: |
+          cd ./UI/dashboard/
+          npm install
+          npm run build
