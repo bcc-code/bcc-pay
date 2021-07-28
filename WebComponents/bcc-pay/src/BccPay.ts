@@ -1,183 +1,56 @@
-import { html, css, LitElement, property } from 'lit-element';
-
+import { html, LitElement, property } from 'lit-element';
+import { applyStyles } from './SharedStyles';
+import { startNetsPayment } from './NetsClient';
 export class BccPay extends LitElement {
-  static styles = css`
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    .card-square {
-      display: grid;
-      grid-template-columns: 1fr;
-      grid-auto-rows: max-content;
-      grid-row-gap: 1rem;
-      max-width: 478px;
-      background: #ffffff;
-      box-shadow: 0px 24px 25px -10px rgba(182, 194, 240, 0.54);
-      border-radius: 15px;
-      padding: 55px 74px;
-    }
-
-    .card-square__sub {
-      font-size: 18px;
-      text-transform: uppercase;
-      color: var(--neutral-500);
-    }
-
-    .card-square__title {
-      font-size: 1.375rem;
-      font-weight: 700;
-    }
-
-    .card-square__price {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 27px 30px;
-      background-color: hsl(238, 90%, 99%);
-      border: 1px solid hsl(227, 65%, 95%);
-      border-radius: 10px;
-    }
-
-    .card-square__price span {
-      font-size: 1.125rem;
-      font-weight: 900;
-    }
-
-    .card-square__btn {
-      font-size: 1rem;
-      text-transform: uppercase;
-      background: hsl(258, 71%, 61%);
-      color: white;
-      padding: 23px;
-      border-radius: 5px;
-      text-align: center;
-      font-weight: 700;
-      margin-top: 1rem;
-    }
-
-    .card-square__link {
-      text-align: center;
-      font-size: 1rem;
-      font-weight: 700;
-      color: hsl(258, 71%, 61%);
-      padding: 20px 0;
-    }
-  `;
-
   @property({ type: String }) item = 'Subscription';
 
   @property({ type: Number }) cost = 5;
 
   @property({ type: String }) currency = 'NOK';
 
-  __increment() {
-    this.cost += 1;
+  loadNestScript() {
+    let script = document.createElement('script');
+    script.src = 'https://test.checkout.dibspayment.eu/v1/checkout.js?v=1';
+    return script;
   }
 
-  async startNetsPayment() {
-    const firstScreenElement = this.shadowRoot?.getElementById(
-      'first-screen'
-    ) as HTMLElement;
-    firstScreenElement.style.display = 'none';
+  createRenderRoot() {
+    return this;
+  }
 
-    const netsScreenElement = this.shadowRoot?.getElementById(
-      'nets-payment-screen'
-    ) as HTMLElement;
-    netsScreenElement.style.display = 'block';
-
-    const paymentId = await initNetsPayment();
-    console.log('Payment id is: ' + paymentId);
-
-    processNetsPayment(paymentId);
+  async applyStyles() {
+    await this.updateComplete;
+    applyStyles();
   }
 
   render() {
     return html`
+      <div style="display: none">
+        ${this.loadNestScript()} ${this.applyStyles()}
+      </div>
       <div class="card-square">
         <div id="first-screen">
-          <div class="card-square__sub">
+          <div class="card-subtitle">
             <h5>you are paying for</h5>
           </div>
-          <div class="card-square__title">
+          <div class="card-title">
             <h3>${this.item}</h3>
           </div>
-          <div class="card-square__price">
-            <span class="card-square__tag">Price</span>
-            <span class="card-square__cost"
-              >${this.cost} ${this.currency}
-            </span>
+          <div class="card-price">
+            <span class="card-tag">Price</span>
+            <span class="card-cost">${this.cost} ${this.currency} </span>
           </div>
-          <button class="card-square__btn" @click=${this.startNetsPayment}>
+          <button class="nets-button" @click=${startNetsPayment}>
             PAY WITH NETS
           </button>
         </div>
         <div id="nets-payment-screen" style="display: none">
           NETS PAYMENT:
-          <script src="https://test.checkout.dibspayment.eu/v1/checkout.js?v=1"></script>
+
           <h1>Checkout</h1>
-          <div id="checkout-container-div">CHECKOUT DIV</div>
+          <div id="checkout-container-div"></div>
         </div>
       </div>
     `;
-  }
-}
-
-export async function initNetsPayment(): Promise<string> {
-  const body = {
-    payerId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-    currency: 'NOK',
-    country: 'NOR',
-    amount: 1000,
-    paymentMethod: 'CreditCard',
-    privatePerson: {
-      email: 'test@test.no',
-      phoneNumberPrefix: '+47',
-      phoneNumberBody: '661626839',
-      firstName: 'TestName',
-      lastName: 'TestLastName',
-      addressLine1: 'TestAddressLine1',
-      addressLine2: 'TestAddressLine2',
-      city: 'Oslo',
-      postalCode: '0001',
-    },
-  };
-
-  let paymentId: string = '';
-  const res = await fetch('https://localhost:5001/Payment', {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-    .then(response => response.json())
-    .then(json => {
-      console.log('parsed json', json);
-      paymentId = json.paymentId;
-    });
-  return paymentId;
-}
-
-export async function processNetsPayment(paymentId: string) {
-  if (paymentId) {
-    const checkoutOptions = {
-      checkoutKey: 'checkoutKey',
-      paymentId: paymentId,
-      containerId: 'checkout-container-div',
-    };
-    document.scripts;
-    // @ts-ignore
-    const checkout = new Dibs.Checkout(checkoutOptions);
-    checkout.on('payment-completed', function (response: any) {
-      // window.location = 'completed.html';
-      console.log('Completed!' + response);
-    });
-  } else {
-    console.log('Expected a paymentId'); // No paymentId provided,
-    // window.location = 'cart.html'; // go back to cart.html
-    console.log('Not completed!');
   }
 }
