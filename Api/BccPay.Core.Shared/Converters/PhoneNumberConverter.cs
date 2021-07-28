@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace BccPay.Core.Shared.Converters
@@ -8,14 +9,23 @@ namespace BccPay.Core.Shared.Converters
     /// </summary>
     public static class PhoneNumberConverter
     {
-        public static (string, string) GetNationalNumber(string phoneNumber, string countryCode)
+        public static bool IsPhoneNumberValid(string phoneNumber) =>
+               _phonePrefixes.Where(x => phoneNumber.StartsWith(x.Value))
+                   .Select(x => x.Value)
+                   .Any();
+
+        public static (string, string) ParseToNationalNumberAndPrefix(string phoneNumber)
         {
-            var normalizedNumber = Regex.Match(phoneNumber, @"\d+").Value;
+            string prefix = _phonePrefixes
+                .Where(x => phoneNumber.StartsWith(x.Value))
+                .Select(x => x.Value)
+                .FirstOrDefault();
 
-            var prefix = _phonePrefixes[AddressConverter.ConvertCountry(countryCode.ToUpper(), Helpers.CountryCodeFormat.Alpha2)];
             int prefixDigitsLength = prefix.Length - 1;
+            string normalizedNumber = Regex.Match(phoneNumber, @"\d+").Value;
+            string body = normalizedNumber[prefixDigitsLength..];
 
-            return (prefix, normalizedNumber[prefixDigitsLength..]);
+            return (prefix, body);
         }
         #region Iso 2 country code with country phone prefix
         private static readonly IReadOnlyDictionary<string, string> _phonePrefixes = new Dictionary<string, string>

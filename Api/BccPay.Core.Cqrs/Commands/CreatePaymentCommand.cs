@@ -15,9 +15,9 @@ namespace BccPay.Core.Cqrs.Commands
 {
     public class CreatePaymentCommand : IRequest<string>
     {
-        public CreatePaymentCommand(Guid payerId,
+        public CreatePaymentCommand(string payerId,
             string currency,
-            int amount,
+            decimal amount,
             string country,
             PaymentMethod paymentMethod)
         {
@@ -28,9 +28,9 @@ namespace BccPay.Core.Cqrs.Commands
             PaymentMethod = paymentMethod;
         }
 
-        public Guid PayerId { get; set; }
+        public string PayerId { get; set; }
         public string Currency { get; set; }
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
 
         public string Email { get; set; }
@@ -48,40 +48,32 @@ namespace BccPay.Core.Cqrs.Commands
         {
             public CreatePaymentCommandValidator()
             {
-                // TODO: Depend on payment provider
                 RuleFor(x => x.Country)
                     .MinimumLength(2)
                     .MaximumLength(3)
-                    .WithMessage("Wrong country code");
+                    .WithMessage("Invalid country code, use alpha2, alpha3 or numeric codes");
 
                 RuleFor(x => x.Currency)
-                    .Must(x => IsCurrencyCodeValid(x))
-                    .WithMessage("Not valid length");
+                    .Matches(new Regex(@"^([A-Z]{3})$"))
+                    .NotEmpty()
+                    .WithMessage("Invalid currency code");
 
                 RuleFor(x => x.Amount)
                     .GreaterThan(0)
-                    .NotEmpty()
                     .WithMessage("Invalid amount, must be greater than 0");
 
                 RuleFor(x => x.Email)
-                    .EmailAddress();
-
-                RuleFor(x => x.PostalCode)
-                    .Matches(new Regex(@"^([0-9]{1,9})$"));
+                    .NotEmpty()
+                    .EmailAddress()
+                    .WithMessage("Invalid email address format");
 
                 RuleFor(x => x.PhoneNumber)
-                    .MinimumLength(10)
-                    .MaximumLength(15);
-                // TODO: Active payments for payer ID
-            }
+                    .Must(x => PhoneNumberConverter.IsPhoneNumberValid(x))
+                    .WithMessage("Invalid phone number");
 
-            /// TODO: country list check 
-            /// From nets https://developers.nets.eu/nets-easy/en-EU/api/#country-codes-and-phone-prefixes
-
-            /// TODO: currency list check
-            private bool IsCurrencyCodeValid(string countryCode)
-            {
-                return countryCode.Length == 3;
+                RuleFor(x => x.PostalCode)
+                    .NotEmpty()
+                    .Matches(new Regex(@"^([0-9A-Z\s]{1,9})$"));
             }
         }
 
@@ -101,13 +93,13 @@ namespace BccPay.Core.Cqrs.Commands
 
             public async Task<string> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
             {
-                var (phonePrefix, phoneBody) = PhoneNumberConverter.GetNationalNumber(request.PhoneNumber, request.Country);
+                var (phonePrefix, phoneBody) = PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);
 
                 var provider = _paymentProviderFactory.GetPaymentProvider(request.PaymentMethod.ToString());
 
                 var paymentId = await provider.CreatePayment(new PaymentRequestDto
                 {
-                    Amount = request.Amount,
+                    Amount = decimal.Round(request.Amount, 2, MidpointRounding.AwayFromZero),
                     Address = new AddressDto
                     {
                         Country = AddressConverter.ConvertCountry(request.Country.ToUpper()),

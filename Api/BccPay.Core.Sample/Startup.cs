@@ -2,6 +2,7 @@ using BccPay.Core.Cqrs;
 using BccPay.Core.Sample.Mappers;
 using BccPay.Core.Sample.Middleware;
 using BccPay.Core.Sample.Validation;
+using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,6 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System.Collections.Generic;
+using System.Reflection;
+using static BccPay.Core.Cqrs.Commands.CreatePaymentCommand;
 
 namespace BccPay.Core.Sample
 {
@@ -37,6 +41,7 @@ namespace BccPay.Core.Sample
 
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+            services.AddMvc().AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(new List<Assembly> { typeof(CreatePaymentCommandValidator).Assembly }));
             services.AddAutoMapper(typeof(PaymentProfile).Assembly);
 
             services.AddControllers();

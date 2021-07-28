@@ -33,12 +33,14 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
             };
         }
 
-        public string PaymentMethod => Enums.PaymentMethod.CreditCard.ToString();
+        public string PaymentMethod => Enums.PaymentMethod.NetsCreditCard.ToString();
 
         public async Task<string> CreatePayment(PaymentRequestDto paymentRequest)
         {
             try
             {
+                int amountMonets = Convert.ToInt32(paymentRequest.Amount * 100);
+
                 var result = await _netsClient.CreatePaymentAsync(_headers, new NetsPaymentRequest()
                 {
                     Checkout = new CheckoutOnCreate
@@ -73,7 +75,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                     },
                     Order = new Order
                     {
-                        Amount = paymentRequest.Amount,// + n // The total amount of the order including VAT, if any. (Sum of all grossTotalAmounts in the order.)
+                        Amount = amountMonets,
                         Currency = paymentRequest.Currency,
                         Items = new List<Item> // A list of order items. At least one item must be specified.
                         {
@@ -83,9 +85,9 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                                 Name = $"DONATION-{paymentRequest.Amount}",
                                 Quantity = 1, // static  
                                 Unit = PaymentProviderConstants.Nets.ItemUnit, // The defined unit of measurement for the product, for example pcs, liters, or kg.
-                                UnitPrice = paymentRequest.Amount, // The price per unit excluding VAT.
-                                GrossTotalAmount = paymentRequest.Amount, //The total amount including VAT (netTotalAmount + taxAmount).
-                                NetTotalAmount = paymentRequest.Amount //The total amount excluding VAT (unitPrice * quantity).
+                                UnitPrice = amountMonets, // The price per unit excluding VAT.
+                                GrossTotalAmount = amountMonets, //The total amount including VAT (netTotalAmount + taxAmount).
+                                NetTotalAmount = amountMonets //The total amount excluding VAT (unitPrice * quantity).
                             }
                         }
                     }

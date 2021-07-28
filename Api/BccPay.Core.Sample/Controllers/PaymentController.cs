@@ -12,6 +12,7 @@ namespace BccPay.Core.Sample.Controllers
     [Route("[controller]")]
     public class PaymentController : BaseController
     {
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreatePaymentResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

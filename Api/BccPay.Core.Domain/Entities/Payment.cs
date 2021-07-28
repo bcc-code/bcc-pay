@@ -14,21 +14,21 @@ namespace BccPay.Core.Domain.Entities
 
         public Guid PaymentId { get; private set; }
         public string PaymentIdForCheckoutForm { get; set; }
-        public Guid PayerId { get; set; }
+        public string PayerId { get; set; }
         public string CurrencyCode { get; set; }
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
         public string CountryCode { get; set; }
 
         public DateTime Created { get; set; }
-        public DateTime Updated { get; set; }
+        public DateTime? Updated { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
         public PaymentDetails PaymentDetails { get; set; } // TODO:
 
         public void Create(string providerPaymentId,
-            Guid payerId,
+            string payerId,
             string currency,
-            int amount,
+            decimal amount,
             string country,
             PaymentMethod paymentMethod)
         {
@@ -41,12 +41,11 @@ namespace BccPay.Core.Domain.Entities
             PaymentMethod = paymentMethod;
             PaymentStatus = PaymentStatus.Draft;
             Created = DateTime.Now;
-            Updated = DateTime.Now;
         }
 
         public void Update(string providerPaymentId,
             string currency,
-            int amount,
+            decimal amount,
             string country,
             PaymentMethod paymentMethod,
             PaymentStatus paymentStatus)
