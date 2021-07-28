@@ -1,8 +1,7 @@
-using BccPay.Core.Cqrs.Commands;
-using BccPay.Core.Sample.Controllers;
+using BccPay.Core.Cqrs;
 using BccPay.Core.Sample.Mappers;
 using BccPay.Core.Sample.Middleware;
-using FluentValidation.AspNetCore;
+using BccPay.Core.Sample.Validation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using static BccPay.Core.Cqrs.Commands.CreatePaymentCommand;
 
 namespace BccPay.Core.Sample
 {
@@ -27,14 +25,18 @@ namespace BccPay.Core.Sample
         {
             services.AddRavenDatabaseDocumentStore();
 
-            services.AddRefitClients();
-            services.ConfigureBccPayInfrastructure();
+            services.ConfigureBccPayInfrastructure(options =>
+            {
+                options.Nets.BaseAddress = "https://test.api.dibspayment.eu";
+                options.Nets.CheckoutPageUrl = "https://localhost:4000/";
+                options.Nets.TermsUrl = "https://localhost:4000/";
+                options.Nets.SecretKey = Configuration["SecretKey"];
+            });
 
-            // TODO: move to service installer
-            services.AddMediatR(typeof(BaseController).Assembly, typeof(CreatePaymentCommand).Assembly);
-            services.AddValidation(new[] { typeof(CreatePaymentCommandValidator).Assembly });
-            services.AddMvc().AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(new[] { typeof(CreatePaymentCommandValidator).Assembly }));
+            services.ConfigureBccCoreCqrs();
 
+
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
             services.AddAutoMapper(typeof(PaymentProfile).Assembly);
 
             services.AddControllers();

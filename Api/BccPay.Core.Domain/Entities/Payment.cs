@@ -16,7 +16,7 @@ namespace BccPay.Core.Domain.Entities
         public string PaymentIdForCheckoutForm { get; set; }
         public Guid PayerId { get; set; }
         public string CurrencyCode { get; set; }
-        public decimal Amount { get; set; }
+        public int Amount { get; set; }
         public string CountryCode { get; set; }
 
         public DateTime Created { get; set; }
@@ -28,7 +28,7 @@ namespace BccPay.Core.Domain.Entities
         public void Create(string providerPaymentId,
             Guid payerId,
             string currency,
-            decimal amount,
+            int amount,
             string country,
             PaymentMethod paymentMethod)
         {
@@ -46,7 +46,7 @@ namespace BccPay.Core.Domain.Entities
 
         public void Update(string providerPaymentId,
             string currency,
-            decimal amount,
+            int amount,
             string country,
             PaymentMethod paymentMethod,
             PaymentStatus paymentStatus)
