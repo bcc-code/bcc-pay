@@ -13,13 +13,13 @@ using System.Threading.Tasks;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 {
-    internal class CreditCardPaymentProvider : IPaymentProvider
+    internal class NetsCreditCardPaymentProvider : IPaymentProvider
     {
         private readonly INetsClient _netsClient;
         private readonly NetsProviderOptions _options;
         private readonly IDictionary<string, string> _headers;
 
-        public CreditCardPaymentProvider(INetsClient netsClient, NetsProviderOptions options)
+        public NetsCreditCardPaymentProvider(INetsClient netsClient, NetsProviderOptions options)
         {
             _netsClient = netsClient
                 ?? throw new ArgumentNullException(nameof(netsClient));

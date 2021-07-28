@@ -26,7 +26,7 @@ namespace BccPay.Core.Cqrs.Queries
 
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
-        public PaymentStatus PaymentStatus { get; set; }
+        public PaymentProgress PaymentProgress { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
     }
 
@@ -49,15 +49,15 @@ namespace BccPay.Core.Cqrs.Queries
                                 select new PaymentResult
                                 {
                                     PaymentId = payment.PaymentId,
-                                    PaymentIdForCheckoutForm = payment.PaymentIdForCheckoutForm,
+                                    PaymentIdForCheckoutForm = payment.Attempts.LastOrDefault().PaymentIdForCheckoutForm,
                                     PayerId = payment.PayerId,
                                     CurrencyCode = payment.CurrencyCode,
                                     Amount = payment.Amount,
-                                    CountryCode = payment.CountryCode,
+                                    CountryCode = payment.Attempts.LastOrDefault().CountryCode,
                                     Created = payment.Created,
                                     Updated = payment.Updated,
-                                    PaymentStatus = payment.PaymentStatus,
-                                    PaymentMethod = payment.PaymentMethod
+                                    PaymentProgress = payment.PaymentProgress,
+                                    PaymentMethod = payment.Attempts.LastOrDefault().PaymentMethod
                                 }).ToListAsync(token: cancellationToken);
 
             return new PaymentsResult(result);
