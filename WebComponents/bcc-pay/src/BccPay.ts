@@ -164,11 +164,11 @@ export async function initNetsPayment(): Promise<string> {
 export async function processNetsPayment(paymentId: string) {
   if (paymentId) {
     const checkoutOptions = {
-      checkoutKey: 'test-checkout-key-0aecada8c3a04286ac9afa8c123b6034',
+      checkoutKey: 'checkoutKey',
       paymentId: paymentId,
       containerId: 'checkout-container-div',
     };
-    document.scripts
+    document.scripts;
     // @ts-ignore
     const checkout = new Dibs.Checkout(checkoutOptions);
     checkout.on('payment-completed', function (response: any) {
