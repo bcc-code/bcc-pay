@@ -1,13 +1,12 @@
-﻿using BccPay.Core.Infrastructure.Constants;
+﻿using BccPay.Core.Domain.Entities;
+using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Dtos;
-using BccPay.Core.Infrastructure.Exceptions;
 using BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
 using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
 using BccPay.Core.Infrastructure.PaymentProviders.RefitClients;
 using Refit;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
 
@@ -35,7 +34,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 
         public string PaymentMethod => Enums.PaymentMethod.NetsCreditCard.ToString();
 
-        public async Task<string> CreatePayment(PaymentRequestDto paymentRequest)
+        public async Task<object> CreatePayment(PaymentRequestDto paymentRequest)
         {
             try
             {
@@ -81,7 +80,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                         {
                             new Item
                             {
-                                Reference = PaymentProviderConstants.Nets.ItemReference, 
+                                Reference = PaymentProviderConstants.Nets.ItemReference,
                                 Name = $"DONATION-{paymentRequest.Amount}",
                                 Quantity = 1, // static  
                                 Unit = PaymentProviderConstants.Nets.ItemUnit,
@@ -108,11 +107,18 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 
                 });
 
-                return result.PaymentId;
+                return new NetsStatusDetails
+                {
+                    PaymentCheckoutId = result.PaymentId
+                };
             }
             catch (ApiException exception)
             {
-                throw new ExternalApiCallException(HttpStatusCode.BadRequest, exception?.Content);
+                return new NetsStatusDetails
+                {
+                    Error = exception?.Content
+                };
+                //throw new ExternalApiCallException(HttpStatusCode.BadRequest, exception?.Content);
             }
         }
     }

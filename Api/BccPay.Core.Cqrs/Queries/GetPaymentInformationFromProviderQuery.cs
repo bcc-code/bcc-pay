@@ -34,7 +34,7 @@ namespace BccPay.Core.Cqrs.Queries
             // await provider.GetPayment(request.PaymentId);
 
             await Task.Delay(100, cancellationToken);
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

@@ -2,7 +2,7 @@
 {
     public class NetsStatusDetails : IStatusDetails
     {
-        public string CheckoutId { get; set; }
-        public string Description { get; set; }
+        public string PaymentCheckoutId { get; set; }
+        public string Error { get; set; }
     }
 }

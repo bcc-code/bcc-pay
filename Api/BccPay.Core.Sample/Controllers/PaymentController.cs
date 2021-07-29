@@ -2,6 +2,7 @@
 using BccPay.Core.Contracts.Responses;
 using BccPay.Core.Cqrs.Commands;
 using BccPay.Core.Cqrs.Queries;
+using BccPay.Core.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -27,7 +28,7 @@ namespace BccPay.Core.Sample.Controllers
         }
 
         [HttpPost("{paymentId}/attempts")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreatePaymentResponse))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IStatusDetails))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreatePaymentAttempt(Guid paymentId, [FromBody] CreatePaymentAttemptRequest request)
         {
@@ -36,7 +37,7 @@ namespace BccPay.Core.Sample.Controllers
 
             var result = await Mediator.Send(command);
 
-            return Ok(new CreatePaymentResponse { PaymentId = result });
+            return Ok(result);
         }
 
         [HttpGet("{paymentId}")]
