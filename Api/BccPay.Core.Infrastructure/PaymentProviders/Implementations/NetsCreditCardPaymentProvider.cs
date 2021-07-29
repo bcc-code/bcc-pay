@@ -109,6 +109,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 
                 return new NetsStatusDetails
                 {
+                    IsSuccessful = true,
                     PaymentCheckoutId = result.PaymentId
                 };
             }
@@ -116,6 +117,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
             {
                 return new NetsStatusDetails
                 {
+                    IsSuccessful = false,
                     Error = exception?.Content
                 };
                 //throw new ExternalApiCallException(HttpStatusCode.BadRequest, exception?.Content);

@@ -114,8 +114,8 @@ namespace BccPay.Core.Cqrs.Commands
             {
                 PaymentAttemptId = Guid.NewGuid(),
                 PaymentMethod = request.PaymentMethod,
-                PaymentStatus = AttemptStatus.WaitingForFee,
-                IsActive = true,
+                PaymentStatus = providerStatusDetails.IsSuccessful ? AttemptStatus.WaitingForFee : AttemptStatus.Rejected,
+                IsActive = providerStatusDetails.IsSuccessful,
                 Created = DateTime.Now,
                 StatusDetails = providerStatusDetails
             };
