@@ -1,6 +1,5 @@
 ﻿using BccPay.Core.Domain.Entities;
 using MediatR;
-using Newtonsoft.Json;
 using Raven.Client.Documents.Session;
 using System;
 using System.Threading;
@@ -33,11 +32,6 @@ namespace BccPay.Core.Cqrs.Queries
         {
             var payment = await _documentSession.LoadAsync<Payment>(Payment.GetPaymentId(request.PaymentId), cancellationToken)
                     ?? throw new Exception("Invalid payment ID");
-
-            //payment.Attempts.ForEach(x =>
-            //JsonConvert.DeserializeObject<object>(
-            //    JsonConvert.SerializeObject(x.StatusDetails, Formatting.Indented, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All }),
-            //    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }));
 
             return payment;
         }

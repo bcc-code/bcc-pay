@@ -6,6 +6,7 @@ using BccPay.Core.Shared.Converters;
 using BccPay.Core.Shared.Helpers;
 using FluentValidation;
 using MediatR;
+using Newtonsoft.Json;
 using Raven.Client.Documents.Session;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace BccPay.Core.Cqrs.Commands
 {
-    public class CreatePaymentAttemptCommand : IRequest<string>
+    public class CreatePaymentAttemptCommand : IRequest<IStatusDetails>
     {
         public CreatePaymentAttemptCommand()
         {
@@ -58,7 +59,7 @@ namespace BccPay.Core.Cqrs.Commands
         }
     }
 
-    public class CreatePaymentAttemptCommandHandler : IRequestHandler<CreatePaymentAttemptCommand, string>
+    public class CreatePaymentAttemptCommandHandler : IRequestHandler<CreatePaymentAttemptCommand, IStatusDetails>
     {
         private readonly IAsyncDocumentSession _documentSession;
         private readonly IPaymentProviderFactory _paymentProviderFactory;
@@ -72,7 +73,7 @@ namespace BccPay.Core.Cqrs.Commands
                 ?? throw new ArgumentNullException(nameof(paymentProviderFactory));
         }
 
-        public async Task<string> Handle(CreatePaymentAttemptCommand request, CancellationToken cancellationToken)
+        public async Task<IStatusDetails> Handle(CreatePaymentAttemptCommand request, CancellationToken cancellationToken)
         {
             var payment = await _documentSession.LoadAsync<Payment>(
                         Payment.GetPaymentId(request.PaymentId), cancellationToken)
@@ -85,7 +86,7 @@ namespace BccPay.Core.Cqrs.Commands
 
             var provider = _paymentProviderFactory.GetPaymentProvider(request.PaymentMethod.ToString());
 
-            var checkoutPaymentId = await provider.CreatePayment(new PaymentRequestDto
+            var providerResult = await provider.CreatePayment(new PaymentRequestDto
             {
                 Amount = decimal.Round(payment.Amount, 2, MidpointRounding.AwayFromZero),
                 Address = new AddressDto
@@ -104,6 +105,11 @@ namespace BccPay.Core.Cqrs.Commands
                 Currency = payment.CurrencyCode
             });
 
+
+            var providerStatusDetails = JsonConvert.DeserializeObject<IStatusDetails>(
+                             JsonConvert.SerializeObject(providerResult, Formatting.Indented, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All }),
+                            new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
+
             var attempt = new Attempt
             {
                 PaymentAttemptId = Guid.NewGuid(),
@@ -111,16 +117,14 @@ namespace BccPay.Core.Cqrs.Commands
                 PaymentStatus = AttemptStatus.WaitingForFee,
                 IsActive = true,
                 Created = DateTime.Now,
-                StatusDetails = new NetsStatusDetails {
-                    CheckoutId = checkoutPaymentId
-                }
+                StatusDetails = providerStatusDetails
             };
 
             payment.Updated = DateTime.Now;
             payment.AddAttempt(new List<Attempt> { attempt });
             await _documentSession.SaveChangesAsync(cancellationToken);
 
-            return checkoutPaymentId;
+            return providerStatusDetails;
         }
     }
 }
