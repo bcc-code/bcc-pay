@@ -14,6 +14,17 @@ namespace BccPay.Core.Sample.Controllers
     [Route("[controller]")]
     public class PaymentController : BaseController
     {
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaymentsResult))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetPayments()
+        {
+            var query = new GetPaymentsQuery();
+
+            var result = await Mediator.Send(query);
+
+            return Ok(result);
+        }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreatePaymentResponse))]

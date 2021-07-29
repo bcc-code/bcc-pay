@@ -1,4 +1,5 @@
-﻿using BccPay.Core.Infrastructure.Dtos;
+﻿using BccPay.Core.Domain.Entities;
+using BccPay.Core.Infrastructure.Dtos;
 using System.Threading.Tasks;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders
@@ -6,6 +7,6 @@ namespace BccPay.Core.Infrastructure.PaymentProviders
     public interface IPaymentProvider
     {
         public string PaymentMethod { get; }
-        Task<object> CreatePayment(PaymentRequestDto paymentRequest);
+        Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest);
     }
 }
