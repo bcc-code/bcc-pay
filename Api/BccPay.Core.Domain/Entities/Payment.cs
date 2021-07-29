@@ -7,10 +7,8 @@ namespace BccPay.Core.Domain.Entities
 {
     public class Payment
     {
-        public static string GetPaymentId(Guid paymentId)
-        {
-            return "payments/" + paymentId.ToString();
-        }
+        public static string GetPaymentId(Guid paymentId) =>
+             $"payments/{paymentId}";
 
         public string Id => GetPaymentId(PaymentId);
 
@@ -21,7 +19,7 @@ namespace BccPay.Core.Domain.Entities
 
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
-        public PaymentProgress PaymentProgress { get; set; }
+        public PaymentStatus PaymentStatus { get; set; }
         public List<Attempt> Attempts { get; set; }
 
         public void Create(Guid paymentId,
@@ -33,6 +31,7 @@ namespace BccPay.Core.Domain.Entities
             PayerId = payerId;
             CurrencyCode = currency;
             Amount = amount;
+            PaymentStatus = PaymentStatus.Open;
             Created = DateTime.Now;
         }
 
@@ -42,16 +41,28 @@ namespace BccPay.Core.Domain.Entities
             CurrencyCode = currency;
             Amount = amount;
             Updated = DateTime.Now;
-        }
-        public void DeactivateLastAttempt()
-        {
-            Attempts.LastOrDefault().IsActive = false;
+            PaymentStatus = PaymentStatus.Open;
         }
 
-        public void AddAttempt(Attempt attempt)
+        public void UpdatePaymentStatus(PaymentStatus paymentProgress)
         {
+            if (paymentProgress == PaymentStatus.Canceled || paymentProgress == PaymentStatus.Completed)
+                Attempts.LastOrDefault().IsActive = false;
+
+            PaymentStatus = paymentProgress;
             Updated = DateTime.Now;
-            Attempts.Add(attempt);
         }
+
+        public void AddAttempt(
+            List<Attempt> attempts)
+        {
+            if (Attempts?.Any() == true)
+                Attempts.AddRange(attempts);
+            else
+                Attempts = new List<Attempt>(attempts);
+        }
+
+        public void CancelLastAttempt() =>
+            Attempts.LastOrDefault().IsActive = false;
     }
 }

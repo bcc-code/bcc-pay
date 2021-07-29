@@ -7,6 +7,8 @@ using FluentValidation;
 using MediatR;
 using Raven.Client.Documents.Session;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +19,6 @@ namespace BccPay.Core.Cqrs.Commands
     {
         public CreatePaymentAttemptCommand()
         {
-
         }
 
         public Guid PaymentId { get; set; }
@@ -43,9 +44,9 @@ namespace BccPay.Core.Cqrs.Commands
                 .NotEmpty();
 
             RuleFor(x => x.Email)
-                    .NotEmpty()
-                    .EmailAddress()
-                    .WithMessage("Invalid email address format");
+                .NotEmpty()
+                .EmailAddress()
+                .WithMessage("Invalid email address format");
 
             RuleFor(x => x.PhoneNumber)
                 .Must(x => PhoneNumberConverter.IsPhoneNumberValid(x))
@@ -78,10 +79,12 @@ namespace BccPay.Core.Cqrs.Commands
 
         public async Task<string> Handle(CreatePaymentAttemptCommand request, CancellationToken cancellationToken)
         {
-            //7b04430d-9c40-4bd1-ad11-b9c301e9926a
             var payment = await _documentSession.LoadAsync<Payment>(
                         Payment.GetPaymentId(request.PaymentId), cancellationToken)
                     ?? throw new Exception();
+
+            if (payment.PaymentStatus != PaymentStatus.Open)
+                throw new Exception();
 
             var (phonePrefix, phoneBody) = PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);
 
@@ -106,14 +109,24 @@ namespace BccPay.Core.Cqrs.Commands
                 Currency = payment.CurrencyCode
             });
 
-            payment.AddAttempt(new Attempt
+            var attempt = new Attempt
             {
                 CountryCode = request.CountryCode,
                 PaymentAttemptId = Guid.NewGuid(),
                 PaymentIdForCheckoutForm = checkoutPaymentId,
                 PaymentMethod = request.PaymentMethod,
-                PaymentStatus = PaymentStatus.Created
-            }) ;
+                PaymentStatus = AttemptStatus.WaitingForFee,
+                PaymentId = payment.PaymentId,
+                IsActive = true,
+                Created = DateTime.Now
+            };
+
+            if (payment.Attempts?.Any() == true)
+                payment.CancelLastAttempt();
+
+            payment.Updated = DateTime.Now;
+            payment.AddAttempt(new List<Attempt> { attempt });
+            await _documentSession.SaveChangesAsync(cancellationToken);
 
             return checkoutPaymentId;
         }

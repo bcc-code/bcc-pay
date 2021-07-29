@@ -2,9 +2,8 @@
 {
     public enum PaymentStatus
     {
-        Created,
-        WaitingForFee,
-        Failed,
-        Rejected
+        Open,
+        Canceled,
+        Completed
     }
 }

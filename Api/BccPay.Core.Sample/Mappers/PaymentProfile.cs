@@ -13,7 +13,8 @@ namespace BccPay.Core.Sample.Mappers
             CreateMap<CreatePaymentRequest, CreatePaymentCommand>();
 
             CreateMap<CreatePaymentAttemptRequest, CreatePaymentAttemptCommand>()
-                .ForMember(destination => destination.PaymentMethod, options => options.MapFrom(source => (PaymentMethod)Enum.Parse(typeof(PaymentMethod), source.PaymentMethod, true)));
+                .ForMember(destination => destination.PaymentMethod, options => options.MapFrom(source => (PaymentMethod)Enum.Parse(typeof(PaymentMethod), source.PaymentMethod, true)))
+                .ForMember(destination => destination.CountryCode, options => options.MapFrom(source => source.CountryCode));
         }
     }
 }

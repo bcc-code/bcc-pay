@@ -77,14 +77,14 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                     {
                         Amount = amountMonets,
                         Currency = paymentRequest.Currency,
-                        Items = new List<Item> // A list of order items. At least one item must be specified.
+                        Items = new List<Item>
                         {
                             new Item
                             {
-                                Reference = PaymentProviderConstants.Nets.ItemReference, // A reference to recognize the product, usually the SKU (stock keeping unit) of the product. For convenience in the case of refunds or modifications of placed orders, the reference should be unique for each variation of a product item (size, color, etc).
+                                Reference = PaymentProviderConstants.Nets.ItemReference, 
                                 Name = $"DONATION-{paymentRequest.Amount}",
                                 Quantity = 1, // static  
-                                Unit = PaymentProviderConstants.Nets.ItemUnit, // The defined unit of measurement for the product, for example pcs, liters, or kg.
+                                Unit = PaymentProviderConstants.Nets.ItemUnit,
                                 UnitPrice = amountMonets, // The price per unit excluding VAT.
                                 GrossTotalAmount = amountMonets, //The total amount including VAT (netTotalAmount + taxAmount).
                                 NetTotalAmount = amountMonets //The total amount excluding VAT (unitPrice * quantity).
