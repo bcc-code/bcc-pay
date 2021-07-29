@@ -3,6 +3,7 @@ using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentProviders;
 using BccPay.Core.Shared.Converters;
+using BccPay.Core.Shared.Helpers;
 using FluentValidation;
 using MediatR;
 using Raven.Client.Documents.Session;
@@ -29,7 +30,6 @@ namespace BccPay.Core.Cqrs.Commands
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
-        public string CountryCode { get; set; }
         public string City { get; set; }
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
@@ -51,11 +51,6 @@ namespace BccPay.Core.Cqrs.Commands
             RuleFor(x => x.PhoneNumber)
                 .Must(x => PhoneNumberConverter.IsPhoneNumberValid(x))
                 .WithMessage("Invalid phone number");
-
-            RuleFor(x => x.CountryCode)
-                .MinimumLength(2)
-                .MaximumLength(3)
-                .WithMessage("Invalid country code, use alpha2, alpha3 or numeric codes");
 
             RuleFor(x => x.PostalCode)
                 .NotEmpty()
@@ -81,10 +76,10 @@ namespace BccPay.Core.Cqrs.Commands
         {
             var payment = await _documentSession.LoadAsync<Payment>(
                         Payment.GetPaymentId(request.PaymentId), cancellationToken)
-                    ?? throw new Exception();
+                    ?? throw new Exception("Invalid payment ID");
 
-            if (payment.PaymentStatus != PaymentStatus.Open)
-                throw new Exception();
+            if (payment.Attempts?.Where(x => x.IsActive).Any() == true)
+                throw new Exception("One of the attempts is still active.");
 
             var (phonePrefix, phoneBody) = PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);
 
@@ -95,7 +90,7 @@ namespace BccPay.Core.Cqrs.Commands
                 Amount = decimal.Round(payment.Amount, 2, MidpointRounding.AwayFromZero),
                 Address = new AddressDto
                 {
-                    Country = AddressConverter.ConvertCountry(request.CountryCode),
+                    Country = AddressConverter.ConvertCountry(payment.CountryCode, CountryCodeFormat.Alpha3),
                     City = request.City,
                     AddressLine1 = request.AddressLine1,
                     AddressLine2 = request.AddressLine2,
@@ -111,18 +106,15 @@ namespace BccPay.Core.Cqrs.Commands
 
             var attempt = new Attempt
             {
-                CountryCode = request.CountryCode,
                 PaymentAttemptId = Guid.NewGuid(),
-                PaymentIdForCheckoutForm = checkoutPaymentId,
                 PaymentMethod = request.PaymentMethod,
                 PaymentStatus = AttemptStatus.WaitingForFee,
-                PaymentId = payment.PaymentId,
                 IsActive = true,
-                Created = DateTime.Now
+                Created = DateTime.Now,
+                StatusDetails = new NetsStatusDetails {
+                    CheckoutId = checkoutPaymentId
+                }
             };
-
-            if (payment.Attempts?.Any() == true)
-                payment.CancelLastAttempt();
 
             payment.Updated = DateTime.Now;
             payment.AddAttempt(new List<Attempt> { attempt });

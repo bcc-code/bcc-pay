@@ -12,26 +12,34 @@ namespace BccPay.Core.Cqrs.Commands
     public class CreatePaymentCommand : IRequest<string>
     {
         public CreatePaymentCommand(string payerId,
-            string currency,
-            decimal amount)
+            string currencyCode,
+            decimal amount,
+            string countryCode)
         {
             PayerId = payerId;
-            Currency = currency;
             Amount = amount;
+            CurrencyCode = currencyCode;
+            CountryCode = countryCode;
         }
 
         public string PayerId { get; set; }
-        public string Currency { get; set; }
+        public string CurrencyCode { get; set; }
+        public string CountryCode { get; set; }
         public decimal Amount { get; set; }
 
         public class CreatePaymentCommandValidator : AbstractValidator<CreatePaymentCommand>
         {
             public CreatePaymentCommandValidator()
             {
-                RuleFor(x => x.Currency)
+                RuleFor(x => x.CurrencyCode)
                     .Matches(new Regex(@"^([A-Z]{3})$"))
                     .NotEmpty()
                     .WithMessage("Invalid currency code");
+
+                RuleFor(x => x.CountryCode)
+                    .MinimumLength(2)
+                    .MaximumLength(3)
+                    .WithMessage("Invalid country code, use alpha2, alpha3 or numeric codes");
 
                 RuleFor(x => x.Amount)
                     .GreaterThan(0)
@@ -52,14 +60,13 @@ namespace BccPay.Core.Cqrs.Commands
             public async Task<string> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
             {
                 var payment = new Payment();
-                var paymentId = Guid.NewGuid();
 
-                payment.Create(paymentId, request.PayerId, request.Currency, request.Amount);
+                payment.Create(request.PayerId, request.CurrencyCode, request.CountryCode, request.Amount);
 
                 await _documentSession.StoreAsync(payment, cancellationToken);
                 await _documentSession.SaveChangesAsync(cancellationToken);
 
-                return paymentId.ToString();
+                return payment.PaymentId.ToString();
             }
         }
     }
