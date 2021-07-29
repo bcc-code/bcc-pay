@@ -46,9 +46,9 @@ export class BccPay extends LitElement {
           </button>
         </div>
         <div id="nets-payment-screen" style="display: none">
-          NETS PAYMENT:
-
-          <h1>Checkout</h1>
+          <div class="card-subtitle">
+            <h5>Pay with nets</h5>
+          </div>
           <div id="checkout-container-div"></div>
         </div>
       </div>
