@@ -3,7 +3,8 @@
     public class CreatePaymentRequest
     {
         public string PayerId { get; set; }
-        public string Currency { get; set; }
+        public string CurrencyCode { get; set; }
+        public string CountryCode { get; set; }
         public decimal Amount { get; set; }
     }
 }

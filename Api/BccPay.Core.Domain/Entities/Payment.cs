@@ -7,14 +7,15 @@ namespace BccPay.Core.Domain.Entities
 {
     public class Payment
     {
-        public static string GetPaymentId(Guid paymentId) =>
-             $"payments/{paymentId}";
+        public static string GetPaymentId(Guid paymentId)
+            => $"payments/{paymentId}";
 
         public string Id => GetPaymentId(PaymentId);
 
-        public Guid PaymentId { get; private set; }
+        public Guid PaymentId { get; set; }
         public string PayerId { get; set; }
         public string CurrencyCode { get; set; }
+        public string CountryCode { get; set; }
         public decimal Amount { get; set; }
 
         public DateTime Created { get; set; }
@@ -22,14 +23,16 @@ namespace BccPay.Core.Domain.Entities
         public PaymentStatus PaymentStatus { get; set; }
         public List<Attempt> Attempts { get; set; }
 
-        public void Create(Guid paymentId,
+        public void Create(
             string payerId,
-            string currency,
+            string currencyCode,
+            string countryCode,
             decimal amount)
         {
-            PaymentId = paymentId;
+            PaymentId = Guid.NewGuid();
             PayerId = payerId;
-            CurrencyCode = currency;
+            CurrencyCode = currencyCode;
+            CountryCode = countryCode;
             Amount = amount;
             PaymentStatus = PaymentStatus.Open;
             Created = DateTime.Now;
@@ -62,7 +65,7 @@ namespace BccPay.Core.Domain.Entities
                 Attempts = new List<Attempt>(attempts);
         }
 
-        public void CancelLastAttempt() =>
-            Attempts.LastOrDefault().IsActive = false;
+        public void CancelLastAttempt()
+            => Attempts.LastOrDefault().IsActive = false;
     }
 }

@@ -2,5 +2,9 @@
 {
     public class UpdatePaymentStatusCommand
     {
+        public UpdatePaymentStatusCommand()
+        {
+
+        }
     }
 }
