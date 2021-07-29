@@ -2,31 +2,55 @@
     <mat-form-field fxFlex="40%">
         <input matInput type="text" (keyup)="applyFilter($any($event.target).value)" placeholder="Filter">
     </mat-form-field>
-
     <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
-        <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Id </th>
-            <td mat-cell *matCellDef="let transaction"> {{transaction.id}} </td>
+        <ng-container matColumnDef="paymentId">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> PaymentId </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.paymentId}} </td>
         </ng-container>
 
-        <ng-container matColumnDef="email">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
-            <td mat-cell *matCellDef="let transaction"> {{transaction.email}} </td>
+        <ng-container matColumnDef="paymentIdForCheckoutForm">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> PaymentIdForCheckoutForm </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.paymentIdForCheckoutForm}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="payerId">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> PayerId </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.payerId}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="currencyCode">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> CurrencyCode </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.currencyCode}} </td>
         </ng-container>
 
         <ng-container matColumnDef="amount">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount </th>
-            <td mat-cell *matCellDef="let transaction"> {{transaction.amount}} </td>
+            <td mat-cell *matCellDef="let payment"> {{payment.amount}} </td>
         </ng-container>
 
-        <ng-container matColumnDef="currency">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Currency </th>
-            <td mat-cell *matCellDef="let transaction"> {{transaction.currency}} </td>
+        <ng-container matColumnDef="countryCode">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> CountryCode </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.countryCode}} </td>
         </ng-container>
 
-        <ng-container matColumnDef="country">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Country </th>
-            <td mat-cell *matCellDef="let transaction"> {{transaction.country}} </td>
+        <ng-container matColumnDef="created">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Created </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.created}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="updated">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.updated}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="paymentStatus">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> PaymentStatus </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.paymentStatus}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="paymentMethod">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> PaymentMethod </th>
+            <td mat-cell *matCellDef="let payment"> {{payment.paymentMethod}} </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
