@@ -15,6 +15,30 @@ export class BccPay extends LitElement {
     return script;
   }
 
+  async initPayment(): Promise<string> {
+    const body = {
+      payerId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      currency: 'NOK',
+      country: 'NOR',
+      amount: 100,
+    };
+
+    let paymentId: string = '';
+    await fetch('https://localhost:5001/Payment', {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(json => {
+        console.log('parsed json', json);
+        paymentId = json.paymentId;
+      });
+    return paymentId;
+  }
+
   createRenderRoot() {
     return this;
   }
