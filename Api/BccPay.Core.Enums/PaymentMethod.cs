@@ -2,6 +2,6 @@
 {
     public enum PaymentMethod
     {
-        CreditCard
+        NetsCreditCard
     }
 }

@@ -12,12 +12,25 @@ namespace BccPay.Core.Sample.Controllers
     [Route("[controller]")]
     public class PaymentController : BaseController
     {
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreatePaymentResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentRequest request)
         {
             CreatePaymentCommand command = Mapper.Map<CreatePaymentCommand>(request);
+
+            var result = await Mediator.Send(command);
+
+            return Ok(new CreatePaymentResponse { PaymentId = result });
+        }
+
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreatePaymentResponse))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreatePaymentAttempt([FromBody] CreatePaymentAttemptRequest request)
+        {
+            CreatePaymentAttemptCommand command = Mapper.Map<CreatePaymentAttemptCommand>(request);
 
             var result = await Mediator.Send(command);
 

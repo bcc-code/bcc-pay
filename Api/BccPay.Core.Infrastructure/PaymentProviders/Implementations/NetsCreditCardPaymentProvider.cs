@@ -13,13 +13,13 @@ using System.Threading.Tasks;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 {
-    internal class CreditCardPaymentProvider : IPaymentProvider
+    internal class NetsCreditCardPaymentProvider : IPaymentProvider
     {
         private readonly INetsClient _netsClient;
         private readonly NetsProviderOptions _options;
         private readonly IDictionary<string, string> _headers;
 
-        public CreditCardPaymentProvider(INetsClient netsClient, NetsProviderOptions options)
+        public NetsCreditCardPaymentProvider(INetsClient netsClient, NetsProviderOptions options)
         {
             _netsClient = netsClient
                 ?? throw new ArgumentNullException(nameof(netsClient));
@@ -33,12 +33,14 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
             };
         }
 
-        public string PaymentMethod => Enums.PaymentMethod.CreditCard.ToString();
+        public string PaymentMethod => Enums.PaymentMethod.NetsCreditCard.ToString();
 
         public async Task<string> CreatePayment(PaymentRequestDto paymentRequest)
         {
             try
             {
+                int amountMonets = Convert.ToInt32(paymentRequest.Amount * 100);
+
                 var result = await _netsClient.CreatePaymentAsync(_headers, new NetsPaymentRequest()
                 {
                     Checkout = new CheckoutOnCreate
@@ -73,19 +75,19 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                     },
                     Order = new Order
                     {
-                        Amount = paymentRequest.Amount,// + n // The total amount of the order including VAT, if any. (Sum of all grossTotalAmounts in the order.)
+                        Amount = amountMonets,
                         Currency = paymentRequest.Currency,
-                        Items = new List<Item> // A list of order items. At least one item must be specified.
+                        Items = new List<Item>
                         {
                             new Item
                             {
-                                Reference = PaymentProviderConstants.Nets.ItemReference, // A reference to recognize the product, usually the SKU (stock keeping unit) of the product. For convenience in the case of refunds or modifications of placed orders, the reference should be unique for each variation of a product item (size, color, etc).
+                                Reference = PaymentProviderConstants.Nets.ItemReference, 
                                 Name = $"DONATION-{paymentRequest.Amount}",
                                 Quantity = 1, // static  
-                                Unit = PaymentProviderConstants.Nets.ItemUnit, // The defined unit of measurement for the product, for example pcs, liters, or kg.
-                                UnitPrice = paymentRequest.Amount, // The price per unit excluding VAT.
-                                GrossTotalAmount = paymentRequest.Amount, //The total amount including VAT (netTotalAmount + taxAmount).
-                                NetTotalAmount = paymentRequest.Amount //The total amount excluding VAT (unitPrice * quantity).
+                                Unit = PaymentProviderConstants.Nets.ItemUnit,
+                                UnitPrice = amountMonets, // The price per unit excluding VAT.
+                                GrossTotalAmount = amountMonets, //The total amount including VAT (netTotalAmount + taxAmount).
+                                NetTotalAmount = amountMonets //The total amount excluding VAT (unitPrice * quantity).
                             }
                         }
                     }
