@@ -10,6 +10,19 @@ export interface Transaction {
   country: string;
 }
 
+export interface Payment {
+  paymentId: string;
+  paymentIdForCheckoutForm: string;
+  payerId: string;
+  currencyCode: string;
+  amount: number;
+  countryCode: string;
+  created: string;
+  updated: string;
+  paymentStatus: string;
+  paymentMethod: string;
+}
+
 const TRANSACTIONS_DATA: Transaction[] = [
   {
     id: '0aaa4d10',
