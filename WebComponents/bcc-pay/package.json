@@ -1,6 +1,6 @@
 {
   "name": "bcc-pay",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "Webcomponent bcc-pay following open-wc recommendations",
   "author": "bcc-pay-devteam",
   "license": "MIT",
@@ -15,6 +15,7 @@
     "build": "tsc",
     "prepublish": "tsc",
     "lint": "eslint --ext .ts,.html . --ignore-path .gitignore && prettier \"**/*.ts\" --check --ignore-path .gitignore",
+    "lint-fix": "eslint --ext .ts,.html . --ignore-path .gitignore && prettier \"**/*.ts\" --check --ignore-path .gitignore --fix",
     "format": "eslint --ext .ts,.html . --fix --ignore-path .gitignore && prettier \"**/*.ts\" --write --ignore-path .gitignore",
     "test": "tsc && wtr --coverage",
     "test:watch": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wtr --watch\"",

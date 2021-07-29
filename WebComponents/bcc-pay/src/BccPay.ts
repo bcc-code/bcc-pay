@@ -1,6 +1,7 @@
 import { html, LitElement, property } from 'lit-element';
 import { applyStyles } from './SharedStyles';
 import { startNetsPayment } from './NetsClient';
+
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
 
