@@ -2,10 +2,11 @@ import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import axios from 'axios';
 
 export interface Payment {
   paymentId: string;
-  paymentIdForCheckoutForm: string;
+  paymentIdForCheckoutForm?: string;
   payerId: string;
   currencyCode: string;
   amount: number;
@@ -13,10 +14,10 @@ export interface Payment {
   created: string;
   updated: string;
   paymentStatus: string;
-  paymentMethod: string;
+  paymentMethod?: string;
 }
 
-const TRANSACTIONS_DATA: Payment[] = [
+let TRANSACTIONS_DATA: Payment[] = [
   {
     paymentId: '123',
     paymentIdForCheckoutForm: '12345',
@@ -61,12 +62,18 @@ export class TransactionsListComponent implements AfterViewInit {
     'paymentStatus',
     'paymentMethod',
   ];
-  dataSource = new MatTableDataSource<Payment>(TRANSACTIONS_DATA);
 
+  dataSource = new MatTableDataSource<Payment>(TRANSACTIONS_DATA);
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  ngAfterViewInit() {
+  async ngAfterViewInit() {
+    const apiPayments = await axios.get('https://localhost:5001/Payment');
+    console.log(apiPayments.data.payments);
+    this.dataSource = new MatTableDataSource<Payment>(
+      apiPayments.data.payments
+    );
+
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
   }
