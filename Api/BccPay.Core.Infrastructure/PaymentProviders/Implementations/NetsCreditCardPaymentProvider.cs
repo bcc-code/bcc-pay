@@ -34,13 +34,46 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 
         public string PaymentMethod => Enums.PaymentMethod.NetsCreditCard.ToString();
 
-        public async Task<object> CreatePayment(PaymentRequestDto paymentRequest)
+        public async Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest)
         {
             try
             {
-                int amountMonets = Convert.ToInt32(paymentRequest.Amount * 100);
+                var result = await _netsClient.CreatePaymentAsync(_headers, BuildNetsPaymentRequest(paymentRequest));
 
-                var result = await _netsClient.CreatePaymentAsync(_headers, new NetsPaymentRequest()
+                return new NetsStatusDetails
+                {
+                    IsSuccessful = true,
+                    PaymentCheckoutId = result.PaymentId
+                };
+            }
+            catch (ApiException retryException)
+            {
+                try
+                {
+                    var result = await _netsClient.CreatePaymentAsync(_headers, BuildNetsPaymentRequest(paymentRequest, false));
+                    return new NetsStatusDetails
+                    {
+                        IsSuccessful = true,
+                        PaymentCheckoutId = result.PaymentId,
+                        Error = "{\"notValidUserBillingDataInTheSystem\":" + retryException?.Content + "}"
+                    };
+                }
+                catch (ApiException exception)
+                {
+                    return new NetsStatusDetails
+                    {
+                        IsSuccessful = false,
+                        Error = exception?.Content
+                    };
+                }
+            }
+        }
+
+        private NetsPaymentRequest BuildNetsPaymentRequest(PaymentRequestDto paymentRequest, bool IsUserDataValid = true)
+        {
+            int amountMonets = Convert.ToInt32(paymentRequest.Amount * 100);
+            if (IsUserDataValid)
+                return new NetsPaymentRequest()
                 {
                     Checkout = new CheckoutOnCreate
                     {
@@ -82,15 +115,14 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                             {
                                 Reference = PaymentProviderConstants.Nets.ItemReference,
                                 Name = $"DONATION-{paymentRequest.Amount}",
-                                Quantity = 1, // static  
+                                Quantity = 1,
                                 Unit = PaymentProviderConstants.Nets.ItemUnit,
-                                UnitPrice = amountMonets, // The price per unit excluding VAT.
-                                GrossTotalAmount = amountMonets, //The total amount including VAT (netTotalAmount + taxAmount).
-                                NetTotalAmount = amountMonets //The total amount excluding VAT (unitPrice * quantity).
+                                UnitPrice = amountMonets,
+                                GrossTotalAmount = amountMonets,
+                                NetTotalAmount = amountMonets
                             }
                         }
                     }
-
                     // TODO: WEBHOOKS
                     // Notifications = new Notifications
                     // {
@@ -105,21 +137,50 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                     //     }
                     // },
 
-                });
-
-                return new NetsStatusDetails
-                {
-                    PaymentCheckoutId = result.PaymentId
                 };
-            }
-            catch (ApiException exception)
-            {
-                return new NetsStatusDetails
+            else
+                return new NetsPaymentRequest()
                 {
-                    Error = exception?.Content
+                    Checkout = new CheckoutOnCreate
+                    {
+                        IntegrationType = PaymentProviderConstants.Nets.IntegrationType,
+                        Charge = false,
+                        MerchantHandlesConsumerData = false,
+                        Url = _options.CheckoutPageUrl,
+                        TermsUrl = _options.TermsUrl,
+                    },
+                    Order = new Order
+                    {
+                        Amount = amountMonets,
+                        Currency = paymentRequest.Currency,
+                        Items = new List<Item>
+                        {
+                            new Item
+                            {
+                                Reference = PaymentProviderConstants.Nets.ItemReference,
+                                Name = $"DONATION-{paymentRequest.Amount}",
+                                Quantity = 1,
+                                Unit = PaymentProviderConstants.Nets.ItemUnit,
+                                UnitPrice = amountMonets,
+                                GrossTotalAmount = amountMonets,
+                                NetTotalAmount = amountMonets
+                            }
+                        }
+                    }
+                    // TODO: WEBHOOKS
+                    // Notifications = new Notifications
+                    // {
+                    //     Webhooks = new List<Webhook>
+                    //     {
+                    //         new Webhook
+                    //         {
+                    //             Authorization = "TOKEN",
+                    //             EventName = PaymentProviderConstants.Nets.WebHookEventName,
+                    //             Url = PaymentProviderConstants.Nets.WebHookUrl
+                    //         }
+                    //     }
+                    // },
                 };
-                //throw new ExternalApiCallException(HttpStatusCode.BadRequest, exception?.Content);
-            }
         }
     }
 }

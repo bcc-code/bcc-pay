@@ -6,7 +6,6 @@ using BccPay.Core.Shared.Converters;
 using BccPay.Core.Shared.Helpers;
 using FluentValidation;
 using MediatR;
-using Newtonsoft.Json;
 using Raven.Client.Documents.Session;
 using System;
 using System.Collections.Generic;
@@ -105,26 +104,21 @@ namespace BccPay.Core.Cqrs.Commands
                 Currency = payment.CurrencyCode
             });
 
-
-            var providerStatusDetails = JsonConvert.DeserializeObject<IStatusDetails>(
-                             JsonConvert.SerializeObject(providerResult, Formatting.Indented, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All }),
-                            new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
-
             var attempt = new Attempt
             {
                 PaymentAttemptId = Guid.NewGuid(),
                 PaymentMethod = request.PaymentMethod,
-                PaymentStatus = AttemptStatus.WaitingForFee,
-                IsActive = true,
+                PaymentStatus = providerResult.IsSuccessful ? AttemptStatus.WaitingForFee : AttemptStatus.Rejected,
+                IsActive = providerResult.IsSuccessful,
                 Created = DateTime.Now,
-                StatusDetails = providerStatusDetails
+                StatusDetails = providerResult
             };
 
             payment.Updated = DateTime.Now;
             payment.AddAttempt(new List<Attempt> { attempt });
             await _documentSession.SaveChangesAsync(cancellationToken);
 
-            return providerStatusDetails;
+            return providerResult;
         }
     }
 }

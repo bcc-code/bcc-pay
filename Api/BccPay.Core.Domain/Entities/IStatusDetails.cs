@@ -2,5 +2,6 @@
 {
     public interface IStatusDetails
     {
+        public bool IsSuccessful { get; set; }
     }
 }
