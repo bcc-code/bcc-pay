@@ -1,8 +1,10 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import axios from 'axios';
+import { TransactionDialog } from './dialog/transaction-dialog.component';
 
 export interface Payment {
   paymentId: string;
@@ -61,7 +63,10 @@ export class TransactionsListComponent implements AfterViewInit {
     'updated',
     'paymentStatus',
     'paymentMethod',
+    'details',
   ];
+
+  constructor(public dialog: MatDialog) {}
 
   dataSource = new MatTableDataSource<Payment>(TRANSACTIONS_DATA);
   @ViewChild(MatSort) sort!: MatSort;
@@ -69,7 +74,6 @@ export class TransactionsListComponent implements AfterViewInit {
 
   async ngAfterViewInit() {
     const apiPayments = await axios.get('https://localhost:5001/Payment');
-    console.log(apiPayments.data.payments);
     this.dataSource = new MatTableDataSource<Payment>(
       apiPayments.data.payments
     );
@@ -81,4 +85,11 @@ export class TransactionsListComponent implements AfterViewInit {
   public applyFilter = (value: string) => {
     this.dataSource.filter = value.trim().toLocaleLowerCase();
   };
+
+  public openDialog(paymentId: string) {
+    const dialogRef = this.dialog.open(TransactionDialog, {
+      minWidth: '350px',
+      data: { paymentId: paymentId },
+    });
+  }
 }
