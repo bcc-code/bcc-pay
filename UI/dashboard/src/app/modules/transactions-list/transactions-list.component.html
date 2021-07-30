@@ -35,12 +35,15 @@
 
         <ng-container matColumnDef="created">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Created </th>
-            <td mat-cell *matCellDef="let payment"> {{payment.created}} </td>
+            <td mat-cell *matCellDef="let payment"> {{ (payment.created !== null) ? (payment.created | date:'short') :
+                ""}} </td>
         </ng-container>
 
         <ng-container matColumnDef="updated">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated </th>
-            <td mat-cell *matCellDef="let payment"> {{payment.updated}} </td>
+            <td mat-cell *matCellDef="let payment"> {{(payment.updated !== null) ? (payment.updated | date: 'short') :
+                ""
+                }} </td>
         </ng-container>
 
         <ng-container matColumnDef="paymentStatus">
@@ -63,5 +66,5 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator>
 </div>
