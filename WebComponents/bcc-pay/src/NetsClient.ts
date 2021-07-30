@@ -1,39 +1,36 @@
-export async function initNetsPayment(): Promise<string> {
+export async function initNetsPayment(paymentId: string): Promise<string> {
   const body = {
-    payerId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-    currency: 'NOK',
-    country: 'NOR',
-    amount: 1000,
-    paymentMethod: 'CreditCard',
-    payer: {
-      email: 'test@test.no',
-      phoneNumber: '+47661626839',
-      firstName: 'TestName',
-      lastName: 'TestLastName',
-      addressLine1: 'TestAddressLine1',
-      addressLine2: 'TestAddressLine2',
-      city: 'Oslo',
-      postalCode: '0001',
-    },
+    paymentMethod: 0,
+    email: 'test@test.no',
+    phoneNumber: '+47661626839',
+    firstName: 'TestName',
+    lastName: 'TestLastName',
+    addressLine1: 'TestAddressLine1',
+    addressLine2: 'TestAddressLine2',
+    city: 'Oslo',
+    postalCode: '0001',
   };
 
-  let paymentId: string = '';
-  const res = await fetch('https://localhost:5001/Payment', {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+  let netsPaymentId: string = '';
+  const res = await fetch(
+    `https://localhost:5001/Payment/${paymentId}/attempts`,
+    {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  )
     .then(response => response.json())
     .then(json => {
       console.log('parsed json', json);
-      paymentId = json.paymentId;
+      netsPaymentId = json.paymentCheckoutId;
     });
-  return paymentId;
+  return netsPaymentId;
 }
 
-export async function startNetsPayment() {
+export async function startNetsPayment(paymentId: string) {
   const firstScreenElement = document.getElementById(
     'first-screen'
   ) as HTMLElement;
@@ -44,10 +41,10 @@ export async function startNetsPayment() {
   ) as HTMLElement;
   netsScreenElement.style.display = 'block';
 
-  const paymentId = await initNetsPayment();
-  console.log('Payment id is: ' + paymentId);
+  const netsPaymentId = await initNetsPayment(paymentId);
+  console.log('Nets payment id is: ' + netsPaymentId);
 
-  processNetsPayment(paymentId);
+  processNetsPayment(netsPaymentId);
 }
 
 export async function processNetsPayment(paymentId: string) {
