@@ -59,7 +59,7 @@ export async function processNetsPayment(paymentId: string) {
     const checkout = new Dibs.Checkout(checkoutOptions);
     checkout.on('payment-completed', function (response: any) {
       // window.location = 'completed.html';
-      console.log('Completed!' + response);
+      console.log('Completed!' + JSON.stringify(response));
     });
   } else {
     console.log('Expected a paymentId'); // No paymentId provided,

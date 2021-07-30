@@ -12,9 +12,9 @@
           "default": "Subscription"
         },
         {
-          "name": "cost",
+          "name": "amount",
           "type": "Number",
-          "description": "Cost of an item",
+          "description": "Amount of an item",
           "default": 0
         },
         {

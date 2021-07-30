@@ -6,8 +6,9 @@ export default {
   component: 'bcc-pay',
   argTypes: {
     item: { control: 'text' },
-    cost: { control: 'number' },
+    amount: { control: 'number' },
     currency: { control: 'text' },
+    country: { control: 'text' },
     server: { control: 'text' },
   },
 };
@@ -20,20 +21,28 @@ interface Story<T> {
 
 interface ArgTypes {
   item?: string;
-  cost?: number;
+  amount?: number;
   currency?: string;
+  country?: string;
   server?: string;
   slot?: TemplateResult;
 }
 
 const Template: Story<ArgTypes> = ({
   item = 'Subscription',
-  cost = 5,
+  amount = 5,
   currency = 'NOK',
+  country = 'NOR',
   server = 'http://localhost:3000',
   slot,
 }: ArgTypes) => html`
-  <bcc-pay .item=${item} .cost=${cost} .currency=${currency} .server=${server}>
+  <bcc-pay
+    .item=${item}
+    .amount=${amount}
+    .currency=${currency}
+    .country=${country}
+    .server=${server}
+  >
     ${slot}
   </bcc-pay>
 `;

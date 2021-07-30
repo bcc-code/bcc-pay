@@ -5,9 +5,9 @@ export async function initPayment(
 ): Promise<string> {
   const body = {
     payerId: '123',
-    currencyCode: 'NOK',
-    countryCode: 'NOR',
-    amount: 10,
+    currencyCode: currency,
+    countryCode: country,
+    amount: amount,
   };
   let paymentId: string = '';
   await fetch('https://localhost:5001/Payment', {

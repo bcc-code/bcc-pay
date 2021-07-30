@@ -1,6 +1,6 @@
 {
   "name": "bcc-pay",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Webcomponent bcc-pay following open-wc recommendations",
   "author": "bcc-pay-devteam",
   "license": "MIT",

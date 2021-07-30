@@ -16,6 +16,8 @@ npm i bcc-pay
 </script>
 
 <bcc-pay></bcc-pay>
+or parametrized
+<bcc-pay amount="1" currency="NOK" country="NOR"></bcc-pay>
 ```
 
 ## Linting with ESLint, Prettier, and Types
@@ -93,3 +95,7 @@ npm start
 ```
 
 To run a local development server that serves the basic demo located in `demo/index.html`
+
+## Publishing package
+
+`npm publish`
