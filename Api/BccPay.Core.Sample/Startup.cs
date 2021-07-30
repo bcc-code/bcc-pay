@@ -1,5 +1,9 @@
-using BccPay.Core.Infrastructure.Extensions;
-using BccPay.Core.Infrastructure.IndexesTEST;
+using BccPay.Core.Cqrs;
+using BccPay.Core.Sample.Mappers;
+using BccPay.Core.Sample.Middleware;
+using BccPay.Core.Sample.Validation;
+using FluentValidation.AspNetCore;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
 using System.Reflection;
+using static BccPay.Core.Cqrs.Commands.CreatePaymentCommand;
 
 namespace BccPay.Core.Sample
 {
@@ -24,6 +29,21 @@ namespace BccPay.Core.Sample
         {
             services.AddRavenDatabaseDocumentStore();
 
+            services.ConfigureBccPayInfrastructure(options =>
+            {
+                options.Nets.BaseAddress = "https://test.api.dibspayment.eu";
+                options.Nets.CheckoutPageUrl = "https://localhost:4000/";
+                options.Nets.TermsUrl = "https://localhost:4000/";
+                options.Nets.SecretKey = Configuration["SecretKey"];
+            });
+
+            services.ConfigureBccCoreCqrs();
+
+
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+            services.AddMvc().AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(new List<Assembly> { typeof(CreatePaymentCommandValidator).Assembly }));
+            services.AddAutoMapper(typeof(PaymentProfile).Assembly);
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -39,6 +59,7 @@ namespace BccPay.Core.Sample
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BccPay.Core.Sample v1"));
             }
+            app.UseMiddleware<ErrorHandlingMiddleware>();
 
             app.UseHttpsRedirection();
 
@@ -51,9 +72,7 @@ namespace BccPay.Core.Sample
                 endpoints.MapControllers();
             });
 
-            app.WarmUpIndexesInRavenDatabase(new List<Assembly> {
-                typeof(PaymentsIndex).Assembly,
-            });
+            //app.WarmUpIndexesInRavenDatabase();
         }
     }
 }
