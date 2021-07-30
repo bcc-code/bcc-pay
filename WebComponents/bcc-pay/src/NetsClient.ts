@@ -1,6 +1,6 @@
 export async function initNetsPayment(paymentId: string): Promise<string> {
   const body = {
-    paymentMethod: 0,
+    paymentMethod: 'NetsCreditCard',
     email: 'test@test.no',
     phoneNumber: '+47661626839',
     firstName: 'TestName',

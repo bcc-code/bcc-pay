@@ -1,6 +1,6 @@
 {
   "name": "bcc-pay",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Webcomponent bcc-pay following open-wc recommendations",
   "author": "bcc-pay-devteam",
   "license": "MIT",
@@ -79,7 +79,6 @@
   },
   "lint-staged": {
     "*.ts": [
-      "eslint --fix",
       "prettier --write"
     ]
   }
