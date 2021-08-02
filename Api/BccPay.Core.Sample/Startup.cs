@@ -1,4 +1,5 @@
 using BccPay.Core.Cqrs;
+using BccPay.Core.Cqrs.Commands;
 using BccPay.Core.Sample.Mappers;
 using BccPay.Core.Sample.Middleware;
 using BccPay.Core.Sample.Validation;
@@ -12,7 +13,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
 using System.Reflection;
-using static BccPay.Core.Cqrs.Commands.CreatePaymentCommand;
 
 namespace BccPay.Core.Sample
 {

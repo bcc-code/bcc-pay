@@ -10,7 +10,6 @@ using Raven.Client.Documents.Session;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -41,20 +40,8 @@ namespace BccPay.Core.Cqrs.Commands
         public CreatePaymentAttemptValidator()
         {
             RuleFor(x => x.PaymentId)
+                .NotNull()
                 .NotEmpty();
-
-            RuleFor(x => x.Email)
-                .NotEmpty()
-                .EmailAddress()
-                .WithMessage("Invalid email address format");
-
-            RuleFor(x => x.PhoneNumber)
-                .Must(x => PhoneNumberConverter.IsPhoneNumberValid(x))
-                .WithMessage("Invalid phone number");
-
-            RuleFor(x => x.PostalCode)
-                .NotEmpty()
-                .Matches(new Regex(@"^([0-9A-Z\s]{1,9})$"));
         }
     }
 
@@ -90,7 +77,9 @@ namespace BccPay.Core.Cqrs.Commands
                 Amount = decimal.Round(payment.Amount, 2, MidpointRounding.AwayFromZero),
                 Address = new AddressDto
                 {
-                    Country = AddressConverter.ConvertCountry(payment.CountryCode, CountryCodeFormat.Alpha3),
+                    Country = string.IsNullOrWhiteSpace(payment.CountryCode)
+                        ? string.Empty
+                        : AddressConverter.ConvertCountry(payment.CountryCode, CountryCodeFormat.Alpha3),
                     City = request.City,
                     AddressLine1 = request.AddressLine1,
                     AddressLine2 = request.AddressLine2,

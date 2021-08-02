@@ -9,13 +9,11 @@ namespace BccPay.Core.Shared.Converters
     /// </summary>
     public static class PhoneNumberConverter
     {
-        public static bool IsPhoneNumberValid(string phoneNumber) =>
-               _phonePrefixes.Where(x => phoneNumber.StartsWith(x.Value))
-                   .Select(x => x.Value)
-                   .Any();
-
         public static (string, string) ParseToNationalNumberAndPrefix(string phoneNumber)
         {
+            if (!IsPhoneNumberValid(phoneNumber))
+                return (string.Empty, string.Empty);
+
             string prefix = _phonePrefixes
                 .Where(x => phoneNumber.StartsWith(x.Value))
                 .Select(x => x.Value)
@@ -26,6 +24,15 @@ namespace BccPay.Core.Shared.Converters
             string body = normalizedNumber[prefixDigitsLength..];
 
             return (prefix, body);
+        }
+
+        private static bool IsPhoneNumberValid(string phoneNumber)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+                return false;
+            return _phonePrefixes.Where(x => phoneNumber.StartsWith(x.Value))
+                .Select(x => x.Value)
+                .Any();
         }
         #region Iso 2 country code with country phone prefix
         private static readonly IReadOnlyDictionary<string, string> _phonePrefixes = new Dictionary<string, string>
