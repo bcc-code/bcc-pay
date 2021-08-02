@@ -10,17 +10,21 @@ export async function initPayment(
     amount: amount,
   };
   let paymentId: string = '';
-  await fetch('https://localhost:5001/Payment', {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-    .then(response => response.json())
-    .then(json => {
-      console.log('parsed json', json);
-      paymentId = json.paymentId;
-    });
-  return paymentId;
+  try {
+    await fetch('https://localhost:5001/Payment', {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(json => {
+        console.log('parsed json', json);
+        paymentId = json.paymentId;
+      });
+    return paymentId;
+  } catch (e) {
+    return '';
+  }
 }

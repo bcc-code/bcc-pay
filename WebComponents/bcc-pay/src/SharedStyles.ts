@@ -89,4 +89,9 @@ export function applyStyles() {
     'nets-button'
   )[0] as HTMLElement;
   netsButton.style.cssText = nestButtonStyle.toString();
+
+  const reloadButton = document.getElementsByClassName(
+    'reload-button'
+  )[0] as HTMLElement;
+  reloadButton.style.cssText = nestButtonStyle.toString();
 }
