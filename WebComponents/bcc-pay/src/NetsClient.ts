@@ -1,36 +1,10 @@
-export async function initNetsPayment(paymentId: string): Promise<string> {
-  const body = {
-    paymentMethod: 'NetsCreditCard',
-    email: 'test@test.no',
-    phoneNumber: '+47661626839',
-    firstName: 'TestName',
-    lastName: 'TestLastName',
-    addressLine1: 'TestAddressLine1',
-    addressLine2: 'TestAddressLine2',
-    city: 'Oslo',
-    postalCode: '0001',
-  };
+import { NetsUser } from './NetsUser';
+import { User } from './User';
 
-  let netsPaymentId: string = '';
-  const res = await fetch(
-    `https://localhost:5001/Payment/${paymentId}/attempts`,
-    {
-      method: 'POST',
-      body: JSON.stringify(body),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  )
-    .then(response => response.json())
-    .then(json => {
-      console.log('parsed json', json);
-      netsPaymentId = json.paymentCheckoutId;
-    });
-  return netsPaymentId;
-}
-
-export async function startNetsPayment(paymentId: string) {
+export async function startNetsPayment(
+  paymentId: string,
+  user: User
+): Promise<boolean> {
   const firstScreenElement = document.getElementById(
     'first-screen'
   ) as HTMLElement;
@@ -41,13 +15,44 @@ export async function startNetsPayment(paymentId: string) {
   ) as HTMLElement;
   netsScreenElement.style.display = 'block';
 
-  const netsPaymentId = await initNetsPayment(paymentId);
+  const netsPaymentId = await initNetsPayment(paymentId, user);
   console.log('Nets payment id is: ' + netsPaymentId);
 
-  processNetsPayment(netsPaymentId);
+  return await processNetsPayment(netsPaymentId);
 }
 
-export async function processNetsPayment(paymentId: string) {
+export async function initNetsPayment(
+  paymentId: string,
+  user: User
+): Promise<string> {
+  const body: NetsUser = {
+    paymentMethod: 'NetsCreditCard',
+    email: user.email,
+    phoneNumber: user.phoneNumber,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    addressLine1: user.addressLine1,
+    addressLine2: user.addressLine2,
+    city: user.city,
+    postalCode: user.postalCode,
+  };
+
+  let netsPaymentId: string = '';
+  await fetch(`https://localhost:5001/Payment/${paymentId}/attempts`, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then(response => response.json())
+    .then(json => {
+      netsPaymentId = json.paymentCheckoutId;
+    });
+  return netsPaymentId;
+}
+
+export async function processNetsPayment(paymentId: string): Promise<boolean> {
   if (paymentId) {
     const checkoutOptions = {
       checkoutKey: '#checkout-key#',
@@ -57,13 +62,15 @@ export async function processNetsPayment(paymentId: string) {
 
     // @ts-ignore
     const checkout = new Dibs.Checkout(checkoutOptions);
-    checkout.on('payment-completed', function (response: any) {
-      // window.location = 'completed.html';
+    await checkout.on('payment-completed', function (response: any) {
       console.log('Completed!' + JSON.stringify(response));
+      return true;
     });
-  } else {
-    console.log('Expected a paymentId'); // No paymentId provided,
-    // window.location = 'cart.html'; // go back to cart.html
+
     console.log('Not completed!');
+    return false;
+  } else {
+    console.log('Expected a paymentId');
+    return false;
   }
 }

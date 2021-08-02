@@ -2,17 +2,25 @@ import { html, LitElement, property } from 'lit-element';
 import { applyStyles } from './SharedStyles';
 import { startNetsPayment } from './NetsClient';
 import { initPayment } from './BccPayClient';
+import { User } from './User';
 
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
-
   @property({ type: Number }) amount = 5;
-
   @property({ type: String }) currency = 'NOK';
-
   @property({ type: String }) country = 'NOR';
+  @property({ type: User }) user = {
+    email: 'test@test.no',
+    phoneNumber: '+47661626839',
+    firstName: 'TestName',
+    lastName: 'TestLastName',
+    addressLine1: 'TestAddressLine1',
+    addressLine2: 'TestAddressLine2',
+    city: 'Oslo',
+    postalCode: '0001',
+  };
 
-  paymentId = '';
+  paymentId: string = '';
 
   loadNestScript() {
     let script = document.createElement('script');
@@ -79,7 +87,7 @@ export class BccPay extends LitElement {
           </div>
           <button
             class="nets-button"
-            @click="${() => startNetsPayment(this.paymentId)}"
+            @click="${() => startNetsPayment(this.paymentId, this.user)}"
           >
             PAY WITH NETS
           </button>
