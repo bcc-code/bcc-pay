@@ -3,6 +3,7 @@ import { applyStyles } from './SharedStyles';
 import { startNetsPayment } from './NetsClient';
 import { initPayment } from './BccPayClient';
 import { User } from './User';
+import { MDCTextField } from '@material/textfield';
 
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
@@ -47,8 +48,20 @@ export class BccPay extends LitElement {
       'payment-error-screen'
     ) as HTMLElement;
     errorScreenElement.style.display = 'block';
-    await this.updateComplete;
-    applyStyles();
+    // await this.updateComplete;
+    // applyStyles();
+  }
+
+  changeUserData() {
+    const errorScreenElement = document.getElementById(
+      'nets-payment-screen'
+    ) as HTMLElement;
+    errorScreenElement.style.display = 'none';
+
+    const changeUserDataElement = document.getElementById(
+      'change-user-data-screen'
+    ) as HTMLElement;
+    changeUserDataElement.style.display = 'block';
   }
 
   reload() {
@@ -66,6 +79,10 @@ export class BccPay extends LitElement {
       this.displayErrorPage();
     }
     console.log('Bcc pay payment id: ' + this.paymentId);
+
+    const textField = new MDCTextField(
+      document.querySelector('.mdc-text-field') || new Element()
+    );
   }
 
   render() {
@@ -94,7 +111,15 @@ export class BccPay extends LitElement {
         </div>
         <div id="nets-payment-screen" style="display: none">
           <div class="card-subtitle">
-            <h5>Pay with nets</h5>
+            <h5>
+              Nets payment as: ${this.user.email}
+              <button
+                class="link-button"
+                @click="${() => this.changeUserData()}"
+              >
+                change data
+              </button>
+            </h5>
           </div>
           <div id="checkout-container-div"></div>
         </div>
@@ -107,6 +132,122 @@ export class BccPay extends LitElement {
           </div>
           <button class="reload-button" @click="${() => this.reload()}">
             RELOAD
+          </button>
+        </div>
+
+        <div id="change-user-data-screen" style="display: none">
+          <div class="card-subtitle">
+            <h5>Changing user data:</h5>
+          </div>
+
+          <label class="mdc-text-field mdc-text-field--filled">
+            <span class="mdc-text-field__ripple"></span>
+            <span class="mdc-floating-label" id="my-label">Email</span>
+            <input
+              type="text"
+              class="mdc-text-field__input"
+              aria-labelledby="my-label"
+              value="${this.user.email}"
+            />
+            <span class="mdc-line-ripple"></span>
+          </label>
+          <br />
+
+          <label class="mdc-text-field mdc-text-field--filled">
+            <span class="mdc-text-field__ripple"></span>
+            <span class="mdc-floating-label" id="my-label">Phone</span>
+            <input
+              type="text"
+              class="mdc-text-field__input"
+              aria-labelledby="my-label"
+              value="${this.user.phoneNumber}"
+            />
+            <span class="mdc-line-ripple"></span>
+          </label>
+          <br />
+
+          <label class="mdc-text-field mdc-text-field--filled">
+            <span class="mdc-text-field__ripple"></span>
+            <span class="mdc-floating-label" id="my-label">First Name</span>
+            <input
+              type="text"
+              class="mdc-text-field__input"
+              aria-labelledby="my-label"
+              value="${this.user.firstName}"
+            />
+            <span class="mdc-line-ripple"></span>
+          </label>
+          <br />
+
+          <label class="mdc-text-field mdc-text-field--filled">
+            <span class="mdc-text-field__ripple"></span>
+            <span class="mdc-floating-label" id="my-label">Last Name</span>
+            <input
+              type="text"
+              class="mdc-text-field__input"
+              aria-labelledby="my-label"
+              value="${this.user.lastName}"
+            />
+            <span class="mdc-line-ripple"></span>
+          </label>
+          <br />
+
+          <label class="mdc-text-field mdc-text-field--filled">
+            <span class="mdc-text-field__ripple"></span>
+            <span class="mdc-floating-label" id="my-label">Address Line 1</span>
+            <input
+              type="text"
+              class="mdc-text-field__input"
+              aria-labelledby="my-label"
+              value="${this.user.addressLine1}"
+            />
+            <span class="mdc-line-ripple"></span>
+          </label>
+          <br />
+
+          <label class="mdc-text-field mdc-text-field--filled">
+            <span class="mdc-text-field__ripple"></span>
+            <span class="mdc-floating-label" id="my-label">Address Line 2</span>
+            <input
+              type="text"
+              class="mdc-text-field__input"
+              aria-labelledby="my-label"
+              value="${this.user.addressLine2}"
+            />
+            <span class="mdc-line-ripple"></span>
+          </label>
+          <br />
+
+          <label class="mdc-text-field mdc-text-field--filled">
+            <span class="mdc-text-field__ripple"></span>
+            <span class="mdc-floating-label" id="my-label">City</span>
+            <input
+              type="text"
+              class="mdc-text-field__input"
+              aria-labelledby="my-label"
+              value="${this.user.city}"
+            />
+            <span class="mdc-line-ripple"></span>
+          </label>
+          <br />
+
+          <label class="mdc-text-field mdc-text-field--filled">
+            <span class="mdc-text-field__ripple"></span>
+            <span class="mdc-floating-label" id="my-label">Postal code</span>
+            <input
+              type="text"
+              class="mdc-text-field__input"
+              aria-labelledby="my-label"
+              value="${this.user.postalCode}"
+            />
+            <span class="mdc-line-ripple"></span>
+          </label>
+
+          <button
+            class="reload-button"
+            @click="${() => startNetsPayment(this.paymentId, this.user)}"
+          >
+            CHANGE
           </button>
         </div>
       </div>

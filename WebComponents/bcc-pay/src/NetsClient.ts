@@ -10,6 +10,11 @@ export async function startNetsPayment(
   ) as HTMLElement;
   firstScreenElement.style.display = 'none';
 
+  const changeUserDataScreenElement = document.getElementById(
+    'change-user-data-screen'
+  ) as HTMLElement;
+  changeUserDataScreenElement.style.display = 'none';
+
   const netsScreenElement = document.getElementById(
     'nets-payment-screen'
   ) as HTMLElement;

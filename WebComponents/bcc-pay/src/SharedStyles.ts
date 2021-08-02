@@ -56,6 +56,18 @@ export const nestButtonStyle = css`
   margin-top: 1rem;
 `;
 
+export const linkButtonStyle = css`
+  background: none !important;
+  border: none;
+  padding: 0 !important;
+  /*optional*/
+  font-family: arial, sans-serif;
+  /*input has OS specific font-family*/
+  color: #069;
+  text-decoration: underline;
+  cursor: pointer;
+`;
+
 export function applyStyles() {
   const cardSquare = document.getElementsByClassName(
     'card-square'
@@ -90,8 +102,15 @@ export function applyStyles() {
   )[0] as HTMLElement;
   netsButton.style.cssText = nestButtonStyle.toString();
 
-  const reloadButton = document.getElementsByClassName(
-    'reload-button'
-  )[0] as HTMLElement;
-  reloadButton.style.cssText = nestButtonStyle.toString();
+  const reloadButtons = document.getElementsByClassName('reload-button');
+  Array.from(reloadButtons).forEach(element => {
+    const htmlElement = element as HTMLElement;
+    htmlElement.style.cssText = nestButtonStyle.toString();
+  });
+
+  const linkButtons = document.getElementsByClassName('link-button');
+  Array.from(linkButtons).forEach(element => {
+    const htmlElement = element as HTMLElement;
+    htmlElement.style.cssText = linkButtonStyle.toString();
+  });
 }
