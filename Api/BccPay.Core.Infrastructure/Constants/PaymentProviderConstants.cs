@@ -1,16 +1,23 @@
 ﻿namespace BccPay.Core.Infrastructure.Constants
 {
-    internal static class PaymentProviderConstants
+    public static class PaymentProviderConstants
     {
-        internal const string AuthorizationHeader = "Authorization";
-        internal const string ContentType = "content-type";
-
-        internal static class Nets
+        public static class Nets
         {
-            public const string IntegrationType = "EmbeddedCheckout";
-            public const string ItemReference = "FUNDS_DONATION";
-            public const string ItemUnit = "FUNDS";
-            public const string WebHookEventName = "payment.charge.created.v2";
+            internal static class Order
+            {
+                public const string IntegrationType = "EmbeddedCheckout";
+                public const string ItemReference = "FUNDS_DONATION";
+                public const string ItemUnit = "FUNDS";
+            }
+
+            public static class WebhookEvents
+            {
+                public const string PaymentCreated = "payment.created";
+                public const string CheckoutCompleted = "payment.checkout.completed";
+                public const string ChargeCreated = "payment.charge.created.v2";
+                public const string ChargeFailed = "payment.charge.failed";
+            }
         }
     }
 }

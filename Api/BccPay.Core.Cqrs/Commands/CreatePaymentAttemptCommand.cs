@@ -72,7 +72,7 @@ namespace BccPay.Core.Cqrs.Commands
 
             var provider = _paymentProviderFactory.GetPaymentProvider(request.PaymentMethod.ToString());
 
-            var providerResult = await provider.CreatePayment(new PaymentRequestDto
+            var paymentRequest = new PaymentRequestDto
             {
                 Amount = decimal.Round(payment.Amount, 2, MidpointRounding.AwayFromZero),
                 Address = new AddressDto
@@ -90,17 +90,21 @@ namespace BccPay.Core.Cqrs.Commands
                 LastName = request.LastName,
                 PhoneNumberBody = phoneBody,
                 PhoneNumberPrefix = phonePrefix,
-                Currency = payment.CurrencyCode
-            });
+                Currency = payment.CurrencyCode,
+                NotificationAccessToken = Guid.NewGuid().ToString()
+            };
+
+            var providerResult = await provider.CreatePayment(paymentRequest);
 
             var attempt = new Attempt
             {
                 PaymentAttemptId = Guid.NewGuid(),
                 PaymentMethod = request.PaymentMethod,
-                PaymentStatus = providerResult.IsSuccessful ? AttemptStatus.WaitingForFee : AttemptStatus.Rejected,
+                AttemptStatus = providerResult.IsSuccessful ? AttemptStatus.WaitingForCharge : AttemptStatus.RejectedEitherCancelled,
                 IsActive = providerResult.IsSuccessful,
                 Created = DateTime.Now,
-                StatusDetails = providerResult
+                StatusDetails = providerResult,
+                NotificationAccessToken = paymentRequest.NotificationAccessToken
             };
 
             payment.Updated = DateTime.Now;
