@@ -1,6 +1,8 @@
 import { NetsUser } from './NetsUser';
 import { User } from './User';
 
+var checkout: any;
+
 export async function startNetsPayment(
   paymentId: string,
   user: User
@@ -66,7 +68,7 @@ export async function processNetsPayment(paymentId: string): Promise<boolean> {
     };
 
     // @ts-ignore
-    const checkout = new Dibs.Checkout(checkoutOptions);
+    checkout = new Dibs.Checkout(checkoutOptions);
     await checkout.on('payment-completed', function (response: any) {
       console.log('Completed!' + JSON.stringify(response));
       return true;
@@ -78,4 +80,8 @@ export async function processNetsPayment(paymentId: string): Promise<boolean> {
     console.log('Expected a paymentId');
     return false;
   }
+}
+
+export async function cleanupNetsPayment() {
+  checkout.cleanup();
 }
