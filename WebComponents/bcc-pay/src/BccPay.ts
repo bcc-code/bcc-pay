@@ -11,10 +11,10 @@ export class BccPay extends LitElement {
   @property({ type: String }) currency = 'NOK';
   @property({ type: String }) country = 'NOR';
   @property({ type: User }) user = {
-    email: 'test@test.no',
+    email: 'doe@test.no',
     phoneNumber: '+47661626839',
-    firstName: 'TestName',
-    lastName: 'TestLastName',
+    firstName: 'John',
+    lastName: 'Doe',
     addressLine1: 'TestAddressLine1',
     addressLine2: 'TestAddressLine2',
     city: 'Oslo',
@@ -85,6 +85,10 @@ export class BccPay extends LitElement {
     );
   }
 
+  updateUserData(paymentId: string, user: any) {
+    console.log('User data updated' + JSON.stringify(user));
+  }
+
   render() {
     return html`
       <div style="display: none">
@@ -112,7 +116,7 @@ export class BccPay extends LitElement {
         <div id="nets-payment-screen" style="display: none">
           <div class="card-subtitle">
             <h5>
-              Nets payment as: ${this.user.email}
+              Nets payment as: <b id="user-email"> ${this.user.email}</b>
               <button
                 class="link-button"
                 @click="${() => this.changeUserData()}"
@@ -148,6 +152,11 @@ export class BccPay extends LitElement {
               class="mdc-text-field__input"
               aria-labelledby="my-label"
               value="${this.user.email}"
+              @change="${(e: any) => {
+                this.user.email = e.target.value;
+                document.getElementById('user-email')!.innerHTML =
+                  this.user.email;
+              }}"
             />
             <span class="mdc-line-ripple"></span>
           </label>
@@ -161,6 +170,7 @@ export class BccPay extends LitElement {
               class="mdc-text-field__input"
               aria-labelledby="my-label"
               value="${this.user.phoneNumber}"
+              @change="${(e: any) => (this.user.phoneNumber = e.target.value)}"
             />
             <span class="mdc-line-ripple"></span>
           </label>
@@ -174,6 +184,7 @@ export class BccPay extends LitElement {
               class="mdc-text-field__input"
               aria-labelledby="my-label"
               value="${this.user.firstName}"
+              @change="${(e: any) => (this.user.firstName = e.target.value)}"
             />
             <span class="mdc-line-ripple"></span>
           </label>
@@ -187,6 +198,9 @@ export class BccPay extends LitElement {
               class="mdc-text-field__input"
               aria-labelledby="my-label"
               value="${this.user.lastName}"
+              @change="${(e: any) => {
+                this.user.lastName = e.target.value;
+              }}"
             />
             <span class="mdc-line-ripple"></span>
           </label>
@@ -200,6 +214,7 @@ export class BccPay extends LitElement {
               class="mdc-text-field__input"
               aria-labelledby="my-label"
               value="${this.user.addressLine1}"
+              @change="${(e: any) => (this.user.addressLine1 = e.target.value)}"
             />
             <span class="mdc-line-ripple"></span>
           </label>
@@ -213,6 +228,7 @@ export class BccPay extends LitElement {
               class="mdc-text-field__input"
               aria-labelledby="my-label"
               value="${this.user.addressLine2}"
+              @change="${(e: any) => (this.user.addressLine2 = e.target.value)}"
             />
             <span class="mdc-line-ripple"></span>
           </label>
@@ -226,6 +242,7 @@ export class BccPay extends LitElement {
               class="mdc-text-field__input"
               aria-labelledby="my-label"
               value="${this.user.city}"
+              @change="${(e: any) => (this.user.city = e.target.value)}"
             />
             <span class="mdc-line-ripple"></span>
           </label>
@@ -239,6 +256,7 @@ export class BccPay extends LitElement {
               class="mdc-text-field__input"
               aria-labelledby="my-label"
               value="${this.user.postalCode}"
+              @change="${(e: any) => (this.user.postalCode = e.target.value)}"
             />
             <span class="mdc-line-ripple"></span>
           </label>
