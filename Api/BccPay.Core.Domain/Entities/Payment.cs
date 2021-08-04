@@ -1,4 +1,5 @@
 ﻿using BccPay.Core.Enums;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,7 +44,7 @@ namespace BccPay.Core.Domain.Entities
         {
             CurrencyCode = currency;
             Amount = amount;
-            Updated = DateTime.Now;
+            Updated = DateTime.UtcNow;
             PaymentStatus = PaymentStatus.Open;
         }
 
@@ -53,7 +54,7 @@ namespace BccPay.Core.Domain.Entities
                 Attempts.LastOrDefault().IsActive = false;
 
             PaymentStatus = paymentProgress;
-            Updated = DateTime.Now;
+            Updated = DateTime.UtcNow;
         }
 
         public void AddAttempt(
@@ -63,6 +64,25 @@ namespace BccPay.Core.Domain.Entities
                 Attempts.AddRange(attempts);
             else
                 Attempts = new List<Attempt>(attempts);
+        }
+
+        public void UpdateAttempt(Attempt attempt)
+        {
+            var attemptToUpdate = Attempts.Find(x => x.PaymentAttemptId == attempt.PaymentAttemptId);
+            attemptToUpdate = attempt;
+
+            if (attempt.AttemptStatus == AttemptStatus.RejectedEitherCancelled)
+            {
+                attemptToUpdate.IsActive = false;
+                PaymentStatus = PaymentStatus.Canceled;
+            }
+            if (attempt.AttemptStatus == AttemptStatus.PaymentIsSuccessful)
+            {
+                attemptToUpdate.IsActive = false;
+                PaymentStatus = PaymentStatus.Completed;
+            }
+
+            Updated = DateTime.UtcNow;
         }
 
         public void CancelLastAttempt()

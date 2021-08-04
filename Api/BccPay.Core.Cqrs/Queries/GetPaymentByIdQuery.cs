@@ -1,4 +1,5 @@
 ﻿using BccPay.Core.Domain.Entities;
+using BccPay.Core.Infrastructure.Exceptions;
 using MediatR;
 using Raven.Client.Documents.Session;
 using System;
@@ -31,7 +32,7 @@ namespace BccPay.Core.Cqrs.Queries
         public async Task<Payment> Handle(GetPaymentByIdQuery request, CancellationToken cancellationToken)
         {
             var payment = await _documentSession.LoadAsync<Payment>(Payment.GetPaymentId(request.PaymentId), cancellationToken)
-                    ?? throw new Exception("Invalid payment ID");
+                    ?? throw new NotFoundException("Invalid payment ID");
 
             return payment;
         }

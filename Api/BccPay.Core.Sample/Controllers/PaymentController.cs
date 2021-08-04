@@ -3,8 +3,10 @@ using BccPay.Core.Contracts.Responses;
 using BccPay.Core.Cqrs.Commands;
 using BccPay.Core.Cqrs.Queries;
 using BccPay.Core.Domain.Entities;
+using BccPay.Core.Infrastructure.PaymentModels.Webhooks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Threading.Tasks;
 
@@ -61,6 +63,22 @@ namespace BccPay.Core.Sample.Controllers
             var result = await Mediator.Send(query);
 
             return Ok(Mapper.Map<GetPaymentResponse>(result));
+        }
+
+        [HttpPost("nets/status")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UpdateNetsPaymentStatus([FromBody] NetsWebhook request)
+        {
+            var auth = HttpContext.Request.Headers[HeaderNames.Authorization];
+
+            var command = new UpdateNetsPaymentStatusCommand(auth, request);
+
+            var result = await Mediator.Send(command);
+
+            return result
+                ? Ok()
+                : BadRequest();
         }
     }
 }

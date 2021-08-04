@@ -4,6 +4,7 @@ using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
 using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
 using BccPay.Core.Infrastructure.PaymentProviders.RefitClients;
+using Microsoft.Net.Http.Headers;
 using Refit;
 using System;
 using System.Collections.Generic;
@@ -27,8 +28,8 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 
             _headers = new Dictionary<string, string>
             {
-                { PaymentProviderConstants.AuthorizationHeader, _options.SecretKey },
-                { PaymentProviderConstants.ContentType, MediaTypeNames.Application.Json }
+                { HeaderNames.Authorization, _options.SecretKey },
+                { HeaderNames.ContentType, MediaTypeNames.Application.Json }
             };
         }
 
@@ -72,13 +73,51 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
         private NetsPaymentRequest BuildNetsPaymentRequest(PaymentRequestDto paymentRequest, bool IsUserDataValid = true)
         {
             int amountMonets = Convert.ToInt32(paymentRequest.Amount * 100);
+            List<Webhook> webhooks = new();
+
+            foreach (var webhookEvent in PaymentProviderConstants.Nets.Webhooks.Messages)
+            {
+                webhooks.Add(new Webhook
+                {
+                    Authorization = paymentRequest.NotificationAccessToken,
+                    EventName = webhookEvent.Key,
+                    Url = _options.NotificationUrl
+                });
+            }
+
+            Notifications notifications = new()
+            {
+                Webhooks = webhooks
+            };
+
+            Order order = new()
+            {
+                Amount = amountMonets,
+                Currency = paymentRequest.Currency,
+                Items =
+                    new List<Item>
+                    {
+                        new Item
+                        {
+                            Reference = PaymentProviderConstants.Nets.Order.ItemReference,
+                            Name = $"DONATION-{paymentRequest.Amount}",
+                            Quantity = 1,
+                            Unit = PaymentProviderConstants.Nets.Order.ItemUnit,
+                            UnitPrice = amountMonets,
+                            GrossTotalAmount = amountMonets,
+                            NetTotalAmount = amountMonets
+                        }
+                    }
+            };
+
             if (IsUserDataValid)
+            {
                 return new NetsPaymentRequest()
                 {
                     Checkout = new CheckoutOnCreate
                     {
-                        IntegrationType = PaymentProviderConstants.Nets.IntegrationType,
-                        Charge = false,
+                        IntegrationType = PaymentProviderConstants.Nets.Order.IntegrationType,
+                        Charge = true,
                         MerchantHandlesConsumerData = true,
                         Url = _options.CheckoutPageUrl,
                         TermsUrl = _options.TermsUrl,
@@ -105,82 +144,27 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                             }
                         }
                     },
-                    Order = new Order
-                    {
-                        Amount = amountMonets,
-                        Currency = paymentRequest.Currency,
-                        Items = new List<Item>
-                        {
-                            new Item
-                            {
-                                Reference = PaymentProviderConstants.Nets.ItemReference,
-                                Name = $"DONATION-{paymentRequest.Amount}",
-                                Quantity = 1,
-                                Unit = PaymentProviderConstants.Nets.ItemUnit,
-                                UnitPrice = amountMonets,
-                                GrossTotalAmount = amountMonets,
-                                NetTotalAmount = amountMonets
-                            }
-                        }
-                    }
-                    // TODO: WEBHOOKS
-                    // Notifications = new Notifications
-                    // {
-                    //     Webhooks = new List<Webhook>
-                    //     {
-                    //         new Webhook
-                    //         {
-                    //             Authorization = "TOKEN",
-                    //             EventName = PaymentProviderConstants.Nets.WebHookEventName,
-                    //             Url = PaymentProviderConstants.Nets.WebHookUrl
-                    //         }
-                    //     }
-                    // },
-
+                    Order = order,
+                    Notifications = notifications,
                 };
+            }
             else
+            {
                 return new NetsPaymentRequest()
                 {
-                    Checkout = new CheckoutOnCreate
-                    {
-                        IntegrationType = PaymentProviderConstants.Nets.IntegrationType,
-                        Charge = false,
-                        MerchantHandlesConsumerData = false,
-                        Url = _options.CheckoutPageUrl,
-                        TermsUrl = _options.TermsUrl,
-                    },
-                    Order = new Order
-                    {
-                        Amount = amountMonets,
-                        Currency = paymentRequest.Currency,
-                        Items = new List<Item>
+                    Checkout =
+                        new CheckoutOnCreate
                         {
-                            new Item
-                            {
-                                Reference = PaymentProviderConstants.Nets.ItemReference,
-                                Name = $"DONATION-{paymentRequest.Amount}",
-                                Quantity = 1,
-                                Unit = PaymentProviderConstants.Nets.ItemUnit,
-                                UnitPrice = amountMonets,
-                                GrossTotalAmount = amountMonets,
-                                NetTotalAmount = amountMonets
-                            }
-                        }
-                    }
-                    // TODO: WEBHOOKS
-                    // Notifications = new Notifications
-                    // {
-                    //     Webhooks = new List<Webhook>
-                    //     {
-                    //         new Webhook
-                    //         {
-                    //             Authorization = "TOKEN",
-                    //             EventName = PaymentProviderConstants.Nets.WebHookEventName,
-                    //             Url = PaymentProviderConstants.Nets.WebHookUrl
-                    //         }
-                    //     }
-                    // },
+                            IntegrationType = PaymentProviderConstants.Nets.Order.IntegrationType,
+                            Charge = false,
+                            MerchantHandlesConsumerData = false,
+                            Url = _options.CheckoutPageUrl,
+                            TermsUrl = _options.TermsUrl,
+                        },
+                    Order = order,
+                    Notifications = notifications,
                 };
+            }
         }
     }
 }
