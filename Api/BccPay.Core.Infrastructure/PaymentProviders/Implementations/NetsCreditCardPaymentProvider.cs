@@ -78,7 +78,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                     Checkout = new CheckoutOnCreate
                     {
                         IntegrationType = PaymentProviderConstants.Nets.IntegrationType,
-                        Charge = false,
+                        Charge = true,
                         MerchantHandlesConsumerData = true,
                         Url = _options.CheckoutPageUrl,
                         TermsUrl = _options.TermsUrl,
