@@ -5,7 +5,8 @@ var checkout: any;
 
 export async function startNetsPayment(
   paymentId: string,
-  user: User
+  user: User,
+  server: string
 ): Promise<boolean> {
   const firstScreenElement = document.getElementById(
     'first-screen'
@@ -22,7 +23,7 @@ export async function startNetsPayment(
   ) as HTMLElement;
   netsScreenElement.style.display = 'block';
 
-  const netsPaymentId = await initNetsPayment(paymentId, user);
+  const netsPaymentId = await initNetsPayment(paymentId, user, server);
   console.log('Nets payment id is: ' + netsPaymentId);
 
   return await processNetsPayment(netsPaymentId);
@@ -30,8 +31,11 @@ export async function startNetsPayment(
 
 export async function initNetsPayment(
   paymentId: string,
-  user: User
+  user: User,
+  server: string
 ): Promise<string> {
+  console.log('User in init nets payment: ' + JSON.stringify(user));
+
   const body: NetsUser = {
     paymentMethod: 'NetsCreditCard',
     email: user.email,
@@ -45,7 +49,7 @@ export async function initNetsPayment(
   };
 
   let netsPaymentId: string = '';
-  await fetch(`https://localhost:5001/Payment/${paymentId}/attempts`, {
+  await fetch(`https://${server}/Payment/${paymentId}/attempts`, {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {

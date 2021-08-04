@@ -20,6 +20,7 @@ export class BccPay extends LitElement {
     city: 'Oslo',
     postalCode: '0001',
   };
+  @property({ type: String }) server = 'https://localhost:5001';
 
   paymentId: string = '';
 
@@ -48,8 +49,6 @@ export class BccPay extends LitElement {
       'payment-error-screen'
     ) as HTMLElement;
     errorScreenElement.style.display = 'block';
-    // await this.updateComplete;
-    // applyStyles();
   }
 
   changeUserData() {
@@ -57,6 +56,11 @@ export class BccPay extends LitElement {
       'nets-payment-screen'
     ) as HTMLElement;
     errorScreenElement.style.display = 'none';
+
+    const checkoutElement = document.getElementById(
+      'checkout-container-div'
+    ) as HTMLElement;
+    checkoutElement.innerHTML = '';
 
     const changeUserDataElement = document.getElementById(
       'change-user-data-screen'
@@ -72,7 +76,8 @@ export class BccPay extends LitElement {
     this.paymentId = await initPayment(
       this.currency,
       this.country,
-      this.amount
+      this.amount,
+      this.server
     );
 
     if (this.paymentId === '') {
@@ -108,7 +113,8 @@ export class BccPay extends LitElement {
           </div>
           <button
             class="nets-button"
-            @click="${() => startNetsPayment(this.paymentId, this.user)}"
+            @click="${() =>
+              startNetsPayment(this.paymentId, this.user, this.server)}"
           >
             PAY WITH NETS
           </button>
@@ -263,7 +269,8 @@ export class BccPay extends LitElement {
 
           <button
             class="reload-button"
-            @click="${() => startNetsPayment(this.paymentId, this.user)}"
+            @click="${() =>
+              startNetsPayment(this.paymentId, this.user, this.server)}"
           >
             CHANGE
           </button>

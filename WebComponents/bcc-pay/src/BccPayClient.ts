@@ -1,7 +1,8 @@
 export async function initPayment(
   currency: string,
   country: string,
-  amount: number
+  amount: number,
+  server: string
 ): Promise<string> {
   const body = {
     payerId: '123',
@@ -11,7 +12,7 @@ export async function initPayment(
   };
   let paymentId: string = '';
   try {
-    await fetch('https://localhost:5001/Payment', {
+    await fetch(`${server}/Payment`, {
       method: 'POST',
       body: JSON.stringify(body),
       headers: {

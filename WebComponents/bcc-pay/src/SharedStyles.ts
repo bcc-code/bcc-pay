@@ -68,6 +68,24 @@ export const linkButtonStyle = css`
   cursor: pointer;
 `;
 
+export const textInputStyle = css`
+  input[type='text'] {
+    width: 100%;
+    border: 2px solid #aaa;
+    border-radius: 4px;
+    margin: 8px 0;
+    outline: none;
+    padding: 8px;
+    box-sizing: border-box;
+    transition: 0.3s;
+  }
+
+  input[type='text']:focus {
+    border-color: dodgerBlue;
+    box-shadow: 0 0 8px 0 dodgerBlue;
+  }
+`;
+
 export function applyStyles() {
   const cardSquare = document.getElementsByClassName(
     'card-square'
@@ -113,4 +131,8 @@ export function applyStyles() {
     const htmlElement = element as HTMLElement;
     htmlElement.style.cssText = linkButtonStyle.toString();
   });
+
+  const inputStyle = document.createElement('style');
+  inputStyle.innerHTML = textInputStyle.toString();
+  document.head.appendChild(inputStyle);
 }
