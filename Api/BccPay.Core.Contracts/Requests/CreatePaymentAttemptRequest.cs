@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace BccPay.Core.Contracts.Requests
+﻿namespace BccPay.Core.Contracts.Requests
 {
     public class CreatePaymentAttemptRequest
     {
-        public string PaymentMethod { get; set; }
+        public string PaymentConfigurationId { get; set; }
 
         public string Email { get; set; }
         public string PhoneNumber { get; set; }

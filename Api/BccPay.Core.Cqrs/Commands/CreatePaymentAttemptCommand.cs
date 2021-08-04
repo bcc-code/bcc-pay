@@ -1,4 +1,10 @@
-﻿using BccPay.Core.Domain.Entities;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using BccPay.Core.Domain;
+using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentProviders;
@@ -7,11 +13,6 @@ using BccPay.Core.Shared.Helpers;
 using FluentValidation;
 using MediatR;
 using Raven.Client.Documents.Session;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BccPay.Core.Cqrs.Commands
 {
@@ -22,7 +23,7 @@ namespace BccPay.Core.Cqrs.Commands
         }
 
         public Guid PaymentId { get; set; }
-        public PaymentMethod PaymentMethod { get; set; }
+        public string PaymentConfigurationId { get; set; }
 
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
@@ -63,14 +64,18 @@ namespace BccPay.Core.Cqrs.Commands
         {
             var payment = await _documentSession.LoadAsync<Payment>(
                         Payment.GetPaymentId(request.PaymentId), cancellationToken)
-                    ?? throw new Exception("Invalid payment ID");
+                        ?? throw new Exception("Invalid payment ID");
+
+            var paymentConfiguration = await _documentSession.LoadAsync<PaymentConfiguration>(
+                    PaymentConfiguration.GetPaymentConfigurationId(request.PaymentConfigurationId), cancellationToken)
+                    ?? throw new Exception("Invalid payment configuration ID");
 
             if (payment.Attempts?.Where(x => x.IsActive).Any() == true)
                 throw new Exception("One of the attempts is still active.");
 
             var (phonePrefix, phoneBody) = PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);
 
-            var provider = _paymentProviderFactory.GetPaymentProvider(request.PaymentMethod.ToString());
+            var provider = _paymentProviderFactory.GetPaymentProvider(paymentConfiguration.Provider);
 
             var providerResult = await provider.CreatePayment(new PaymentRequestDto
             {
@@ -91,12 +96,12 @@ namespace BccPay.Core.Cqrs.Commands
                 PhoneNumberBody = phoneBody,
                 PhoneNumberPrefix = phonePrefix,
                 Currency = payment.CurrencyCode
-            });
+            }, paymentConfiguration.Settings);
 
             var attempt = new Attempt
             {
                 PaymentAttemptId = Guid.NewGuid(),
-                PaymentMethod = request.PaymentMethod,
+                PaymentMethod = paymentConfiguration.Settings.PaymentMethod,
                 PaymentStatus = providerResult.IsSuccessful ? AttemptStatus.WaitingForFee : AttemptStatus.Rejected,
                 IsActive = providerResult.IsSuccessful,
                 Created = DateTime.Now,
