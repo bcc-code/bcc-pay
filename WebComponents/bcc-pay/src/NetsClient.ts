@@ -35,22 +35,19 @@ export async function initNetsPayment(
   server: string
 ): Promise<string> {
   console.log('User in init nets payment: ' + JSON.stringify(user));
-
-  // const body: NetsUser = {
-  //   paymentMethod: 'NetsCreditCard',
-  //   email: user.email,
-  //   phoneNumber: user.phoneNumber,
-  //   firstName: user.firstName,
-  //   lastName: user.lastName,
-  //   addressLine1: user.addressLine1,
-  //   addressLine2: user.addressLine2,
-  //   city: user.city,
-  //   postalCode: user.postalCode,
-  // };
-
   const body = {
     paymentMethod: 'NetsCreditCard',
+    email: user.email === null ? undefined : user.email,
+    phoneNumber: user.phoneNumber === null ? undefined : user.phoneNumber,
+    firstName: user.firstName === null ? undefined : user.firstName,
+    lastName: user.lastName === null ? undefined : user.lastName,
+    addressLine1: user.addressLine1 === null ? undefined : user.addressLine1,
+    addressLine2: user.addressLine2 === null ? undefined : user.addressLine2,
+    city: user.city === null ? undefined : user.city,
+    postalCode: user.postalCode === null ? undefined : user.postalCode,
   };
+
+  console.log('Body in init nets payment: ' + JSON.stringify(body));
 
   let netsPaymentId: string = '';
   await fetch(`${server}/Payment/${paymentId}/attempts`, {

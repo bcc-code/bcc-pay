@@ -1,24 +1,24 @@
 export class NetsUser {
   paymentMethod: string;
-  email: string;
-  phoneNumber: string;
-  firstName: string;
-  lastName: string;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  postalCode: string;
+  email?: string;
+  phoneNumber?: string;
+  firstName?: string;
+  lastName?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  city?: string;
+  postalCode?: string;
 
   constructor(
     paymentMethod: string,
-    email: string,
-    phoneNumber: string,
-    firstName: string,
-    lastName: string,
-    addressLine1: string,
-    addressLine2: string,
-    city: string,
-    postalCode: string
+    email?: string,
+    phoneNumber?: string,
+    firstName?: string,
+    lastName?: string,
+    addressLine1?: string,
+    addressLine2?: string,
+    city?: string,
+    postalCode?: string
   ) {
     this.paymentMethod = paymentMethod;
     this.email = email;

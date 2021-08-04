@@ -18,6 +18,17 @@ To use webComponent in external application you have to upgrade version number i
 In actual application type:
 `npm install bcc-pay`
 
+For angular module you have to add CUSTOM_ELEMENTS_SCHEMA from '@angular/core'
+
+```JavaScript
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+@NgModule({
+  declarations: [SampleComponent],
+  imports: [CommonModule, SampleRoutingModule],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
+```
+
 Then you can use webComponent with one of options presented below:
 
 <bcc-pay></bcc-pay>

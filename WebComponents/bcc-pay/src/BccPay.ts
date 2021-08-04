@@ -10,15 +10,14 @@ export class BccPay extends LitElement {
   @property({ type: Number }) amount = 5;
   @property({ type: String }) currency = 'NOK';
   @property({ type: String }) country = 'NOR';
-  @property({ type: User }) user = {
+  @property({ type: User }) user: User = {
     email: 'doe@test.no',
-    phoneNumber: '+47661626839',
     firstName: 'John',
     lastName: 'Doe',
-    addressLine1: 'TestAddressLine1',
-    addressLine2: 'TestAddressLine2',
-    city: 'Oslo',
-    postalCode: '0001',
+    phoneNumber: undefined,
+    addressLine1: undefined,
+    addressLine2: undefined,
+    postalCode: undefined,
   };
   @property({ type: String }) server = 'https://localhost:5001';
 
@@ -161,7 +160,7 @@ export class BccPay extends LitElement {
               @change="${(e: any) => {
                 this.user.email = e.target.value;
                 document.getElementById('user-email')!.innerHTML =
-                  this.user.email;
+                  e.target.value;
               }}"
             />
             <span class="mdc-line-ripple"></span>

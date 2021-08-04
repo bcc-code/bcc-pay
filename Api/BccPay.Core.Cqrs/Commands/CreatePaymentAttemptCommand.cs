@@ -65,16 +65,6 @@ namespace BccPay.Core.Cqrs.Commands
                         Payment.GetPaymentId(request.PaymentId), cancellationToken)
                     ?? throw new Exception("Invalid payment ID");
 
-
-            if (payment.Attempts?.Where(x => x.IsActive).Any() == true)
-            {
-                foreach (var activePayment in payment.Attempts?.Where(activePayment => activePayment.IsActive))
-                {
-                    activePayment.PaymentStatus = AttemptStatus.Rejected;
-                }
-            }
-           
-
             var (phonePrefix, phoneBody) = PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);
 
             var provider = _paymentProviderFactory.GetPaymentProvider(request.PaymentMethod.ToString());
