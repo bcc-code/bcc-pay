@@ -73,36 +73,21 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
         private NetsPaymentRequest BuildNetsPaymentRequest(PaymentRequestDto paymentRequest, bool IsUserDataValid = true)
         {
             int amountMonets = Convert.ToInt32(paymentRequest.Amount * 100);
+            List<Webhook> webhooks = new();
+
+            foreach (var webhookEvent in PaymentProviderConstants.Nets.Webhooks.Messages)
+            {
+                webhooks.Add(new Webhook
+                {
+                    Authorization = paymentRequest.NotificationAccessToken,
+                    EventName = webhookEvent.Key,
+                    Url = _options.NotificationUrl
+                });
+            }
+
             Notifications notifications = new()
             {
-                Webhooks =
-                    new List<Webhook>
-                    {
-                        new Webhook
-                        {
-                            Authorization = paymentRequest.NotificationAccessToken,
-                            EventName = PaymentProviderConstants.Nets.WebhookEvents.PaymentCreated,
-                            Url = _options.NotificationUrl
-                        },
-                        new Webhook
-                        {
-                            Authorization = paymentRequest.NotificationAccessToken,
-                            EventName = PaymentProviderConstants.Nets.WebhookEvents.CheckoutCompleted,
-                            Url = _options.NotificationUrl
-                        },
-                        new Webhook
-                        {
-                            Authorization = paymentRequest.NotificationAccessToken,
-                            EventName = PaymentProviderConstants.Nets.WebhookEvents.ChargeCreated,
-                            Url = _options.NotificationUrl
-                        },
-                        new Webhook
-                        {
-                            Authorization = paymentRequest.NotificationAccessToken,
-                            EventName = PaymentProviderConstants.Nets.WebhookEvents.ChargeFailed,
-                            Url = _options.NotificationUrl
-                        }
-                    }
+                Webhooks = webhooks
             };
 
             Order order = new()

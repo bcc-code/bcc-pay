@@ -1,6 +1,6 @@
 ﻿using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
-using BccPay.Core.Infrastructure.Constants;
+using BccPay.Core.Infrastructure.Helpers;
 using BccPay.Core.Infrastructure.PaymentModels.Webhooks;
 using MediatR;
 using Raven.Client.Documents.Session;
@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using static BccPay.Core.Infrastructure.Constants.PaymentProviderConstants.Nets;
 
 namespace BccPay.Core.Cqrs.Commands
 {
@@ -46,20 +47,28 @@ namespace BccPay.Core.Cqrs.Commands
                     .FirstOrDefault()
                 ?? throw new Exception("Invalid request: token is invalid or attempt is inactive.");
 
-            actualAttempt.AttemptStatus = request.Webhook.Event.ToLower() switch
+
+            var (webhookEvent, webhookStatus) = Webhooks.Messages
+                .Where(x => x.Key == request.Webhook.Event.ToLower())
+                .FirstOrDefault();
+
+            actualAttempt.AttemptStatus = webhookEvent switch
             {
-                PaymentProviderConstants.Nets.WebhookEvents.PaymentCreated => actualAttempt.AttemptStatus = AttemptStatus.ProcessingPayment,
-                PaymentProviderConstants.Nets.WebhookEvents.CheckoutCompleted => actualAttempt.AttemptStatus = AttemptStatus.WaitingForCharge,
-                PaymentProviderConstants.Nets.WebhookEvents.ChargeCreated => actualAttempt.AttemptStatus = AttemptStatus.PaymentIsSuccessful,
-                PaymentProviderConstants.Nets.WebhookEvents.ChargeFailed => actualAttempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled,
+                Webhooks.PaymentCreated => actualAttempt.AttemptStatus = AttemptStatus.ProcessingPayment,
+                Webhooks.CheckoutCompleted => actualAttempt.AttemptStatus = AttemptStatus.WaitingForCharge,
+                Webhooks.ChargeCreated => actualAttempt.AttemptStatus = AttemptStatus.PaymentIsSuccessful,
+                Webhooks.ChargeFailed => actualAttempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled,
                 _ => actualAttempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled,
             };
 
-            payment.UpdateAttempt(actualAttempt);
+            var statusDetails = StatusDetailsDeserializer<NetsStatusDetails>.GetStatusDetailsType(actualAttempt.StatusDetails);
+            statusDetails.WebhookStatus = webhookStatus;
+            actualAttempt.StatusDetails = statusDetails;
 
+            payment.UpdateAttempt(actualAttempt);
             await _documentSession.SaveChangesAsync(cancellationToken);
 
-            return true; // Webhook expects status code 200 otherwise - retry.
+            return true;
         }
     }
 }
