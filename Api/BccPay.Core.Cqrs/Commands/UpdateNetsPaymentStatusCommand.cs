@@ -1,5 +1,6 @@
 ﻿using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
+using BccPay.Core.Infrastructure.Exceptions;
 using BccPay.Core.Infrastructure.Helpers;
 using BccPay.Core.Infrastructure.PaymentModels.Webhooks;
 using MediatR;
@@ -37,16 +38,15 @@ namespace BccPay.Core.Cqrs.Commands
         {
             var payment = await _documentSession.LoadAsync<Payment>(
                     Payment.GetPaymentId(Guid.Parse(request.Webhook.Data.PaymentId)), cancellationToken)
-                ?? throw new Exception("Invalid payment id");
+                ?? throw new NotFoundException("Invalid payment ID");
 
             if (payment.PaymentStatus == PaymentStatus.Canceled || payment.PaymentStatus == PaymentStatus.Completed)
-                throw new Exception("Payment is not valid.");
+                throw new InvalidPaymentException("Payment is not valid.");
 
             var actualAttempt = payment.Attempts
                     .Where(x => x.IsActive && x.NotificationAccessToken.Contains(request.AccessToken))
                     .FirstOrDefault()
-                ?? throw new Exception("Invalid request: token is invalid or attempt is inactive.");
-
+                ?? throw new UpdatePaymentAttemptForbiddenException("Token is invalid or attempt is inactive.");
 
             var (webhookEvent, webhookStatus) = Webhooks.Messages
                 .Where(x => x.Key == request.Webhook.Event.ToLower())
