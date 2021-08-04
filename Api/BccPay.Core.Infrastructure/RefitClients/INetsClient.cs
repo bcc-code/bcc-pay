@@ -4,7 +4,7 @@ using Refit;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BccPay.Core.Infrastructure.PaymentProviders.RefitClients
+namespace BccPay.Core.Infrastructure.RefitClients
 {
     internal interface INetsClient
     {

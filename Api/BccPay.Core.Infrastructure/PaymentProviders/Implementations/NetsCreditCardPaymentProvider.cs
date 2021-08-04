@@ -3,7 +3,7 @@ using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
 using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
-using BccPay.Core.Infrastructure.PaymentProviders.RefitClients;
+using BccPay.Core.Infrastructure.RefitClients;
 using Microsoft.Net.Http.Headers;
 using Refit;
 using System;

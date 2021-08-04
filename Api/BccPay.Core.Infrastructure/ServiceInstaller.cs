@@ -1,6 +1,6 @@
 ﻿using BccPay.Core.Infrastructure.PaymentProviders;
 using BccPay.Core.Infrastructure.PaymentProviders.Implementations;
-using BccPay.Core.Infrastructure.PaymentProviders.RefitClients;
+using BccPay.Core.Infrastructure.RefitClients;
 using Microsoft.AspNetCore.Builder;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Indexes;
@@ -32,6 +32,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddRefitClient<INetsClient>()
                 .ConfigureHttpClient(client => client.BaseAddress = new Uri(defaultOptions.Nets.BaseAddress));
 
+            services.AddRefitClient<IFixerClient>()
+                .ConfigureHttpClient(client => client.BaseAddress = new Uri(""));
             return services;
         }
 
