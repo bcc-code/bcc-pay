@@ -43,10 +43,13 @@ namespace BccPay.Core.Cqrs.Commands
             if (payment.PaymentStatus == PaymentStatus.Canceled || payment.PaymentStatus == PaymentStatus.Completed)
                 throw new InvalidPaymentException("Payment is not valid.");
 
+            if (!payment.Attempts.Where(x => x.NotificationAccessToken.Contains(request.AccessToken)).Any())
+                throw new UnauthorizedException();
+
             var actualAttempt = payment.Attempts
                     .Where(x => x.IsActive && x.NotificationAccessToken.Contains(request.AccessToken))
                     .FirstOrDefault()
-                ?? throw new UpdatePaymentAttemptForbiddenException("Token is invalid or attempt is inactive.");
+                    ?? throw new UpdatePaymentAttemptForbiddenException("Attempt is inactive.");
 
             var (webhookEvent, webhookStatus) = Webhooks.Messages
                 .Where(x => x.Key == request.Webhook.Event.ToLower())

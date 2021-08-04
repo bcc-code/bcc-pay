@@ -3,9 +3,9 @@ using System.Net;
 
 namespace BccPay.Core.Infrastructure.Exceptions
 {
-    public class UpdatePaymentAttemptForbiddenException : Exception
+    public class UnauthorizedException : Exception
     {
-        public UpdatePaymentAttemptForbiddenException(string message, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
+        public UnauthorizedException(string message = "Invalid token", HttpStatusCode statusCode = HttpStatusCode.Unauthorized)
             : base(message)
         {
             StatusCode = statusCode;
@@ -14,4 +14,3 @@ namespace BccPay.Core.Infrastructure.Exceptions
         public HttpStatusCode StatusCode { get; private set; }
     }
 }
-
