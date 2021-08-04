@@ -3,7 +3,6 @@ import { applyStyles } from './SharedStyles';
 import { startNetsPayment } from './NetsClient';
 import { initPayment } from './BccPayClient';
 import { User } from './User';
-import { MDCTextField } from '@material/textfield';
 
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
@@ -14,12 +13,10 @@ export class BccPay extends LitElement {
     email: 'doe@test.no',
     firstName: 'John',
     lastName: 'Doe',
-    phoneNumber: undefined,
-    addressLine1: undefined,
-    addressLine2: undefined,
-    postalCode: undefined,
   };
   @property({ type: String }) server = 'https://localhost:5001';
+  @property({ type: String }) checkoutKey = 'https://localhost:5001';
+  @property({ type: Boolean }) isDevEnv: boolean = false;
 
   paymentId: string = '';
 
@@ -38,7 +35,7 @@ export class BccPay extends LitElement {
     applyStyles();
   }
 
-  async displayErrorPage() {
+  displayErrorPage() {
     const firstScreenElement = document.getElementById(
       'first-screen'
     ) as HTMLElement;
@@ -50,7 +47,7 @@ export class BccPay extends LitElement {
     errorScreenElement.style.display = 'block';
   }
 
-  changeUserData() {
+  displayChangeUserDataPage() {
     const errorScreenElement = document.getElementById(
       'nets-payment-screen'
     ) as HTMLElement;
@@ -83,14 +80,6 @@ export class BccPay extends LitElement {
       this.displayErrorPage();
     }
     console.log('Bcc pay payment id: ' + this.paymentId);
-
-    const textField = new MDCTextField(
-      document.querySelector('.mdc-text-field') || new Element()
-    );
-  }
-
-  updateUserData(paymentId: string, user: any) {
-    console.log('User data updated' + JSON.stringify(user));
   }
 
   render() {
@@ -124,7 +113,7 @@ export class BccPay extends LitElement {
               Nets payment as: <b id="user-email"> ${this.user.email}</b>
               <button
                 class="link-button"
-                @click="${() => this.changeUserData()}"
+                @click="${() => this.displayChangeUserDataPage()}"
               >
                 change data
               </button>
@@ -149,122 +138,77 @@ export class BccPay extends LitElement {
             <h5>Changing user data:</h5>
           </div>
 
-          <label class="mdc-text-field mdc-text-field--filled">
-            <span class="mdc-text-field__ripple"></span>
-            <span class="mdc-floating-label" id="my-label">Email</span>
+          <div>
+            <span>Email</span>
             <input
               type="text"
-              class="mdc-text-field__input"
-              aria-labelledby="my-label"
               value="${this.user.email}"
-              @change="${(e: any) => {
-                this.user.email = e.target.value;
-                document.getElementById('user-email')!.innerHTML =
-                  e.target.value;
-              }}"
+              @change="${(e: any) => (this.user.email = e.target.value)}"
             />
-            <span class="mdc-line-ripple"></span>
-          </label>
-          <br />
+          </div>
 
-          <label class="mdc-text-field mdc-text-field--filled">
-            <span class="mdc-text-field__ripple"></span>
-            <span class="mdc-floating-label" id="my-label">Phone</span>
+          <div>
+            <span>Phone</span>
             <input
               type="text"
-              class="mdc-text-field__input"
-              aria-labelledby="my-label"
               value="${this.user.phoneNumber}"
               @change="${(e: any) => (this.user.phoneNumber = e.target.value)}"
             />
-            <span class="mdc-line-ripple"></span>
-          </label>
-          <br />
+          </div>
 
-          <label class="mdc-text-field mdc-text-field--filled">
-            <span class="mdc-text-field__ripple"></span>
-            <span class="mdc-floating-label" id="my-label">First Name</span>
+          <div>
+            <span>First Name</span>
             <input
               type="text"
-              class="mdc-text-field__input"
-              aria-labelledby="my-label"
               value="${this.user.firstName}"
               @change="${(e: any) => (this.user.firstName = e.target.value)}"
             />
-            <span class="mdc-line-ripple"></span>
-          </label>
-          <br />
+          </div>
 
-          <label class="mdc-text-field mdc-text-field--filled">
-            <span class="mdc-text-field__ripple"></span>
-            <span class="mdc-floating-label" id="my-label">Last Name</span>
+          <div>
+            <span>Last Name</span>
             <input
               type="text"
-              class="mdc-text-field__input"
-              aria-labelledby="my-label"
               value="${this.user.lastName}"
-              @change="${(e: any) => {
-                this.user.lastName = e.target.value;
-              }}"
+              @change="${(e: any) => (this.user.lastName = e.target.value)}"
             />
-            <span class="mdc-line-ripple"></span>
-          </label>
-          <br />
+          </div>
 
-          <label class="mdc-text-field mdc-text-field--filled">
-            <span class="mdc-text-field__ripple"></span>
-            <span class="mdc-floating-label" id="my-label">Address Line 1</span>
+          <div>
+            <span>Address Line 1</span>
             <input
               type="text"
-              class="mdc-text-field__input"
-              aria-labelledby="my-label"
               value="${this.user.addressLine1}"
               @change="${(e: any) => (this.user.addressLine1 = e.target.value)}"
             />
-            <span class="mdc-line-ripple"></span>
-          </label>
-          <br />
+          </div>
 
-          <label class="mdc-text-field mdc-text-field--filled">
-            <span class="mdc-text-field__ripple"></span>
-            <span class="mdc-floating-label" id="my-label">Address Line 2</span>
+          <div>
+            <span>Address Line 2</span>
             <input
               type="text"
-              class="mdc-text-field__input"
-              aria-labelledby="my-label"
               value="${this.user.addressLine2}"
               @change="${(e: any) => (this.user.addressLine2 = e.target.value)}"
             />
-            <span class="mdc-line-ripple"></span>
-          </label>
-          <br />
+          </div>
 
-          <label class="mdc-text-field mdc-text-field--filled">
-            <span class="mdc-text-field__ripple"></span>
-            <span class="mdc-floating-label" id="my-label">City</span>
+          <div>
+            <span>City</span>
             <input
               type="text"
-              class="mdc-text-field__input"
-              aria-labelledby="my-label"
               value="${this.user.city}"
               @change="${(e: any) => (this.user.city = e.target.value)}"
             />
-            <span class="mdc-line-ripple"></span>
-          </label>
-          <br />
+          </div>
 
-          <label class="mdc-text-field mdc-text-field--filled">
-            <span class="mdc-text-field__ripple"></span>
-            <span class="mdc-floating-label" id="my-label">Postal code</span>
+          <div>
+            <span>Postal code</span>
             <input
               type="text"
-              class="mdc-text-field__input"
-              aria-labelledby="my-label"
               value="${this.user.postalCode}"
               @change="${(e: any) => (this.user.postalCode = e.target.value)}"
             />
-            <span class="mdc-line-ripple"></span>
-          </label>
+          </div>
 
           <button
             class="reload-button"
