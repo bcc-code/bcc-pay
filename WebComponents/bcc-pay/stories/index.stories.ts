@@ -33,7 +33,7 @@ const Template: Story<ArgTypes> = ({
   amount = 5,
   currency = 'NOK',
   country = 'NOR',
-  server = 'http://localhost:3000',
+  server = 'https://localhost:5001',
   slot,
 }: ArgTypes) => html`
   <bcc-pay

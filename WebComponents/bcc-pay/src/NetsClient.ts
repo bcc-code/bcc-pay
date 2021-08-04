@@ -36,20 +36,24 @@ export async function initNetsPayment(
 ): Promise<string> {
   console.log('User in init nets payment: ' + JSON.stringify(user));
 
-  const body: NetsUser = {
+  // const body: NetsUser = {
+  //   paymentMethod: 'NetsCreditCard',
+  //   email: user.email,
+  //   phoneNumber: user.phoneNumber,
+  //   firstName: user.firstName,
+  //   lastName: user.lastName,
+  //   addressLine1: user.addressLine1,
+  //   addressLine2: user.addressLine2,
+  //   city: user.city,
+  //   postalCode: user.postalCode,
+  // };
+
+  const body = {
     paymentMethod: 'NetsCreditCard',
-    email: user.email,
-    phoneNumber: user.phoneNumber,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    addressLine1: user.addressLine1,
-    addressLine2: user.addressLine2,
-    city: user.city,
-    postalCode: user.postalCode,
   };
 
   let netsPaymentId: string = '';
-  await fetch(`https://${server}/Payment/${paymentId}/attempts`, {
+  await fetch(`${server}/Payment/${paymentId}/attempts`, {
     method: 'POST',
     body: JSON.stringify(body),
     headers: {
