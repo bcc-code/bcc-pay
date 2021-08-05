@@ -58,7 +58,7 @@ namespace BccPay.Core.Cqrs.Queries
                                     PaymentStatus = payment.PaymentStatus,
                                     Created = payment.Created,
                                     Updated = payment.Updated,
-                                    AmountOfAttempts = payment.Attempts != null ? payment.Attempts.Count : 0
+                                    AmountOfAttempts = payment.Attempts == null ? 0 :  payment.Attempts.Count
                                 }).ToListAsync(token: cancellationToken);
 
             return new PaymentsResult(result);

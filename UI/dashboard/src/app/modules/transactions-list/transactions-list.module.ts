@@ -8,9 +8,13 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSortModule } from '@angular/material/sort';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { TransactionDialog } from './dialog/transaction-dialog.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
-  declarations: [TransactionsListComponent],
+  declarations: [TransactionsListComponent, TransactionDialog],
   imports: [
     CommonModule,
     TransactionsListRoutingModule,
@@ -19,6 +23,9 @@ import { MatSortModule } from '@angular/material/sort';
     MatFormFieldModule,
     MatInputModule,
     MatSortModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
   ],
 })
 export class TransactionsListModule {}

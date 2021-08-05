@@ -10,6 +10,11 @@ const routes: Routes = [
         (m) => m.TransactionsListModule
       ),
   },
+  {
+    path: 'sample',
+    loadChildren: () =>
+      import('./modules/sample/sample.module').then((m) => m.SampleModule),
+  },
 ];
 
 @NgModule({
