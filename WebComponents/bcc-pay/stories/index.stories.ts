@@ -10,6 +10,8 @@ export default {
     currency: { control: 'text' },
     country: { control: 'text' },
     server: { control: 'text' },
+    netsCheckoutKey: { control: 'text' },
+    isDevEnv: { control: 'boolean' },
   },
 };
 
@@ -25,6 +27,8 @@ interface ArgTypes {
   currency?: string;
   country?: string;
   server?: string;
+  netsCheckoutKey?: string;
+  isDevEnv?: boolean;
   slot?: TemplateResult;
 }
 
@@ -34,6 +38,8 @@ const Template: Story<ArgTypes> = ({
   currency = 'NOK',
   country = 'NOR',
   server = 'https://localhost:5001',
+  netsCheckoutKey = '#netsCheckoutKey#',
+  isDevEnv = true,
   slot,
 }: ArgTypes) => html`
   <bcc-pay
