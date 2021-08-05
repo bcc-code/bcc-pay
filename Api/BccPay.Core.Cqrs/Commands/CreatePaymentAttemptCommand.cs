@@ -71,9 +71,6 @@ namespace BccPay.Core.Cqrs.Commands
                     PaymentConfiguration.GetPaymentConfigurationId(request.PaymentConfigurationId), cancellationToken)
                     ?? throw new Exception("Invalid payment configuration ID");
 
-            if (payment.Attempts?.Where(x => x.IsActive).Any() == true)
-                throw new Exception("One of the attempts is still active.");
-
             var (phonePrefix, phoneBody) = PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);
 
             var provider = _paymentProviderFactory.GetPaymentProvider(paymentConfiguration.Provider);
