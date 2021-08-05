@@ -16,7 +16,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Nets
             _options = options;
         }
 
-        public NetsPaymentRequest BuildNetsPaymentRequest(PaymentRequestDto paymentRequest, bool IsUserDataValid = true)
+        public NetsPaymentRequest BuildNetsPaymentRequest(PaymentRequestDto paymentRequest, string originUrl, bool IsUserDataValid = true)
         {
             int amountMonets = Convert.ToInt32(paymentRequest.Amount * 100);
             List<Webhook> webhooks = new();
@@ -65,7 +65,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Nets
                         IntegrationType = PaymentProviderConstants.Nets.Order.IntegrationType,
                         Charge = true,
                         MerchantHandlesConsumerData = true,
-                        Url = _options.CheckoutPageUrl,
+                        Url = $"{originUrl}{_options.CheckoutPageUrl}",
                         TermsUrl = _options.TermsUrl,
                         Consumer = new ConsumerOnCreate
                         {
@@ -104,7 +104,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Nets
                             IntegrationType = PaymentProviderConstants.Nets.Order.IntegrationType,
                             Charge = false,
                             MerchantHandlesConsumerData = false,
-                            Url = _options.CheckoutPageUrl,
+                            Url = $"{originUrl}{_options.CheckoutPageUrl}",
                             TermsUrl = _options.TermsUrl,
                         },
                     Order = order,
