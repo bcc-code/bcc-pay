@@ -123,20 +123,6 @@ export class BccPay extends LitElement {
             PAY WITH NETS
           </button>
         </div>
-        <div id="nets-payment-screen" style="display: none">
-          <div class="card-subtitle">
-            <h5>
-              Nets payment as: <b id="user-email"> ${this.user.email}</b>
-              <button
-                class="link-button"
-                @click="${() => this.displayChangeUserDataPage()}"
-              >
-                change data
-              </button>
-            </h5>
-          </div>
-          <div id="checkout-container-div"></div>
-        </div>
 
         <div id="payment-error-screen" style="display: none">
           <div class="card-subtitle">
@@ -147,6 +133,21 @@ export class BccPay extends LitElement {
           <button class="reload-button" @click="${() => this.reload()}">
             RELOAD
           </button>
+        </div>
+
+        <div id="nets-payment-screen" style="display: none">
+          <div class="card-subtitle">
+            <h5>
+              Issue with payment?
+              <button
+                class="link-button"
+                @click="${() => this.displayChangeUserDataPage()}"
+              >
+                Edit personal data
+              </button>
+            </h5>
+          </div>
+          <div id="checkout-container-div"></div>
         </div>
 
         <div id="change-user-data-screen" style="display: none">

@@ -48,6 +48,8 @@ const Template: Story<ArgTypes> = ({
     .currency=${currency}
     .country=${country}
     .server=${server}
+    .netsCheckoutKey=${netsCheckoutKey}
+    .isDevEnv=${isDevEnv}
   >
     ${slot}
   </bcc-pay>

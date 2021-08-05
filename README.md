@@ -31,9 +31,9 @@ import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 
 Then you can use webComponent with one of options presented below:
 
-<bcc-pay></bcc-pay>
+<bcc-pay checkoutKey="" isDevEnv="true"></bcc-pay>
 
-<bcc-pay item="Subscpription" currency="NOK" country="NOR" amount="10" server="http://localhost:5001"></bcc-pay>
+<bcc-pay item="Subscpription" currency="NOK" country="NOR" amount="10" server="https://localhost:5001"></bcc-pay>
 
 You can also pass user object to component:
 
