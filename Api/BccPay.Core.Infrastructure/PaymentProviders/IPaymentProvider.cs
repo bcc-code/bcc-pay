@@ -10,6 +10,6 @@ namespace BccPay.Core.Infrastructure.PaymentProviders
     {
         public PaymentProvider PaymentProvider { get; }
 
-        Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentProviderSettings settings);
+        Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSettings settings);
     }
 }

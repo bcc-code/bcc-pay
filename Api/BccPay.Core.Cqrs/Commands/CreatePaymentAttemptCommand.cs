@@ -100,7 +100,7 @@ namespace BccPay.Core.Cqrs.Commands
                 NotificationAccessToken = Guid.NewGuid().ToString()
             };
 
-            var providerResult = await paymentProvider.CreatePayment(paymentRequest, paymentConfiguration.Settings);
+            var providerResult = await provider.CreatePayment(paymentRequest, paymentConfiguration.Settings);
 
             var attemptToAdd = new Attempt
             {
