@@ -1,4 +1,6 @@
+using BccPay.Core.Infrastructure.BackgroundServices;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace BccPay.Core.Sample
@@ -15,6 +17,9 @@ namespace BccPay.Core.Sample
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                }).ConfigureServices(services =>
+                {
+                    services.AddHostedService<CurrencyRateUpdateBackgroundService>();
                 });
     }
 }

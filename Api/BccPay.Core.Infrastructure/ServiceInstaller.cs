@@ -1,4 +1,5 @@
-﻿using BccPay.Core.Infrastructure.PaymentProviders;
+﻿using BccPay.Core.Infrastructure.Helpers;
+using BccPay.Core.Infrastructure.PaymentProviders;
 using BccPay.Core.Infrastructure.PaymentProviders.Implementations;
 using BccPay.Core.Infrastructure.RefitClients;
 using Microsoft.AspNetCore.Builder;
@@ -33,7 +34,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 .ConfigureHttpClient(client => client.BaseAddress = new Uri(defaultOptions.Nets.BaseAddress));
 
             services.AddRefitClient<IFixerClient>()
-                .ConfigureHttpClient(client => client.BaseAddress = new Uri(""));
+                .ConfigureHttpClient(client => client.BaseAddress = new Uri(defaultOptions.Fixer.BaseAddress));
+
+            services.AddTransient<ICurrencyExchangeService, CurrencyExchangeService>();
             return services;
         }
 

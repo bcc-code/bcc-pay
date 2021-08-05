@@ -36,6 +36,7 @@ namespace BccPay.Core.Sample
                 options.Nets.TermsUrl = "https://localhost:4000/";
                 options.Nets.SecretKey = Configuration["SecretKey"];
                 options.Nets.NotificationUrl = "https://localhost:5001/Payment/webhook";
+                options.Fixer.BaseAddress = "http://data.fixer.io/api";
             });
 
             services.ConfigureBccCoreCqrs();
