@@ -9,31 +9,16 @@ To run Api go to sample app /Api/BccPay.Core.Sample/ and type
 
 # WebComponent
 
-To run webComponent in dev mode go to /webComponent/bcc-pay/
-`npm run storybook`
+For more info about webcomponent go to /WebComponents/README.md file.
 
-To use webComponent in external application you have to upgrade version number in package.json and publish component with command:
-`npm publish`
-
-In actual application type:
+To use webComponent in application type:
 `npm install bcc-pay`
 
-For angular module you have to add CUSTOM_ELEMENTS_SCHEMA from '@angular/core'
+You have to always pass your netsCheckoutKey from nets admin panel. Sample uses of component:
 
-```JavaScript
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
-@NgModule({
-  declarations: [SampleComponent],
-  imports: [CommonModule, SampleRoutingModule],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-})
-```
+<bcc-pay netsCheckoutKey="#netsCheckoutKey#" amount="12"></bcc-pay>
 
-Then you can use webComponent with one of options presented below:
-
-<bcc-pay checkoutKey="" isDevEnv="true"></bcc-pay>
-
-<bcc-pay item="Subscpription" currency="NOK" country="NOR" amount="10" server="https://localhost:5001"></bcc-pay>
+<bcc-pay item="Subscpription" currency="NOK" country="NOR" amount="10" server="https://localhost:5001" netsCheckoutKey="#netsCheckoutKey#" isDevEnv="true"></bcc-pay>
 
 You can also pass user object to component:
 
@@ -50,7 +35,7 @@ const sampleUser = {
   };
 ```
 
-<bcc-pay item="Subscpription" currency="NOK" country="NOR" amount="12" server="https://localhost:5001" user=${this.sampleUser}></bcc-pay>
+<bcc-pay item="Subscpription" currency="NOK" country="NOR" amount="12" server="https://localhost:5001" user=${this.sampleUser} netsCheckoutKey="#netsCheckoutKey#"></bcc-pay>
 
 # Admin panel
 
