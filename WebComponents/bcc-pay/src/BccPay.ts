@@ -11,11 +11,7 @@ export class BccPay extends LitElement {
   @property({ type: Number }) amount = 5;
   @property({ type: String }) currency = 'NOK';
   @property({ type: String }) country = 'NOR';
-  @property({ type: User }) user: User = {
-    email: 'doe@test.no',
-    firstName: 'John',
-    lastName: 'Doe',
-  };
+  @property({ type: User }) user: User = {};
   @property({ type: String }) server = 'https://localhost:5001';
   @property({ type: String }) netsCheckoutKey = '#checkout_key#';
   @property({ type: Boolean }) isDevEnv: boolean = false;
