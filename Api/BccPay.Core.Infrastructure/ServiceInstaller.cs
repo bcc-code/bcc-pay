@@ -1,14 +1,15 @@
-﻿using BccPay.Core.Infrastructure.PaymentProviders;
+﻿using System;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
+using BccPay.Core.Infrastructure.PaymentProviders;
 using BccPay.Core.Infrastructure.PaymentProviders.Implementations;
 using BccPay.Core.Infrastructure.PaymentProviders.RefitClients;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Indexes;
 using Raven.DependencyInjection;
 using Refit;
-using System;
-using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -24,7 +25,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<IPaymentProvider, NetsPaymentProvider>(implementationFactory =>
             {
                 return new NetsPaymentProvider(implementationFactory.GetRequiredService<INetsClient>(),
-                    defaultOptions.Nets);
+                    defaultOptions.Nets,
+                    implementationFactory.GetRequiredService<IHttpContextAccessor>());
             });
 
             services.AddScoped<IPaymentProviderFactory, PaymentProviderFactory>();

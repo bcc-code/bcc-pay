@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Reflection;
 using BccPay.Core.Cqrs;
 using BccPay.Core.Cqrs.Commands;
 using BccPay.Core.Sample.Mappers;
@@ -11,8 +13,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
-using System.Reflection;
 
 namespace BccPay.Core.Sample
 {
@@ -33,7 +33,7 @@ namespace BccPay.Core.Sample
             services.ConfigureBccPayInfrastructure(options =>
             {
                 options.Nets.BaseAddress = "https://test.api.dibspayment.eu";
-                options.Nets.CheckoutPageUrl = "http://localhost:8000";
+                options.Nets.CheckoutPageUrl = "/checkout";
                 options.Nets.TermsUrl = "http://localhost:8000";
                 options.Nets.SecretKey = Configuration["SecretKey"];
                 options.Nets.NotificationUrl = "https://localhost:5001/Payment/webhook";
@@ -53,7 +53,7 @@ namespace BccPay.Core.Sample
                             .AllowAnyHeader();
                     });
             });
-            
+
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
             services.AddMvc().AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(new List<Assembly> { typeof(CreatePaymentCommandValidator).Assembly }));
             services.AddAutoMapper(typeof(PaymentProfile).Assembly);
