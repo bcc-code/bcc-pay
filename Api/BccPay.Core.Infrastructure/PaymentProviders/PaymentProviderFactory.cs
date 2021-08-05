@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using BccPay.Core.Enums;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders
 {
@@ -12,9 +13,9 @@ namespace BccPay.Core.Infrastructure.PaymentProviders
             _paymentProviders = paymentProviders;
         }
 
-        public IPaymentProvider GetPaymentProvider(string paymentMethod)
+        public IPaymentProvider GetPaymentProvider(PaymentProvider paymentProvider)
         {
-            return _paymentProviders.First(x => x.PaymentMethod == paymentMethod);
+            return _paymentProviders.First(x => x.PaymentProvider == paymentProvider);
         }
     }
 }

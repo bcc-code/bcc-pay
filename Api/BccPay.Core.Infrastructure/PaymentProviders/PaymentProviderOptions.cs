@@ -6,6 +6,7 @@
         public string CheckoutPageUrl { get; set; }
         public string SecretKey { get; set; }
         public string TermsUrl { get; set; }
+        public string NotificationUrl { get; set; }
     }
 
     public class PaymentProviderOptions
