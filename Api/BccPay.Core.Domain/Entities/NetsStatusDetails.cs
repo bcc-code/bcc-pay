@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace BccPay.Core.Domain.Entities
+﻿namespace BccPay.Core.Domain.Entities
 {
     public class NetsStatusDetails : IStatusDetails
     {

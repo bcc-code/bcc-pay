@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BccPay.Core.Cqrs.Queries;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
@@ -51,14 +52,18 @@ namespace BccPay.Core.Cqrs.Commands
     {
         private readonly IAsyncDocumentSession _documentSession;
         private readonly IPaymentProviderFactory _paymentProviderFactory;
+        private IMediator _mediator;
 
-        public CreatePaymentAttemptCommandHandler(IPaymentProviderFactory paymentProviderFactory,
-            IAsyncDocumentSession documentSession)
+        public CreatePaymentAttemptCommandHandler(
+            IPaymentProviderFactory paymentProviderFactory,
+            IAsyncDocumentSession documentSession,
+            IMediator mediator)
         {
             _documentSession = documentSession
                 ?? throw new ArgumentNullException(nameof(documentSession));
             _paymentProviderFactory = paymentProviderFactory
                 ?? throw new ArgumentNullException(nameof(paymentProviderFactory));
+            _mediator = mediator;
         }
 
         public async Task<IStatusDetails> Handle(CreatePaymentAttemptCommand request, CancellationToken cancellationToken)
@@ -68,11 +73,16 @@ namespace BccPay.Core.Cqrs.Commands
                     ?? throw new NotFoundException("Invalid payment ID");
 
             var paymentConfiguration = await _documentSession.LoadAsync<PaymentConfiguration>(
-                    PaymentConfiguration.GetPaymentConfigurationId(request.PaymentConfigurationId), cancellationToken)
+                    PaymentConfiguration.GetDocumentId(request.PaymentConfigurationId), cancellationToken)
                     ?? throw new Exception("Invalid payment configuration ID");
+
+            var countryAvailableConfigurations = await _mediator.Send(new GetCountryPaymentConfigurationsQuery(payment.CountryCode));
 
             if (payment.Attempts?.Where(x => x.IsActive).Any() == true)
                 throw new Exception("One of the attempts is still active.");
+
+            if (!countryAvailableConfigurations.Any(x => x.Id == request.PaymentConfigurationId))
+                throw new InvalidPaymentException($"The payment configuration {request.PaymentConfigurationId} is not available for the country '{payment.CountryCode}'");
 
             var (phonePrefix, phoneBody) = PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);
 

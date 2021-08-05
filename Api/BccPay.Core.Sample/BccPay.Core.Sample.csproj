@@ -13,11 +13,13 @@
     <PackageReference Include="RavenDB.Client" Version="5.2.1" />
     <PackageReference Include="RavenDB.DependencyInjection" Version="4.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BccPay.Core.Contracts\BccPay.Core.Contracts.csproj" />
     <ProjectReference Include="..\BccPay.Core.Cqrs\BccPay.Core.Cqrs.csproj" />
+    <ProjectReference Include="..\BccPay.Core.DataAccess\BccPay.Core.DataAccess.csproj" />
     <ProjectReference Include="..\BccPay.Core.Domain\BccPay.Core.Domain.csproj" />
     <ProjectReference Include="..\BccPay.Core.Infrastructure\BccPay.Core.Infrastructure.csproj" />
   </ItemGroup>

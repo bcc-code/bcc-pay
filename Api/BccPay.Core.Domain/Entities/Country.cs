@@ -2,9 +2,11 @@
 {
     public class Country
     {
-        public static string GetCountryId(string countryCode) => $"countries/{countryCode}";
+        public static string DefaultCountryCode = "default";
 
-        public string Id => GetCountryId(CountryCode);
+        public static string GetDocumentId(string countryCode) => $"countries/{countryCode}";
+
+        public string Id => GetDocumentId(CountryCode);
 
         public string CountryCode { get; set; }
 
