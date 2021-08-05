@@ -10,6 +10,7 @@
         public string PhoneNumberBody { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string NotificationAccessToken { get; set; }
         public AddressDto Address { get; set; }
     }
 }

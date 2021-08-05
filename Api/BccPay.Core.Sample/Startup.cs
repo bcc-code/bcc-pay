@@ -35,6 +35,7 @@ namespace BccPay.Core.Sample
                 options.Nets.CheckoutPageUrl = "https://localhost:4000/";
                 options.Nets.TermsUrl = "https://localhost:4000/";
                 options.Nets.SecretKey = Configuration["SecretKey"];
+                options.Nets.NotificationUrl = "https://localhost:5001/Payment/webhook";
             });
 
             services.ConfigureBccCoreCqrs();

@@ -7,6 +7,7 @@ using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Dtos;
+using BccPay.Core.Infrastructure.Exceptions;
 using BccPay.Core.Infrastructure.PaymentProviders;
 using BccPay.Core.Shared.Converters;
 using BccPay.Core.Shared.Helpers;
@@ -64,7 +65,7 @@ namespace BccPay.Core.Cqrs.Commands
         {
             var payment = await _documentSession.LoadAsync<Payment>(
                         Payment.GetPaymentId(request.PaymentId), cancellationToken)
-                        ?? throw new Exception("Invalid payment ID");
+                    ?? throw new NotFoundException("Invalid payment ID");
 
             var paymentConfiguration = await _documentSession.LoadAsync<PaymentConfiguration>(
                     PaymentConfiguration.GetPaymentConfigurationId(request.PaymentConfigurationId), cancellationToken)
@@ -77,7 +78,7 @@ namespace BccPay.Core.Cqrs.Commands
 
             var provider = _paymentProviderFactory.GetPaymentProvider(paymentConfiguration.Provider);
 
-            var providerResult = await provider.CreatePayment(new PaymentRequestDto
+            var paymentRequest = new PaymentRequestDto
             {
                 Amount = decimal.Round(payment.Amount, 2, MidpointRounding.AwayFromZero),
                 Address = new AddressDto
@@ -95,21 +96,25 @@ namespace BccPay.Core.Cqrs.Commands
                 LastName = request.LastName,
                 PhoneNumberBody = phoneBody,
                 PhoneNumberPrefix = phonePrefix,
-                Currency = payment.CurrencyCode
-            }, paymentConfiguration.Settings);
+                Currency = payment.CurrencyCode,
+                NotificationAccessToken = Guid.NewGuid().ToString()
+            };
 
-            var attempt = new Attempt
+            var providerResult = await paymentProvider.CreatePayment(paymentRequest, paymentConfiguration.Settings);
+
+            var attemptToAdd = new Attempt
             {
                 PaymentAttemptId = Guid.NewGuid(),
                 PaymentMethod = paymentConfiguration.Settings.PaymentMethod,
-                PaymentStatus = providerResult.IsSuccessful ? AttemptStatus.WaitingForFee : AttemptStatus.Rejected,
+                AttemptStatus = providerResult.IsSuccessful ? AttemptStatus.WaitingForCharge : AttemptStatus.RejectedEitherCancelled,
                 IsActive = providerResult.IsSuccessful,
                 Created = DateTime.Now,
-                StatusDetails = providerResult
+                StatusDetails = providerResult,
+                NotificationAccessToken = paymentRequest.NotificationAccessToken
             };
 
             payment.Updated = DateTime.Now;
-            payment.AddAttempt(new List<Attempt> { attempt });
+            payment.AddAttempt(new List<Attempt> { attemptToAdd });
             await _documentSession.SaveChangesAsync(cancellationToken);
 
             return providerResult;
