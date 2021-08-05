@@ -21,7 +21,6 @@ export async function initPayment(
     })
       .then(response => response.json())
       .then(json => {
-        console.log('parsed json', json);
         paymentId = json.paymentId;
       });
     return paymentId;

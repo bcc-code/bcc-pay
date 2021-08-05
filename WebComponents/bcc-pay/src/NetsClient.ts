@@ -1,12 +1,13 @@
-import { NetsUser } from './NetsUser';
 import { User } from './User';
+import { isDevEnv } from './BccPay';
 
 var checkout: any;
 
 export async function startNetsPayment(
   paymentId: string,
   user: User,
-  server: string
+  server: string,
+  checkoutKey: string
 ): Promise<boolean> {
   const firstScreenElement = document.getElementById(
     'first-screen'
@@ -24,9 +25,10 @@ export async function startNetsPayment(
   netsScreenElement.style.display = 'block';
 
   const netsPaymentId = await initNetsPayment(paymentId, user, server);
-  console.log('Nets payment id is: ' + netsPaymentId);
-
-  return await processNetsPayment(netsPaymentId);
+  if (isDevEnv === true) {
+    console.log('Nets payment id is: ' + netsPaymentId);
+  }
+  return await processNetsPayment(netsPaymentId, checkoutKey);
 }
 
 export async function initNetsPayment(
@@ -34,7 +36,6 @@ export async function initNetsPayment(
   user: User,
   server: string
 ): Promise<string> {
-  console.log('User in init nets payment: ' + JSON.stringify(user));
   const body = {
     paymentMethod: 'NetsCreditCard',
     email: user.email === null ? undefined : user.email,
@@ -46,8 +47,6 @@ export async function initNetsPayment(
     city: user.city === null ? undefined : user.city,
     postalCode: user.postalCode === null ? undefined : user.postalCode,
   };
-
-  console.log('Body in init nets payment: ' + JSON.stringify(body));
 
   let netsPaymentId: string = '';
   await fetch(`${server}/Payment/${paymentId}/attempts`, {
@@ -64,10 +63,13 @@ export async function initNetsPayment(
   return netsPaymentId;
 }
 
-export async function processNetsPayment(paymentId: string): Promise<boolean> {
+export async function processNetsPayment(
+  paymentId: string,
+  checkoutKey: string
+): Promise<boolean> {
   if (paymentId) {
     const checkoutOptions = {
-      checkoutKey: '#checkout-key#',
+      checkoutKey: checkoutKey,
       paymentId: paymentId,
       containerId: 'checkout-container-div',
     };
@@ -75,14 +77,20 @@ export async function processNetsPayment(paymentId: string): Promise<boolean> {
     // @ts-ignore
     checkout = new Dibs.Checkout(checkoutOptions);
     await checkout.on('payment-completed', function (response: any) {
-      console.log('Completed!' + JSON.stringify(response));
+      if (isDevEnv === true) {
+        console.log('Completed!' + JSON.stringify(response));
+      }
       return true;
     });
 
-    console.log('Not completed!');
+    if (isDevEnv === true) {
+      console.log('Not completed!');
+    }
     return false;
   } else {
-    console.log('Expected a paymentId');
+    if (isDevEnv === true) {
+      console.log('Expected a paymentId');
+    }
     return false;
   }
 }

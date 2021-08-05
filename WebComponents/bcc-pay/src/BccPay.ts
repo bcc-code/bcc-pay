@@ -4,6 +4,8 @@ import { startNetsPayment } from './NetsClient';
 import { initPayment } from './BccPayClient';
 import { User } from './User';
 
+export let isDevEnv: boolean;
+
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
   @property({ type: Number }) amount = 5;
@@ -15,14 +17,20 @@ export class BccPay extends LitElement {
     lastName: 'Doe',
   };
   @property({ type: String }) server = 'https://localhost:5001';
-  @property({ type: String }) checkoutKey = 'https://localhost:5001';
+  @property({ type: String }) netsCheckoutKey = '#checkout_key#';
   @property({ type: Boolean }) isDevEnv: boolean = false;
 
   paymentId: string = '';
 
   loadNestScript() {
     let script = document.createElement('script');
-    script.src = 'https://test.checkout.dibspayment.eu/v1/checkout.js?v=1';
+    isDevEnv = this.isDevEnv;
+    if (isDevEnv === true) {
+      script.src = 'https://test.checkout.dibspayment.eu/v1/checkout.js?v=1';
+    } else {
+      script.src = 'https://checkout.dibspayment.eu/v1/checkout.js?v=1';
+    }
+
     return script;
   }
 
@@ -79,7 +87,10 @@ export class BccPay extends LitElement {
     if (this.paymentId === '') {
       this.displayErrorPage();
     }
-    console.log('Bcc pay payment id: ' + this.paymentId);
+
+    if (isDevEnv === true) {
+      console.log('Bcc pay payment id: ' + this.paymentId);
+    }
   }
 
   render() {
@@ -102,7 +113,12 @@ export class BccPay extends LitElement {
           <button
             class="nets-button"
             @click="${() =>
-              startNetsPayment(this.paymentId, this.user, this.server)}"
+              startNetsPayment(
+                this.paymentId,
+                this.user,
+                this.server,
+                this.netsCheckoutKey
+              )}"
           >
             PAY WITH NETS
           </button>
@@ -213,7 +229,12 @@ export class BccPay extends LitElement {
           <button
             class="reload-button"
             @click="${() =>
-              startNetsPayment(this.paymentId, this.user, this.server)}"
+              startNetsPayment(
+                this.paymentId,
+                this.user,
+                this.server,
+                this.netsCheckoutKey
+              )}"
           >
             CHANGE
           </button>
