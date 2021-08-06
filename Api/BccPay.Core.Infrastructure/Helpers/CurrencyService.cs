@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
+using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.Exceptions;
 using BccPay.Core.Infrastructure.RefitClients;
 using BccPay.Core.Shared.Converters;
@@ -32,10 +33,10 @@ namespace BccPay.Core.Infrastructure.Helpers
                 ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        public async Task<(decimal, decimal)> Exchange(Currencies fromCurrency, Currencies toCurrency, decimal amount, decimal tax = 0)
+        public async Task<CurrencyExchangeResult> Exchange(Currencies fromCurrency, Currencies toCurrency, decimal amount, decimal tax = 0)
         {
-            if (fromCurrency == toCurrency)
-                return (amount, 0);
+            if (fromCurrency == toCurrency || amount == 0)
+                throw new CurrencyExchangeOperationException("Unable to convert values.");
 
             var (currencyRate, fromOpposite) = await GetExhangeRateByCurrency(fromCurrency, toCurrency);
 
@@ -49,12 +50,20 @@ namespace BccPay.Core.Infrastructure.Helpers
             if (tax is not 0)
             {
                 tax += Decimal.Multiply(exchangeResultNetto, tax);
-                return (
-                    decimal.Round(exchangeResultNetto + tax, 2, MidpointRounding.AwayFromZero),
-                    decimal.Round(tax, 2, MidpointRounding.AwayFromZero));
+                return new CurrencyExchangeResult(
+                fromCurrency,
+                toCurrency,
+                amount,
+                decimal.Round(exchangeResultNetto + tax, 2, MidpointRounding.AwayFromZero),
+                decimal.Round(exchangeResultNetto, 2, MidpointRounding.AwayFromZero),
+                decimal.Round(tax, 2, MidpointRounding.AwayFromZero));
             }
 
-            return (
+            return new CurrencyExchangeResult(
+                fromCurrency,
+                toCurrency,
+                amount,
+                decimal.Round(exchangeResultNetto, 2, MidpointRounding.AwayFromZero),
                 decimal.Round(exchangeResultNetto, 2, MidpointRounding.AwayFromZero),
                 decimal.Round(tax, 2, MidpointRounding.AwayFromZero));
         }
