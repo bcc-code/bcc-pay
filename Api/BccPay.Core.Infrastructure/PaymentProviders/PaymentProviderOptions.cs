@@ -8,15 +8,4 @@
         public string TermsUrl { get; set; }
         public string NotificationUrl { get; set; }
     }
-
-    public class FixerProviderOptions
-    {
-        public string BaseAddress { get; set; }
-    }
-
-    public class PaymentProviderOptions
-    {
-        public NetsProviderOptions Nets { get; } = new NetsProviderOptions();
-        public FixerProviderOptions Fixer { get; } = new FixerProviderOptions();
-    }
 }

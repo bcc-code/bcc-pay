@@ -12,10 +12,11 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="10.3.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Net.Http.Headers" Version="2.2.8" />
-    <PackageReference Include="RavenDB.DependencyInjection" Version="4.0.2" />
+    <PackageReference Include="RavenDB.Client" Version="5.2.1" />
     <PackageReference Include="Refit" Version="6.0.38" />
     <PackageReference Include="Refit.HttpClientFactory" Version="6.0.38" />
   </ItemGroup>
