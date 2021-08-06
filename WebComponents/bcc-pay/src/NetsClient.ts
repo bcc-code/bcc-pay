@@ -1,5 +1,6 @@
 import { User } from './User';
 import { isDevEnv } from './BccPay';
+import { displayErrorPage } from './ScreenChange';
 
 var checkout: any;
 
@@ -27,6 +28,11 @@ export async function startNetsPayment(
   const netsPaymentId = await initNetsPayment(paymentId, user, server);
   if (isDevEnv === true) {
     console.log('Nets payment id is: ' + netsPaymentId);
+  }
+
+  if (netsPaymentId === null || netsPaymentId === undefined) {
+    displayErrorPage();
+    return false;
   }
   return await processNetsPayment(netsPaymentId, checkoutKey);
 }

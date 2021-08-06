@@ -3,6 +3,11 @@ import { applyStyles } from './SharedStyles';
 import { startNetsPayment } from './NetsClient';
 import { initPayment } from './BccPayClient';
 import { User } from './User';
+import {
+  displayChangeUserDataPage,
+  displayErrorPage,
+  reload,
+} from './ScreenChange';
 
 export let isDevEnv: boolean;
 
@@ -39,39 +44,6 @@ export class BccPay extends LitElement {
     applyStyles();
   }
 
-  displayErrorPage() {
-    const firstScreenElement = document.getElementById(
-      'first-screen'
-    ) as HTMLElement;
-    firstScreenElement.style.display = 'none';
-
-    const errorScreenElement = document.getElementById(
-      'payment-error-screen'
-    ) as HTMLElement;
-    errorScreenElement.style.display = 'block';
-  }
-
-  displayChangeUserDataPage() {
-    const errorScreenElement = document.getElementById(
-      'nets-payment-screen'
-    ) as HTMLElement;
-    errorScreenElement.style.display = 'none';
-
-    const checkoutElement = document.getElementById(
-      'checkout-container-div'
-    ) as HTMLElement;
-    checkoutElement.innerHTML = '';
-
-    const changeUserDataElement = document.getElementById(
-      'change-user-data-screen'
-    ) as HTMLElement;
-    changeUserDataElement.style.display = 'block';
-  }
-
-  reload() {
-    window.location.reload();
-  }
-
   async init() {
     this.paymentId = await initPayment(
       this.currency,
@@ -81,7 +53,7 @@ export class BccPay extends LitElement {
     );
 
     if (this.paymentId === '') {
-      this.displayErrorPage();
+      displayErrorPage();
     }
 
     if (isDevEnv === true) {
@@ -126,7 +98,7 @@ export class BccPay extends LitElement {
               There is an issue with starting payment, please try again later.
             </h5>
           </div>
-          <button class="reload-button" @click="${() => this.reload()}">
+          <button class="reload-button" @click="${() => reload()}">
             RELOAD
           </button>
         </div>
@@ -137,7 +109,7 @@ export class BccPay extends LitElement {
               Issue with payment?
               <button
                 class="link-button"
-                @click="${() => this.displayChangeUserDataPage()}"
+                @click="${() => displayChangeUserDataPage()}"
               >
                 Edit personal data
               </button>
