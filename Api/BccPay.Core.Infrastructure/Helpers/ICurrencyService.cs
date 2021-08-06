@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace BccPay.Core.Infrastructure.Helpers
 {
-    public interface ICurrencyExchangeService
+    public interface ICurrencyService
     {
-        Task<(decimal, decimal)> ExchangeCurrency(Currencies formCurrency, Currencies toCurrency, decimal amount, decimal tax = 0);
+        Task<(decimal, decimal)> Exchange(Currencies formCurrency, Currencies toCurrency, decimal amount, decimal tax = 0);
         Task UpsertCurrencyRate(CancellationToken cancellationToken);
     }
 }

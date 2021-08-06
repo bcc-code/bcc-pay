@@ -14,13 +14,13 @@ using System.Threading.Tasks;
 
 namespace BccPay.Core.Infrastructure.Helpers
 {
-    public class CurrencyExchangeService : ICurrencyExchangeService
+    public class CurrencyService : ICurrencyService
     {
         private readonly IAsyncDocumentSession _documentSession;
         private readonly IFixerClient _fixerClient;
         private readonly IConfiguration _configuration;
 
-        public CurrencyExchangeService(IAsyncDocumentSession documentSession,
+        public CurrencyService(IAsyncDocumentSession documentSession,
             IFixerClient fixerClient,
             IConfiguration configuration)
         {
@@ -32,7 +32,7 @@ namespace BccPay.Core.Infrastructure.Helpers
                 ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        public async Task<(decimal, decimal)> ExchangeCurrency(Currencies fromCurrency, Currencies toCurrency, decimal amount, decimal tax = 0)
+        public async Task<(decimal, decimal)> Exchange(Currencies fromCurrency, Currencies toCurrency, decimal amount, decimal tax = 0)
         {
             if (fromCurrency == toCurrency)
                 return (amount, 0);

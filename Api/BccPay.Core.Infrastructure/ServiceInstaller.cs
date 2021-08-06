@@ -32,7 +32,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddRefitClient<IFixerClient>()
                 .ConfigureHttpClient(client => client.BaseAddress = new Uri(defaultOptions.Fixer.BaseAddress));
 
-            services.AddTransient<ICurrencyExchangeService, CurrencyExchangeService>();
+            services.AddTransient<ICurrencyService, CurrencyService>();
             return services;
         }
 

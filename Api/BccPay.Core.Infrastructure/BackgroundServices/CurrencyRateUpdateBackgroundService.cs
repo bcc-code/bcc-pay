@@ -23,11 +23,11 @@ namespace BccPay.Core.Infrastructure.BackgroundServices
                 try
                 {
                     using var serviceProvider = _serviceProvider.CreateScope();
-                    var _currencyExchangeService = (ICurrencyExchangeService)serviceProvider
+                    var _currencyService = (ICurrencyService)serviceProvider
                         .ServiceProvider
-                        .GetRequiredService(typeof(ICurrencyExchangeService));
+                        .GetRequiredService(typeof(ICurrencyService));
 
-                    await _currencyExchangeService.UpsertCurrencyRate(cancellationToken);
+                    await _currencyService.UpsertCurrencyRate(cancellationToken);
                 }
                 catch
                 {
