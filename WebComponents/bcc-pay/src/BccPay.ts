@@ -3,14 +3,20 @@ import { applyStyles } from './SharedStyles';
 import { startNetsPayment } from './NetsClient';
 import { initPayment } from './BccPayClient';
 import { User } from './User';
+import {
+  displayChangeUserDataPage,
+  displayErrorPage,
+  reload,
+  close,
+} from './ScreenChange';
 
 export let isDevEnv: boolean;
 
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
   @property({ type: Number }) amount = 5;
-  @property({ type: String }) currency = 'NOK';
-  @property({ type: String }) country = 'NOR';
+  @property({ type: String }) currency = 'EUR';
+  @property({ type: String }) country = 'DE';
   @property({ type: User }) user: User = {};
   @property({ type: String }) server = 'https://localhost:5001';
   @property({ type: String }) netsCheckoutKey = '#checkout_key#';
@@ -39,39 +45,6 @@ export class BccPay extends LitElement {
     applyStyles();
   }
 
-  displayErrorPage() {
-    const firstScreenElement = document.getElementById(
-      'first-screen'
-    ) as HTMLElement;
-    firstScreenElement.style.display = 'none';
-
-    const errorScreenElement = document.getElementById(
-      'payment-error-screen'
-    ) as HTMLElement;
-    errorScreenElement.style.display = 'block';
-  }
-
-  displayChangeUserDataPage() {
-    const errorScreenElement = document.getElementById(
-      'nets-payment-screen'
-    ) as HTMLElement;
-    errorScreenElement.style.display = 'none';
-
-    const checkoutElement = document.getElementById(
-      'checkout-container-div'
-    ) as HTMLElement;
-    checkoutElement.innerHTML = '';
-
-    const changeUserDataElement = document.getElementById(
-      'change-user-data-screen'
-    ) as HTMLElement;
-    changeUserDataElement.style.display = 'block';
-  }
-
-  reload() {
-    window.location.reload();
-  }
-
   async init() {
     this.paymentId = await initPayment(
       this.currency,
@@ -81,7 +54,7 @@ export class BccPay extends LitElement {
     );
 
     if (this.paymentId === '') {
-      this.displayErrorPage();
+      displayErrorPage();
     }
 
     if (isDevEnv === true) {
@@ -94,7 +67,7 @@ export class BccPay extends LitElement {
       <div style="display: none">
         ${this.loadNestScript()} ${this.applyStyles()} ${this.init()}
       </div>
-      <div class="card-square">
+      <div class="card-square" id="main-div">
         <div id="first-screen">
           <div class="card-subtitle">
             <h5>you are paying for</h5>
@@ -126,18 +99,25 @@ export class BccPay extends LitElement {
               There is an issue with starting payment, please try again later.
             </h5>
           </div>
-          <button class="reload-button" @click="${() => this.reload()}">
+          <button class="reload-button" @click="${() => reload()}">
             RELOAD
           </button>
         </div>
 
+        <div id="payment-completed-screen" style="display: none">
+          <div class="card-subtitle">
+            <h5>Payment success</h5>
+          </div>
+          <button class="reload-button" @click="${() => close()}">Close</button>
+        </div>
+
         <div id="nets-payment-screen" style="display: none">
           <div class="card-subtitle">
-            <h5>
+            <h5 id="payment-issue">
               Issue with payment?
               <button
                 class="link-button"
-                @click="${() => this.displayChangeUserDataPage()}"
+                @click="${() => displayChangeUserDataPage()}"
               >
                 Edit personal data
               </button>

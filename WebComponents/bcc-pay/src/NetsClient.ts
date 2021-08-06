@@ -1,5 +1,6 @@
 import { User } from './User';
 import { isDevEnv } from './BccPay';
+import { displayErrorPage, paymentCompleted } from './ScreenChange';
 
 var checkout: any;
 
@@ -28,6 +29,11 @@ export async function startNetsPayment(
   if (isDevEnv === true) {
     console.log('Nets payment id is: ' + netsPaymentId);
   }
+
+  if (netsPaymentId === null || netsPaymentId === undefined) {
+    displayErrorPage();
+    return false;
+  }
   return await processNetsPayment(netsPaymentId, checkoutKey);
 }
 
@@ -37,7 +43,7 @@ export async function initNetsPayment(
   server: string
 ): Promise<string> {
   const body = {
-    paymentConfigurationId: 'nets-cc-nok',
+    paymentConfigurationId: 'nets-cc-eur',
     email: user.email === null ? undefined : user.email,
     phoneNumber: user.phoneNumber === null ? undefined : user.phoneNumber,
     firstName: user.firstName === null ? undefined : user.firstName,
@@ -49,17 +55,21 @@ export async function initNetsPayment(
   };
 
   let netsPaymentId: string = '';
-  await fetch(`${server}/Payment/${paymentId}/attempts`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-    .then(response => response.json())
-    .then(json => {
-      netsPaymentId = json.paymentCheckoutId;
-    });
+  try {
+    await fetch(`${server}/Payment/${paymentId}/attempts`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(json => {
+        netsPaymentId = json.paymentCheckoutId;
+      });
+  } catch (e) {
+    displayErrorPage();
+  }
   return netsPaymentId;
 }
 
@@ -80,6 +90,7 @@ export async function processNetsPayment(
       if (isDevEnv === true) {
         console.log('Completed!' + JSON.stringify(response));
       }
+      paymentCompleted();
       return true;
     });
 
