@@ -1,56 +1,59 @@
 name: Push Nuget Packages to NuGet Package Registry
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
 
 env:
-  BUILD_CONFIGURATION: "Release"
-  DOTNET_VERSION: "5.0.x"
-  GITHUB_PACKAGE_REGISTRY_URL: https://api.nuget.org/v3/index.json
+    BUILD_CONFIGURATION: "Release"
+    DOTNET_VERSION: "5.0.x"
+    GITHUB_PACKAGE_REGISTRY_URL: https://api.nuget.org/v3/index.json
 
 jobs:
-  gpr-build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      
-      - name: Generate build number
-        id: build_number
-        uses: paulhatch/semantic-version@v4.0.2
-        with:
-          tag_prefix: "v"
+    gpr-build-and-deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-          source-url: ${{ env.GITHUB_PACKAGE_REGISTRY_URL }}
-        env:
-          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+            - name: Generate build number
+              id: build_number
+              uses: paulhatch/semantic-version@v4.0.2
+              with:
+                  tag_prefix: "v"
 
-      - name: dotnet build and publish
-        run: |
-          dotnet restore Api/BccPay.Core.sln
-          dotnet build Api/BccPay.Core.Domain/BccPay.Core.Domain.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
-          dotnet build Api/BccPay.Core.Infrastructure/BccPay.Core.Infrastructure.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
-          dotnet build Api/BccPay.Core.Cqrs/BccPay.Core.Cqrs.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
-          dotnet build Api/BccPay.Core.Enums/BccPay.Core.Enums.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
-          dotnet build Api/BccPay.Core.Shared/BccPay.Core.Shared.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
-          dotnet pack Api/BccPay.Core.Domain/BccPay.Core.Domain.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
-          dotnet pack Api/BccPay.Core.Infrastructure/BccPay.Core.Infrastructure.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
-          dotnet pack Api/BccPay.Core.Cqrs/BccPay.Core.Cqrs.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
-          dotnet pack Api/BccPay.Core.Enums/BccPay.Core.Enums.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
-          dotnet pack Api/BccPay.Core.Shared/BccPay.Core.Shared.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v1
+              with:
+                  dotnet-version: ${{ env.DOTNET_VERSION }}
+                  source-url: ${{ env.GITHUB_PACKAGE_REGISTRY_URL }}
+              env:
+                  NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - name: nuget publish
-        run: |
-          dotnet nuget push Api/BccPay.Core.Infrastructure/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
-          dotnet nuget push Api/BccPay.Core.Domain/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
-          dotnet nuget push Api/BccPay.Core.Cqrs/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
-          dotnet nuget push Api/BccPay.Core.Enums/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
-          dotnet nuget push Api/BccPay.Core.Shared/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+            - name: dotnet build and publish
+              run: |
+                  dotnet restore Api/BccPay.Core.sln
+                  dotnet build Api/BccPay.Core.Domain/BccPay.Core.Domain.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+                  dotnet build Api/BccPay.Core.Infrastructure/BccPay.Core.Infrastructure.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+                  dotnet build Api/BccPay.Core.Cqrs/BccPay.Core.Cqrs.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+                  dotnet build Api/BccPay.Core.Enums/BccPay.Core.Enums.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+                  dotnet build Api/BccPay.Core.Shared/BccPay.Core.Shared.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+                  dotnet build Api/BccPay.Core.DataAccess/BccPay.Core.DataAccess.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+                  dotnet pack Api/BccPay.Core.Domain/BccPay.Core.Domain.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+                  dotnet pack Api/BccPay.Core.Infrastructure/BccPay.Core.Infrastructure.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+                  dotnet pack Api/BccPay.Core.Cqrs/BccPay.Core.Cqrs.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+                  dotnet pack Api/BccPay.Core.Enums/BccPay.Core.Enums.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+                  dotnet pack Api/BccPay.Core.Shared/BccPay.Core.Shared.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+                  dotnet pack Api/BccPay.Core.DataAccess/BccPay.Core.DataAccess.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+
+            - name: nuget publish
+              run: |
+                  dotnet nuget push Api/BccPay.Core.Infrastructure/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+                  dotnet nuget push Api/BccPay.Core.Domain/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+                  dotnet nuget push Api/BccPay.Core.Cqrs/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+                  dotnet nuget push Api/BccPay.Core.Enums/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+                  dotnet nuget push Api/BccPay.Core.Shared/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+                  dotnet nuget push Api/BccPay.Core.DataAccess/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate

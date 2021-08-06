@@ -8,9 +8,4 @@
         public string TermsUrl { get; set; }
         public string NotificationUrl { get; set; }
     }
-
-    public class PaymentProviderOptions
-    {
-        public NetsProviderOptions Nets { get; } = new NetsProviderOptions();
-    }
 }
