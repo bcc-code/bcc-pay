@@ -1,6 +1,6 @@
 import { User } from './User';
 import { isDevEnv } from './BccPay';
-import { displayErrorPage } from './ScreenChange';
+import { displayErrorPage, paymentCompleted } from './ScreenChange';
 
 var checkout: any;
 
@@ -90,6 +90,7 @@ export async function processNetsPayment(
       if (isDevEnv === true) {
         console.log('Completed!' + JSON.stringify(response));
       }
+      paymentCompleted();
       return true;
     });
 

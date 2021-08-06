@@ -27,6 +27,23 @@ export function displayChangeUserDataPage() {
   changeUserDataElement.style.display = 'block';
 }
 
+export function paymentCompleted() {
+  const errorScreenElement = document.getElementById(
+    'payment-issue'
+  ) as HTMLElement;
+  errorScreenElement.style.display = 'none';
+
+  const paymentCompletedElement = document.getElementById(
+    'payment-completed-screen'
+  ) as HTMLElement;
+  paymentCompletedElement.style.display = 'block';
+}
+
 export function reload() {
   window.location.reload();
+}
+
+export function close() {
+  const mainElement = document.getElementById('main-div') as HTMLElement;
+  mainElement.style.display = 'none';
 }

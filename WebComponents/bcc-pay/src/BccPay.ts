@@ -7,6 +7,7 @@ import {
   displayChangeUserDataPage,
   displayErrorPage,
   reload,
+  close,
 } from './ScreenChange';
 
 export let isDevEnv: boolean;
@@ -66,7 +67,7 @@ export class BccPay extends LitElement {
       <div style="display: none">
         ${this.loadNestScript()} ${this.applyStyles()} ${this.init()}
       </div>
-      <div class="card-square">
+      <div class="card-square" id="main-div">
         <div id="first-screen">
           <div class="card-subtitle">
             <h5>you are paying for</h5>
@@ -103,9 +104,16 @@ export class BccPay extends LitElement {
           </button>
         </div>
 
+        <div id="payment-completed-screen" style="display: none">
+          <div class="card-subtitle">
+            <h5>Payment success</h5>
+          </div>
+          <button class="reload-button" @click="${() => close()}">Close</button>
+        </div>
+
         <div id="nets-payment-screen" style="display: none">
           <div class="card-subtitle">
-            <h5>
+            <h5 id="payment-issue">
               Issue with payment?
               <button
                 class="link-button"

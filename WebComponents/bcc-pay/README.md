@@ -2,100 +2,71 @@
 
 This webcomponent follows the [open-wc](https://github.com/open-wc/open-wc) recommendation.
 
-## Installation
+Install of component:
+`npm install bcc-pay`
 
-```bash
-npm i bcc-pay
+For angular module you have to add CUSTOM_ELEMENTS_SCHEMA from '@angular/core'
+
+```JavaScript
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+@NgModule({
+  declarations: [SampleComponent],
+  imports: [CommonModule, SampleRoutingModule],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+})
 ```
 
-## Usage
+Then you can use webComponent with one of options presented below, you have to always pass your netsCheckoutKey from nets admin panel:
+
+```
+> https://portal.dibspayment.eu/dashboard
+> Company
+> Integration
+> Checkout key
+```
+
+Examples of using component
 
 ```html
-<script type="module">
-  import 'bcc-pay/dist/bcc-pay.js';
-</script>
+<bcc-pay netsCheckoutKey="#netsCheckoutKey#" isDevEnv="true"></bcc-pay>
 
-<bcc-pay></bcc-pay>
-or parametrized
-<bcc-pay amount="1" currency="NOK" country="NOR"></bcc-pay>
+<bcc-pay
+  item="Subscpription"
+  currency="NOK"
+  country="NOR"
+  amount="10"
+  server="https://localhost:5001"
+  netsCheckoutKey="#netsCheckoutKey#"
+></bcc-pay>
 ```
 
-## Linting with ESLint, Prettier, and Types
+You can also pass user object to component:
 
-To scan the project for linting errors, run
+JS
 
-```bash
-npm run lint
+```JavaScript
+const sampleUser = {
+    email: 'doe@test.no',
+    phoneNumber: '+47661626839',
+    firstName: 'John',
+    lastName: 'Doe',
+    addressLine1: 'TestAddressLine1',
+    addressLine2: 'TestAddressLine2',
+    city: 'Oslo',
+    postalCode: '0001',
+  };
 ```
 
-You can lint with ESLint and Prettier individually as well
+HTML
 
-```bash
-npm run lint:eslint
+```html
+<bcc-pay
+  item="Subscpription"
+  currency="NOK"
+  country="NOR"
+  amount="12"
+  server="https://localhost:5001"
+  user="${this.sampleUser}"
+  netsCheckoutKey="#netsCheckoutKey#"
+></bcc-pay>
 ```
-
-```bash
-npm run lint:prettier
-```
-
-To automatically fix many linting errors, run
-
-```bash
-npm run format
-```
-
-You can format using ESLint and Prettier individually as well
-
-```bash
-npm run format:eslint
-```
-
-```bash
-npm run format:prettier
-```
-
-## Testing with Web Test Runner
-
-To run the suite of Web Test Runner tests, run
-
-```bash
-npm run test
-```
-
-To run the tests in watch mode (for &lt;abbr title=&#34;test driven development&#34;&gt;TDD&lt;/abbr&gt;, for example), run
-
-```bash
-npm run test:watch
-```
-
-## Demoing with Storybook
-
-To run a local instance of Storybook for your component, run
-
-```bash
-npm run storybook
-```
-
-To build a production version of Storybook, run
-
-```bash
-npm run storybook:build
-```
-
-## Tooling configs
-
-For most of the tools, the configuration is in the `package.json` to reduce the amount of files in your project.
-
-If you customize the configuration a lot, you can consider moving them to individual files.
-
-## Local Demo with `web-dev-server`
-
-```bash
-npm start
-```
-
-To run a local development server that serves the basic demo located in `demo/index.html`
-
-## Publishing package
-
-`npm publish`
