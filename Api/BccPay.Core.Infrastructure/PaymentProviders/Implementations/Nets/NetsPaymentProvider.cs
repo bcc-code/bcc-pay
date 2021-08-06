@@ -7,7 +7,8 @@ using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentProviders.Implementations.Nets;
-using BccPay.Core.Infrastructure.RefitClients;
+using BccPay.Core.Infrastructure.PaymentProviders.RefitClients;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using Refit;
 
@@ -17,15 +18,16 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
     {
         private readonly INetsClient _netsClient;
         private readonly NetsProviderOptions _options;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDictionary<string, string> _headers;
 
-        public NetsPaymentProvider(INetsClient netsClient, NetsProviderOptions options)
+        public NetsPaymentProvider(INetsClient netsClient, NetsProviderOptions options, IHttpContextAccessor httpContextAccessor)
         {
             _netsClient = netsClient
                 ?? throw new ArgumentNullException(nameof(netsClient));
 
             _options = options;
-
+            _httpContextAccessor = httpContextAccessor;
             _headers = new Dictionary<string, string>
             {
                 { HeaderNames.Authorization, _options.SecretKey },
@@ -38,9 +40,12 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
         public async Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSettings settings)
         {
             INetsPaymentRequestBuilder requestBuilder = this.CreateRequestBuilder(settings);
+            var referer = new Uri(_httpContextAccessor.HttpContext.Request.Headers["Referer"].ToString());
+            var host = $"{referer.Scheme}://{referer.Authority}";
+
             try
             {
-                var result = await _netsClient.CreatePaymentAsync(_headers, requestBuilder.BuildNetsPaymentRequest(paymentRequest));
+                var result = await _netsClient.CreatePaymentAsync(_headers, requestBuilder.BuildNetsPaymentRequest(paymentRequest, host));
 
                 return new NetsStatusDetails
                 {
@@ -52,7 +57,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
             {
                 try
                 {
-                    var result = await _netsClient.CreatePaymentAsync(_headers, requestBuilder.BuildNetsPaymentRequest(paymentRequest, false));
+                    var result = await _netsClient.CreatePaymentAsync(_headers, requestBuilder.BuildNetsPaymentRequest(paymentRequest, host, isUserDataValid: false));
                     return new NetsStatusDetails
                     {
                         IsSuccessful = true,
