@@ -7,7 +7,7 @@ using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentProviders.Implementations.Nets;
-using BccPay.Core.Infrastructure.PaymentProviders.RefitClients;
+using BccPay.Core.Infrastructure.RefitClients;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using Refit;
