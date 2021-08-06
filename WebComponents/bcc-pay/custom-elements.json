@@ -1,0 +1,50 @@
+{
+  "version": 2,
+  "tags": [
+    {
+      "name": "bcc-pay",
+      "description": "Bcc pay component to receive payments",
+      "properties": [
+        {
+          "name": "item",
+          "type": "String",
+          "description": "Item what user is paying",
+          "default": "Subscription"
+        },
+        {
+          "name": "amount",
+          "type": "Number",
+          "description": "Amount of an item",
+          "default": 0
+        },
+        {
+          "name": "currency",
+          "type": "String",
+          "description": "Actual currency",
+          "default": "NOK"
+        },
+        {
+          "name": "server",
+          "type": "String",
+          "description": "Bcc pay API url",
+          "default": "https://localhost:5001"
+        },
+        {
+          "name": "netsCheckoutKey",
+          "type": "String",
+          "description": "NetsCheckoutKey",
+          "default": "#netsCheckoutKey#"
+        },
+        {
+          "name": "isDevEnv",
+          "type": "Boolean",
+          "description": "Enables dev nets sdk",
+          "default": false
+        }
+      ],
+      "events": [],
+      "slots": [],
+      "cssProperties": []
+    }
+  ]
+}

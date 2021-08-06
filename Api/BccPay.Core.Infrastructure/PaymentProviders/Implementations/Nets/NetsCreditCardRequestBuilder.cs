@@ -1,76 +1,22 @@
-﻿using BccPay.Core.Domain.Entities;
+﻿using System;
+using System.Collections.Generic;
 using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
 using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
-using BccPay.Core.Infrastructure.RefitClients;
-using Microsoft.Net.Http.Headers;
-using Refit;
-using System;
-using System.Collections.Generic;
-using System.Net.Mime;
-using System.Threading.Tasks;
 
-namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
+namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Nets
 {
-    internal class NetsCreditCardPaymentProvider : IPaymentProvider
+    public class NetsCreditCardRequestBuilder : INetsPaymentRequestBuilder
     {
-        private readonly INetsClient _netsClient;
         private readonly NetsProviderOptions _options;
-        private readonly IDictionary<string, string> _headers;
 
-        public NetsCreditCardPaymentProvider(INetsClient netsClient, NetsProviderOptions options)
+        public NetsCreditCardRequestBuilder(NetsProviderOptions options)
         {
-            _netsClient = netsClient
-                ?? throw new ArgumentNullException(nameof(netsClient));
-
             _options = options;
-
-            _headers = new Dictionary<string, string>
-            {
-                { HeaderNames.Authorization, _options.SecretKey },
-                { HeaderNames.ContentType, MediaTypeNames.Application.Json }
-            };
         }
 
-        public string PaymentMethod => Enums.PaymentMethod.NetsCreditCard.ToString();
-
-        public async Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest)
-        {
-            try
-            {
-                var result = await _netsClient.CreatePaymentAsync(_headers, BuildNetsPaymentRequest(paymentRequest));
-
-                return new NetsStatusDetails
-                {
-                    IsSuccessful = true,
-                    PaymentCheckoutId = result.PaymentId
-                };
-            }
-            catch (ApiException retryException)
-            {
-                try
-                {
-                    var result = await _netsClient.CreatePaymentAsync(_headers, BuildNetsPaymentRequest(paymentRequest, false));
-                    return new NetsStatusDetails
-                    {
-                        IsSuccessful = true,
-                        PaymentCheckoutId = result.PaymentId,
-                        Error = "{\"notValidUserBillingDataInTheSystem\":" + retryException?.Content + "}"
-                    };
-                }
-                catch (ApiException exception)
-                {
-                    return new NetsStatusDetails
-                    {
-                        IsSuccessful = false,
-                        Error = exception?.Content
-                    };
-                }
-            }
-        }
-
-        private NetsPaymentRequest BuildNetsPaymentRequest(PaymentRequestDto paymentRequest, bool IsUserDataValid = true)
+        public NetsPaymentRequest BuildNetsPaymentRequest(PaymentRequestDto paymentRequest, bool IsUserDataValid = true)
         {
             int amountMonets = Convert.ToInt32(paymentRequest.Amount * 100);
             List<Webhook> webhooks = new();

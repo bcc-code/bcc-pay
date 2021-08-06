@@ -22,6 +22,7 @@ namespace BccPay.Core.Sample
         {
             Configuration = configuration;
         }
+        private const string AllowOrigins = "_allowOrigins";
 
         public IConfiguration Configuration { get; }
 
@@ -32,8 +33,8 @@ namespace BccPay.Core.Sample
             services.ConfigureBccPayInfrastructure(options =>
             {
                 options.Nets.BaseAddress = "https://test.api.dibspayment.eu";
-                options.Nets.CheckoutPageUrl = "https://localhost:4000/";
-                options.Nets.TermsUrl = "https://localhost:4000/";
+                options.Nets.CheckoutPageUrl = "http://localhost:8000";
+                options.Nets.TermsUrl = "http://localhost:8000";
                 options.Nets.SecretKey = Configuration["SecretKey"];
                 options.Nets.NotificationUrl = "https://localhost:5001/Payment/webhook";
                 options.Fixer.BaseAddress = "http://data.fixer.io/api";
@@ -41,7 +42,19 @@ namespace BccPay.Core.Sample
 
             services.ConfigureBccCoreCqrs();
 
-
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: AllowOrigins,
+                    builder =>
+                    {
+                        builder.WithOrigins(Configuration.GetValue<string>("CorsUrl").Split(','))
+                            .SetIsOriginAllowedToAllowWildcardSubdomains()
+                            .AllowAnyMethod()
+                            .AllowCredentials()
+                            .AllowAnyHeader();
+                    });
+            });
+            
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
             services.AddMvc().AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(new List<Assembly> { typeof(CreatePaymentCommandValidator).Assembly }));
             services.AddAutoMapper(typeof(PaymentProfile).Assembly);
@@ -66,6 +79,8 @@ namespace BccPay.Core.Sample
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(AllowOrigins);
 
             app.UseAuthorization();
 

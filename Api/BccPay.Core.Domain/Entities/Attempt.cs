@@ -1,5 +1,5 @@
-﻿using BccPay.Core.Enums;
-using System;
+﻿using System;
+using BccPay.Core.Enums;
 
 namespace BccPay.Core.Domain.Entities
 {

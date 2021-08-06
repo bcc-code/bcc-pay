@@ -1,0 +1,84 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Mime;
+using System.Threading.Tasks;
+using BccPay.Core.Domain;
+using BccPay.Core.Domain.Entities;
+using BccPay.Core.Enums;
+using BccPay.Core.Infrastructure.Dtos;
+using BccPay.Core.Infrastructure.PaymentProviders.Implementations.Nets;
+using BccPay.Core.Infrastructure.PaymentProviders.RefitClients;
+using Microsoft.Net.Http.Headers;
+using Refit;
+
+namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
+{
+    internal class NetsPaymentProvider : IPaymentProvider
+    {
+        private readonly INetsClient _netsClient;
+        private readonly NetsProviderOptions _options;
+        private readonly IDictionary<string, string> _headers;
+
+        public NetsPaymentProvider(INetsClient netsClient, NetsProviderOptions options)
+        {
+            _netsClient = netsClient
+                ?? throw new ArgumentNullException(nameof(netsClient));
+
+            _options = options;
+
+            _headers = new Dictionary<string, string>
+            {
+                { HeaderNames.Authorization, _options.SecretKey },
+                { HeaderNames.ContentType, MediaTypeNames.Application.Json }
+            };
+        }
+
+        public PaymentProvider PaymentProvider => PaymentProvider.Nets;
+
+        public async Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSettings settings)
+        {
+            INetsPaymentRequestBuilder requestBuilder = this.CreateRequestBuilder(settings);
+            try
+            {
+                var result = await _netsClient.CreatePaymentAsync(_headers, requestBuilder.BuildNetsPaymentRequest(paymentRequest));
+
+                return new NetsStatusDetails
+                {
+                    IsSuccessful = true,
+                    PaymentCheckoutId = result.PaymentId
+                };
+            }
+            catch (ApiException retryException)
+            {
+                try
+                {
+                    var result = await _netsClient.CreatePaymentAsync(_headers, requestBuilder.BuildNetsPaymentRequest(paymentRequest, false));
+                    return new NetsStatusDetails
+                    {
+                        IsSuccessful = true,
+                        PaymentCheckoutId = result.PaymentId,
+                        Error = "{\"notValidUserBillingDataInTheSystem\":" + retryException?.Content + "}"
+                    };
+                }
+                catch (ApiException exception)
+                {
+                    return new NetsStatusDetails
+                    {
+                        IsSuccessful = false,
+                        Error = exception?.Content
+                    };
+                }
+            }
+        }
+
+        private INetsPaymentRequestBuilder CreateRequestBuilder(PaymentSettings settings)
+        {
+            // create a builder depending on the settings
+            return settings switch
+            {
+                { PaymentMethod: PaymentMethod.CreditCard } => new NetsCreditCardRequestBuilder(_options),
+                _ => throw new NotImplementedException()
+            };
+        }
+    }
+}

@@ -22,9 +22,9 @@ namespace Microsoft.Extensions.DependencyInjection
             var defaultOptions = new PaymentProviderOptions();
             configuration(defaultOptions);
 
-            services.AddScoped<IPaymentProvider, NetsCreditCardPaymentProvider>(implementationFactory =>
+            services.AddScoped<IPaymentProvider, NetsPaymentProvider>(implementationFactory =>
             {
-                return new NetsCreditCardPaymentProvider(implementationFactory.GetRequiredService<INetsClient>(),
+                return new NetsPaymentProvider(implementationFactory.GetRequiredService<INetsClient>(),
                     defaultOptions.Nets);
             });
 
