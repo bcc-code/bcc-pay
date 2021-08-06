@@ -66,6 +66,7 @@ namespace BccPay.Core.Infrastructure.Helpers
 
             var lastCurrencyRateUpdate = await _documentSession
                     .Query<CurrencyRate>()
+                    .Where(x => x.Base == currency)
                     .OrderByDescending(x => x.FixerServerUpdate)
                     .FirstOrDefaultAsync(token: cancellationToken);
 
@@ -97,22 +98,17 @@ namespace BccPay.Core.Infrastructure.Helpers
 
         private async Task<(decimal, bool)> GetExhangeRateByCurrency(Currencies formCurrency, Currencies toCurrency)
         {
-            decimal currencyRate = 0;
-            bool fromOpposite = false;
+            var result = await _documentSession.Query<CurrencyRate>()
+                   .Where(x => x.Base == formCurrency)
+                   .FirstOrDefaultAsync();
 
-            currencyRate = await _documentSession.Query<CurrencyRate>()
-                    .Where(x => x.Base == formCurrency)
-                    .Select(x => x.Rates[toCurrency])
-                    .FirstOrDefaultAsync();
-
-            if (currencyRate == 0)
+            if (!IsCurrencyRateValid(result, 2))
             {
-                currencyRate = await _documentSession.Query<CurrencyRate>()
+                var oppositeResult = await _documentSession.Query<CurrencyRate>()
                     .Where(x => x.Base == toCurrency)
-                    .Select(x => x.Rates[formCurrency])
                     .FirstOrDefaultAsync();
 
-                if (currencyRate == 0)
+                if (!IsCurrencyRateValid(oppositeResult, 2))
                 {
                     try
                     {
@@ -124,11 +120,19 @@ namespace BccPay.Core.Infrastructure.Helpers
                         throw new CurrencyExchangeOperationException("The exchange operation cannot be performed");
                     }
                 }
-                fromOpposite = true;
-                return (currencyRate, fromOpposite);
+
+                return (oppositeResult.Rates[formCurrency], true);
             }
 
-            return (currencyRate, fromOpposite);
+            return (result.Rates[toCurrency], false);
+        }
+
+        private bool IsCurrencyRateValid(CurrencyRate currencyRate, int expirationTimeInHours)
+        {
+            if (currencyRate is null)
+                return false;
+
+            return DateTime.UtcNow.Subtract(currencyRate.ServerUpdate).TotalHours < expirationTimeInHours;
         }
     }
 }

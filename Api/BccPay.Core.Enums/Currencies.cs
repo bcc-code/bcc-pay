@@ -4,7 +4,6 @@
     {
         EUR = 0,
         USD = 1,
-        NOK = 2,
-        GBP = 3
+        NOK = 2
     }
 }
