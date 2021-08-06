@@ -47,16 +47,15 @@ namespace BccPay.Core.Infrastructure.Helpers
 
             if (exchangeRateMarkup is not 0)
             {
-                exchangeRateMarkup = Decimal.Multiply(exchangeResultNetto, exchangeRateMarkup);
-                decimal exchangeResultGross = exchangeResultNetto + exchangeRateMarkup;
+                decimal markup = Decimal.Multiply(exchangeResultNetto, exchangeRateMarkup);
+                decimal exchangeResultGross = exchangeResultNetto + markup;
 
                 return new CurrencyExchangeResult(
                 fromCurrency,
                 toCurrency,
                 amount,
                 exchangeResultGross.TwoDigitsAfterPoint(),
-                exchangeResultNetto.TwoDigitsAfterPoint(),
-                exchangeRateMarkup.TwoDigitsAfterPoint());
+                exchangeResultNetto.TwoDigitsAfterPoint());
             }
 
             return new CurrencyExchangeResult(
@@ -64,8 +63,7 @@ namespace BccPay.Core.Infrastructure.Helpers
                 toCurrency,
                 amount,
                 exchangeResultNetto.TwoDigitsAfterPoint(),
-                exchangeResultNetto.TwoDigitsAfterPoint(),
-                exchangeRateMarkup.TwoDigitsAfterPoint());
+                exchangeResultNetto.TwoDigitsAfterPoint());
         }
 
         public async Task UpsertByBaseCurrencyRate(Currencies currency = Currencies.NOK, CancellationToken cancellationToken = default)

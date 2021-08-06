@@ -7,6 +7,5 @@ namespace BccPay.Core.Infrastructure.Dtos
        Currencies ToCurrency,
        decimal Amount,
        decimal Gross,
-       decimal Netto,
-       decimal ExchangeRateMarkup);
+       decimal Netto);
 }
