@@ -19,7 +19,7 @@ namespace BccPay.Core.Sample
                     webBuilder.UseStartup<Startup>();
                 }).ConfigureServices(services =>
                 {
-                    //services.AddHostedService<CurrencyRateUpdateBackgroundService>();
+                    services.AddHostedService<CurrencyRateUpdateBackgroundService>();
                 });
     }
 }
