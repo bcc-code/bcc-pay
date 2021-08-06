@@ -1,4 +1,8 @@
-﻿using BccPay.Core.Domain.Entities;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Exceptions;
 using BccPay.Core.Infrastructure.RefitClients;
@@ -7,10 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
 using Raven.Client.Documents.Session;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BccPay.Core.Infrastructure.Helpers
 {
@@ -49,16 +49,19 @@ namespace BccPay.Core.Infrastructure.Helpers
             if (tax is not 0)
             {
                 tax += Decimal.Multiply(exchangeResultNetto, tax);
-                return (exchangeResultNetto + tax, tax);
+                return (
+                    decimal.Round(exchangeResultNetto + tax, 2, MidpointRounding.AwayFromZero),
+                    decimal.Round(tax, 2, MidpointRounding.AwayFromZero));
             }
 
-            return (decimal.Round(exchangeResultNetto, 2, MidpointRounding.AwayFromZero), decimal.Round(tax, 2, MidpointRounding.AwayFromZero));
+            return (
+                decimal.Round(exchangeResultNetto, 2, MidpointRounding.AwayFromZero),
+                decimal.Round(tax, 2, MidpointRounding.AwayFromZero));
         }
 
-        public async Task UpsertCurrencyRate(CancellationToken cancellationToken = default)
+        public async Task UpsertByBaseCurrencyRate(Currencies currency = Currencies.NOK, CancellationToken cancellationToken = default)
         {
-            // NOTE: this endpoint in fixer client works only with EUR because of subscription plan
-            var fixerApiResult = await _fixerClient.GetLatestCurrencyRate(_configuration["FixerApiKey"], 1)
+            var fixerApiResult = await _fixerClient.GetRatesByBaseCurrency(_configuration["FixerApiKey"], currency.ToString())
                         ?? throw new Exception();
 
             var lastCurrencyRateUpdate = await _documentSession
@@ -113,7 +116,7 @@ namespace BccPay.Core.Infrastructure.Helpers
                 {
                     try
                     {
-                        await UpsertCurrencyRate();
+                        await UpsertByBaseCurrencyRate(formCurrency);
                         return await GetExhangeRateByCurrency(formCurrency, toCurrency);
                     }
                     catch

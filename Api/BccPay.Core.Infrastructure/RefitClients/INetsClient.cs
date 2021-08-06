@@ -1,8 +1,8 @@
-﻿using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
 using BccPay.Core.Infrastructure.PaymentModels.Response.Nets;
 using Refit;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace BccPay.Core.Infrastructure.RefitClients
 {

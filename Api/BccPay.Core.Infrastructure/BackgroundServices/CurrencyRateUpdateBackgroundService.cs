@@ -1,9 +1,9 @@
-﻿using BccPay.Core.Infrastructure.Helpers;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using BccPay.Core.Infrastructure.Helpers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace BccPay.Core.Infrastructure.BackgroundServices
 {
@@ -27,7 +27,7 @@ namespace BccPay.Core.Infrastructure.BackgroundServices
                         .ServiceProvider
                         .GetRequiredService(typeof(ICurrencyService));
 
-                    await _currencyService.UpsertCurrencyRate(cancellationToken);
+                    await _currencyService.UpsertByBaseCurrencyRate(Enums.Currencies.NOK, cancellationToken);
                 }
                 catch
                 {
