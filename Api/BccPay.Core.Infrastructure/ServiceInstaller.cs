@@ -5,6 +5,7 @@ using BccPay.Core.Infrastructure.PaymentProviders;
 using BccPay.Core.Infrastructure.PaymentProviders.Implementations;
 using BccPay.Core.Infrastructure.PaymentProviders.RefitClients;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Refit;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -20,7 +21,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddScoped<IPaymentProvider, NetsPaymentProvider>(implementationFactory =>
             {
-                return new NetsPaymentProvider(implementationFactory.GetRequiredService<INetsClient>(), defaultOptions.Nets);
+                return new NetsPaymentProvider(implementationFactory.GetRequiredService<INetsClient>(),
+                    defaultOptions.Nets,
+                    implementationFactory.GetRequiredService<IHttpContextAccessor>());
             });
 
             services.AddScoped<IPaymentProviderFactory, PaymentProviderFactory>();

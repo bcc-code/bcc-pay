@@ -5,6 +5,6 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Nets
 {
     public interface INetsPaymentRequestBuilder
     {
-        NetsPaymentRequest BuildNetsPaymentRequest(PaymentRequestDto paymentRequest, bool IsUserDataValid = true);
+        NetsPaymentRequest BuildNetsPaymentRequest(PaymentRequestDto paymentRequest, string originUrl, bool isUserDataValid = true);
     }
 }
