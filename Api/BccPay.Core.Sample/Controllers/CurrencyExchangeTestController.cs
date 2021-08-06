@@ -21,9 +21,9 @@ namespace BccPay.Core.Sample.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CurrencyExchangeResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreatePayment([FromQuery] Currencies from, Currencies to, decimal amount, decimal tax)
+        public async Task<IActionResult> CreatePayment([FromQuery] Currencies from, Currencies to, decimal amount, decimal exchangeRateMarkup)
         {
-            var result = await _exchangeService.Exchange(from, to, amount, tax);
+            var result = await _exchangeService.Exchange(from, to, amount, exchangeRateMarkup);
 
             return Ok(result);
         }

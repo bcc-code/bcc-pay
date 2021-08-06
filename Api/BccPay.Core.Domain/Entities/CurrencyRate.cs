@@ -1,18 +1,17 @@
-﻿using BccPay.Core.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using BccPay.Core.Enums;
 
 namespace BccPay.Core.Domain.Entities
 {
     public class CurrencyRate
     {
-        public static string GetCurrencyRateId(Guid currencyRateId)
-             => $"currencyRate/{currencyRateId}";
+        public static string GetCurrencyRateId(Currencies baseCurrency)
+             => $"currencyRate/{baseCurrency}";
 
-        public string Id => GetCurrencyRateId(CurrencyRateId);
-        public Guid CurrencyRateId { get; set; }
+        public string Id => GetCurrencyRateId(BaseCurrency);
 
-        public Currencies Base { get; set; }
+        public Currencies BaseCurrency { get; set; }
         public IDictionary<Currencies, decimal> Rates { get; set; }
         public DateTime ServerUpdate { get; set; }
         public DateTime? FixerServerUpdate { get; set; }

@@ -7,7 +7,7 @@ namespace BccPay.Core.Infrastructure.Helpers
 {
     public interface ICurrencyService
     {
-        Task<CurrencyExchangeResult> Exchange(Currencies formCurrency, Currencies toCurrency, decimal amount, decimal tax = 0);
+        Task<CurrencyExchangeResult> Exchange(Currencies fromCurrency, Currencies toCurrency, decimal amount, decimal exchangeRateMarkup = 0);
         Task UpsertByBaseCurrencyRate(Currencies currency = Currencies.NOK, CancellationToken cancellationToken = default);
     }
 }
