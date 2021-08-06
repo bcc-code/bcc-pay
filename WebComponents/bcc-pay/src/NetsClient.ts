@@ -55,17 +55,21 @@ export async function initNetsPayment(
   };
 
   let netsPaymentId: string = '';
-  await fetch(`${server}/Payment/${paymentId}/attempts`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-    .then(response => response.json())
-    .then(json => {
-      netsPaymentId = json.paymentCheckoutId;
-    });
+  try {
+    await fetch(`${server}/Payment/${paymentId}/attempts`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(json => {
+        netsPaymentId = json.paymentCheckoutId;
+      });
+  } catch (e) {
+    displayErrorPage();
+  }
   return netsPaymentId;
 }
 
