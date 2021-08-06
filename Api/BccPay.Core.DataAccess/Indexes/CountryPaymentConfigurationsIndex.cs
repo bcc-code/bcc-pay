@@ -15,17 +15,23 @@ namespace BccPay.Core.DataAccess.Indexes
                                          let config = LoadDocument<PaymentConfiguration>("payment-configurations/" + configId)
                                          select new Result
                                          {
-                                             Id = configId,
+                                             ConfigId = configId,
                                              CountryCode = country.CountryCode,
                                              Currency = config.Settings.Currency,
                                              PaymentMethod = config.Settings.PaymentMethod,
                                              PaymentProvider = config.Provider
                                          });
+
+            Store(x => x.ConfigId, FieldStorage.Yes);
+            Store(x => x.CountryCode, FieldStorage.Yes);
+            Store(x => x.Currency, FieldStorage.Yes);
+            Store(x => x.PaymentMethod, FieldStorage.Yes);
+            Store(x => x.PaymentProvider, FieldStorage.Yes);
         }
 
         public class Result
         {
-            public string Id { get; set; }
+            public string ConfigId { get; set; }
 
             public string CountryCode { get; set; }
 

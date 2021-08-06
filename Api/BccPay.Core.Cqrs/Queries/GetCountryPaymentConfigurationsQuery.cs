@@ -44,7 +44,7 @@ namespace BccPay.Core.Cqrs.Queries
                                     .Where(x => x.CountryCode == request.countryCode || x.CountryCode == Country.DefaultCountryCode)
                                     .Select(x => new PaymentConfigurationResult
                                     {
-                                        Id = x.Id,
+                                        Id = x.ConfigId,
                                         Currency = x.Currency,
                                         PaymentMethod = x.PaymentMethod,
                                         Provider = x.PaymentProvider,
