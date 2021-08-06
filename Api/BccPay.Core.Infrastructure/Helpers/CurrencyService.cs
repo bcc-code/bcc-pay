@@ -54,18 +54,18 @@ namespace BccPay.Core.Infrastructure.Helpers
                 fromCurrency,
                 toCurrency,
                 amount,
-                exchangeResultGross.TwoNumbersAfterFloatPoint(),
-                exchangeResultNetto.TwoNumbersAfterFloatPoint(),
-                exchangeRateMarkup.TwoNumbersAfterFloatPoint());
+                exchangeResultGross.TwoDigitsAfterPoint(),
+                exchangeResultNetto.TwoDigitsAfterPoint(),
+                exchangeRateMarkup.TwoDigitsAfterPoint());
             }
 
             return new CurrencyExchangeResult(
                 fromCurrency,
                 toCurrency,
                 amount,
-                exchangeResultNetto.TwoNumbersAfterFloatPoint(),
-                exchangeResultNetto.TwoNumbersAfterFloatPoint(),
-                exchangeRateMarkup.TwoNumbersAfterFloatPoint());
+                exchangeResultNetto.TwoDigitsAfterPoint(),
+                exchangeResultNetto.TwoDigitsAfterPoint(),
+                exchangeRateMarkup.TwoDigitsAfterPoint());
         }
 
         public async Task UpsertByBaseCurrencyRate(Currencies currency = Currencies.NOK, CancellationToken cancellationToken = default)

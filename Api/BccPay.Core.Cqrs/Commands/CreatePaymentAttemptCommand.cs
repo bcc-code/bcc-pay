@@ -90,7 +90,7 @@ namespace BccPay.Core.Cqrs.Commands
 
             var paymentRequest = new PaymentRequestDto
             {
-                Amount = payment.Amount.TwoNumbersAfterFloatPoint(),
+                Amount = payment.Amount.TwoDigitsAfterPoint(),
                 Address = new AddressDto
                 {
                     Country = string.IsNullOrWhiteSpace(payment.CountryCode)
