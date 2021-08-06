@@ -1,4 +1,6 @@
-﻿using BccPay.Core.Contracts.Requests;
+﻿using System;
+using System.Threading.Tasks;
+using BccPay.Core.Contracts.Requests;
 using BccPay.Core.Contracts.Responses;
 using BccPay.Core.Cqrs.Commands;
 using BccPay.Core.Cqrs.Queries;
@@ -7,8 +9,6 @@ using BccPay.Core.Infrastructure.PaymentModels.Webhooks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using System;
-using System.Threading.Tasks;
 
 namespace BccPay.Core.Sample.Controllers
 {

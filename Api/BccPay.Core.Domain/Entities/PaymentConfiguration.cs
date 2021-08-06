@@ -4,15 +4,13 @@ namespace BccPay.Core.Domain
 {
     public class PaymentConfiguration
     {
-        public static string GetPaymentConfigurationId(string countryCode) => $"payment-configurations/{countryCode}";
+        public static string GetDocumentId(string code) => $"payment-configurations/{code}";
 
-        public string Id => GetPaymentConfigurationId(PaymentConfigurationCode);
-
-        public string CountryCode { get; set; }
+        public string Id => GetDocumentId(PaymentConfigurationCode);
 
         public string PaymentConfigurationCode { get; init; }
 
-        public PaymentProvider Provider { get; init; }
+        public PaymentProvider Provider { get; set; }
 
         public PaymentSettings Settings { get; set; }
     }

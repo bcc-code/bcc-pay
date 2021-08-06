@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using BccPay.Core.Cqrs;
 using BccPay.Core.Cqrs.Commands;
+using BccPay.Core.Infrastructure.Configuration;
 using BccPay.Core.Sample.Mappers;
 using BccPay.Core.Sample.Middleware;
 using BccPay.Core.Sample.Validation;
@@ -28,9 +30,12 @@ namespace BccPay.Core.Sample
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var bccPaymentsConfiguration = Configuration.GetSection("BccPaymentsConfiguration");
+            services.Configure<BccPaymentsConfiguration>(bccPaymentsConfiguration);
+
             services.AddRavenDatabaseDocumentStore();
 
-            services.ConfigureBccPayInfrastructure(options =>
+            services.ConfigureBccPayInfrastructureServices(options =>
             {
                 options.Nets.BaseAddress = "https://test.api.dibspayment.eu";
                 options.Nets.CheckoutPageUrl = "/checkout";
@@ -55,7 +60,12 @@ namespace BccPay.Core.Sample
             });
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
-            services.AddMvc().AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(new List<Assembly> { typeof(CreatePaymentCommandValidator).Assembly }));
+            services.AddMvc()
+                .AddJsonOptions(op =>
+                {
+                    op.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                })
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(new List<Assembly> { typeof(CreatePaymentCommandValidator).Assembly }));
             services.AddAutoMapper(typeof(PaymentProfile).Assembly);
 
             services.AddControllers();
@@ -88,7 +98,9 @@ namespace BccPay.Core.Sample
                 endpoints.MapControllers();
             });
 
-            //app.WarmUpIndexesInRavenDatabase();
+            app.WarmUpIndexesInRavenDatabase();
+
+            app.InitPaymentsConfiguration();
         }
     }
 }
