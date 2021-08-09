@@ -1,0 +1,57 @@
+name: Build Solution
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  BUILD_CONFIGURATION: "Release"
+  DOTNET_VERSION: "5.0.x"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_DEV }}
+          service_account_key: ${{ secrets.GCP_GITHUB_KEY_DEV }}
+          export_default_credentials: true
+
+      - uses: actions/checkout@v2
+
+      - name: Webcomponent build & publish
+        run: |
+          cd ./WebComponents/bcc-pay/
+          npm install
+          npm run build
+          npm publish
+        env:
+          NPM_AUTH_TOKEN_OSKAR: ${{ secrets.NPM_AUTH_TOKEN_OSKAR }}
+
+
+      - name: Replace Ai Token & API Url
+        uses: cschleiden/replace-tokens@v1
+        with:
+          tokenPrefix: "#{"
+          tokenSuffix: "}#"
+          files: '["UI/dashboard/src/environments/environment.prod.ts","UI/dashboard/src/environments/environment.ts"]'
+        env:
+          bccPayUrl: ${{secrets.BCC_PAY_URL_DEV}}
+          netsCheckoutKey: ${{secrets.NETS_CHECKOUT_KEY_DEV}}
+
+      - name: Update version of bcc-pay package
+          working-directory: UI/dashboard
+        run: |
+          cd ./UI/dashboard/
+          npm install bcc-pay
+          npm install
+
+      - name: Frontend build
+        run: |
+          cd ./UI/dashboard/
+          gcloud builds submit --tag gcr.io/myshare-dev-317106/bcc-pay-front-dev
+          gcloud run deploy bcc-pay-front-dev --image gcr.io/myshare-dev-317106/bcc-pay-front-dev --platform=managed --region=europe-west1 --project=myshare-dev-317106 --allow-unauthenticated
