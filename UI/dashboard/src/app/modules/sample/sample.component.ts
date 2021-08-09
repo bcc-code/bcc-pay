@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import 'bcc-pay/dist/bcc-pay';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-sample',
@@ -7,7 +8,12 @@ import 'bcc-pay/dist/bcc-pay';
   styleUrls: ['./sample.component.scss'],
 })
 export class SampleComponent implements OnInit {
-  constructor() {}
+  serverUrl: string;
+  netsCheckoutKey: string;
+  constructor() {
+    this.serverUrl = environment.bccPayUrl;
+    this.netsCheckoutKey = environment.netsCheckoutKey;
+  }
 
   ngOnInit(): void {}
 }

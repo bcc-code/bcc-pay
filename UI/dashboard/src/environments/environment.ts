@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   bccPayUrl: 'https://localhost:5001',
+  netsCheckoutKey: '#netsCheckoutKey#',
 };
 
 /*

@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>a00b492c-26f9-4d12-beb8-9e06cc7c90e7</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +23,12 @@
     <ProjectReference Include="..\BccPay.Core.DataAccess\BccPay.Core.DataAccess.csproj" />
     <ProjectReference Include="..\BccPay.Core.Domain\BccPay.Core.Domain.csproj" />
     <ProjectReference Include="..\BccPay.Core.Infrastructure\BccPay.Core.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Dockerfile">
+      <Link>Dockerfile</Link>
+    </Content>
   </ItemGroup>
 
 </Project>

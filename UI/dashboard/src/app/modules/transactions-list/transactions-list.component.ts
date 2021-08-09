@@ -4,6 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import axios from 'axios';
+import { environment } from 'src/environments/environment';
 import { TransactionDialog } from './dialog/transaction-dialog.component';
 
 export interface Payment {
@@ -73,7 +74,7 @@ export class TransactionsListComponent implements AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   async ngAfterViewInit() {
-    const apiPayments = await axios.get('https://localhost:5001/Payment');
+    const apiPayments = await axios.get(`${environment.bccPayUrl}/Payment`);
     this.dataSource = new MatTableDataSource<Payment>(
       apiPayments.data.payments
     );
