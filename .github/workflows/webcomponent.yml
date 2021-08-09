@@ -27,6 +27,7 @@ jobs:
         run: |
           cd ./WebComponents/bcc-pay/
           npm install
+          npm version patch
           npm run build
           npm publish
         env:
