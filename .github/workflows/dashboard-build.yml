@@ -32,7 +32,6 @@ jobs:
         env:
           NPM_AUTH_TOKEN_OSKAR: ${{ secrets.NPM_AUTH_TOKEN_OSKAR }}
 
-
       - name: Replace Ai Token & API Url
         uses: cschleiden/replace-tokens@v1
         with:
@@ -44,7 +43,6 @@ jobs:
           netsCheckoutKey: ${{secrets.NETS_CHECKOUT_KEY_DEV}}
 
       - name: Update version of bcc-pay package
-          working-directory: UI/dashboard
         run: |
           cd ./UI/dashboard/
           npm install bcc-pay
