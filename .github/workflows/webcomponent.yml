@@ -23,12 +23,17 @@ jobs:
 
       - uses: actions/checkout@v2
 
+      - name: Cat npm rc
+        run: |
+          cd ./WebComponents/bcc-pay/
+          cat .npmrc
+
       - name: Replace NPM Auth Token
         uses: cschleiden/replace-tokens@v1
         with:
           tokenPrefix: "#{"
           tokenSuffix: "}#"
-          files: '["UI/WebComponents/bcc-pay/.npmrc"]'
+          files: '["./WebComponents/bcc-pay/.npmrc"]'
         env:
           npmAuthToken: ${{ secrets.NPM_AUTH_TOKEN_OSKAR }}
 
