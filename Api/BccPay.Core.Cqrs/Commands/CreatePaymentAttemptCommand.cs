@@ -90,6 +90,7 @@ namespace BccPay.Core.Cqrs.Commands
 
             var paymentRequest = new PaymentRequestDto
             {
+                PaymentId = payment.PaymentId.ToString(),
                 Amount = decimal.Round(payment.Amount, 2, MidpointRounding.AwayFromZero),
                 Address = new AddressDto
                 {

@@ -8,6 +8,7 @@ namespace BccPay.Core.Domain.Entities
         public string CheckoutUrl { get; set; }
         public DateTime ExpiresAt { get; set; }
         public string Description { get; set; }
+        public string WebhookUrl { get; set; }
         public bool IsSuccessful { get; set; }
         public CurrencyConversionRecord CurrencyConversionResult { get; set; }
     }

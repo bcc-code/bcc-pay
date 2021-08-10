@@ -64,21 +64,5 @@ namespace BccPay.Core.Sample.Controllers
 
             return Ok(Mapper.Map<GetPaymentResponse>(result));
         }
-
-        [HttpPost("nets/status")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateNetsPaymentStatus([FromBody] NetsWebhook request)
-        {
-            var auth = HttpContext.Request.Headers[HeaderNames.Authorization];
-
-            var command = new UpdateNetsPaymentStatusCommand(auth, request);
-
-            var result = await Mediator.Send(command);
-
-            return result
-                ? Ok()
-                : BadRequest();
-        }
     }
 }

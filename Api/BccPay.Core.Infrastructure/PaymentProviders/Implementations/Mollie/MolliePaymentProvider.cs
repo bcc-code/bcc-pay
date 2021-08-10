@@ -35,7 +35,6 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
             var request = requestBuilder.BuildMolliePaymentRequest(paymentRequest);
 
             CurrencyConversionRecord currencyConversion = null;
-
             if (settings.PaymentMethod == PaymentMethod.Giropay)
             {
                 currencyConversion = await _currencyService.Exchange(
@@ -49,22 +48,15 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
 
             var paymentResult = await _mollieClient.CreatePayment(request);
 
-            if (paymentResult is not null)
-            {
-                return new MollieStatusDetails
-                {
-                    PaymentId = paymentResult.Id,
-                    CheckoutUrl = paymentResult?.Links?.Checkout?.Href,
-                    Description = paymentResult.Description,
-                    ExpiresAt = paymentResult.ExpiresAt,
-                    CurrencyConversionResult = currencyConversion,
-                    IsSuccessful = true
-                };
-            }
-
             return new MollieStatusDetails
             {
-                IsSuccessful = false
+                PaymentId = paymentResult.Id,
+                CheckoutUrl = paymentResult.Links?.Checkout?.Href,
+                Description = paymentResult.Description,
+                ExpiresAt = paymentResult.ExpiresAt,
+                CurrencyConversionResult = currencyConversion,
+                WebhookUrl = paymentResult.WebhookUrl,
+                IsSuccessful = true
             };
         }
 
