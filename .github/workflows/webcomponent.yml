@@ -69,7 +69,7 @@ jobs:
           gcloud run deploy bcc-pay-front-dev --image gcr.io/myshare-dev-317106/bcc-pay-front-dev --platform=managed --region=europe-west1 --project=myshare-dev-317106 --allow-unauthenticated
 
       - name: Backend variables substitution
-      - uses: microsoft/variable-substitution@v1 
+      uses: microsoft/variable-substitution@v1 
       with:
         files: "MyShare.Api/appsettings.json,MyShare.Core.Api/appsettings.core.json"
       env:
