@@ -75,7 +75,7 @@ jobs:
         env:
           RavenSettings.CertFilePath: ${{ secrets.CERT_FILE_PATH_DEV }}
           RavenSettings.CertPassword: ${{ secrets.CERT_PASSWORD_DEV }}
-          SecretKey: ${{ secrets.Origins }}
+          SecretKey: ${{ secrets.NETS_SECRET_KEY_DEV }}
 
       - name: Backend deploy
         run: |
