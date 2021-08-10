@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 using BccPay.Core.Infrastructure.PaymentModels.MollieNodes;
+using Newtonsoft.Json;
 
 namespace BccPay.Core.Infrastructure.PaymentModels.Response.Mollie
 {
@@ -21,6 +23,8 @@ namespace BccPay.Core.Infrastructure.PaymentModels.Response.Mollie
         public string SequenceType { get; set; }
         public string RedirectUrl { get; set; }
         public string WebhookUrl { get; set; }
+
+        [JsonPropertyName("_links")]
         public MollieLinks Links { get; set; }
     }
 }

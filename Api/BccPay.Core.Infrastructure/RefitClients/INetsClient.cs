@@ -9,10 +9,10 @@ namespace BccPay.Core.Infrastructure.RefitClients
     internal interface INetsClient
     {
         [Post("/v1/payments")]
-        Task<CreatePaymentResponse> CreatePaymentAsync([HeaderCollection] IDictionary<string, string> headers, [Body] NetsPaymentRequest payment);
+        Task<NetsCreatePaymentResponse> CreatePaymentAsync([HeaderCollection] IDictionary<string, string> headers, [Body] NetsPaymentRequest payment);
 
         [Get("/v1/payments/{paymentId}")]
-        Task<RetrievePaymentResponse> RetrievePayment([HeaderCollection] IDictionary<string, string> headers, [Query] string paymentId);
+        Task<NetsRetrievePaymentResponse> RetrievePayment([HeaderCollection] IDictionary<string, string> headers, [Query] string paymentId);
     }
 }
 

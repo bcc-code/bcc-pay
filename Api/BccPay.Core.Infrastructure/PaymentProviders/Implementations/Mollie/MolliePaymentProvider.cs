@@ -52,7 +52,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
                 return new MollieStatusDetails
                 {
                     PaymentId = paymentResult.Id,
-                    ProfileId = paymentResult.ProfileId,
+                    CheckoutUrl = paymentResult?.Links?.Checkout?.Href,
                     Description = paymentResult.Description,
                     ExpiresAt = paymentResult.ExpiresAt,
                     IsSuccessful = true
