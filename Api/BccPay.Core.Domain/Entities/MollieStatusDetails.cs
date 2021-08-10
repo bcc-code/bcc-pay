@@ -9,5 +9,6 @@ namespace BccPay.Core.Domain.Entities
         public DateTime ExpiresAt { get; set; }
         public string Description { get; set; }
         public bool IsSuccessful { get; set; }
+        public CurrencyConversionRecord CurrencyConversionResult { get; set; }
     }
 }
