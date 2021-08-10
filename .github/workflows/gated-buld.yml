@@ -25,8 +25,14 @@ jobs:
           dotnet restore Api/BccPay.Core.sln
           dotnet build Api/BccPay.Core.Domain/BccPay.Core.Domain.csproj -c ${{ env.BUILD_CONFIGURATION }}
 
-      - name: Frontend build
+      - name: Dashboard angular build
         run: |
           cd ./UI/dashboard/
+          npm install
+          npm run build
+
+      - name: Webcomponent build
+        run: |
+          cd ./WebComponents/bcc-pay/
           npm install
           npm run build
