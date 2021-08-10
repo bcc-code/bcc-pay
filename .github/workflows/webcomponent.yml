@@ -1,9 +1,6 @@
 name: WebComponent build & deploy
 
 on:
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 env:
@@ -49,8 +46,14 @@ jobs:
           npm install bcc-pay
           npm install
 
-      - name: Frontend build
+      - name: Dashboard deploy
         run: |
           cd ./UI/dashboard/
           gcloud builds submit --tag gcr.io/myshare-dev-317106/bcc-pay-front-dev
           gcloud run deploy bcc-pay-front-dev --image gcr.io/myshare-dev-317106/bcc-pay-front-dev --platform=managed --region=europe-west1 --project=myshare-dev-317106 --allow-unauthenticated
+
+      - name: Backend deploy
+        run: |
+          cd ./Api/
+          gcloud builds submit --tag gcr.io/myshare-dev-317106/bcc-pay-sample-api-dev
+          gcloud run deploy bcc-pay-sample-api-dev --image gcr.io/myshare-dev-317106/bcc-pay-sample-api-dev --platform=managed --region=europe-west1 --project=myshare-dev-317106 --allow-unauthenticated
