@@ -1,5 +1,5 @@
 import { User } from './User';
-import { isDevEnv } from './BccPay';
+import { isDevEnv, requestHeaders } from './BccPay';
 import { displayErrorPage, paymentCompleted } from './ScreenChange';
 
 var checkout: any;
@@ -54,14 +54,20 @@ export async function initNetsPayment(
     postalCode: user.postalCode === null ? undefined : user.postalCode,
   };
 
+  const fetchHeaders = new Headers();
+  fetchHeaders.append('Content-Type', 'application/json');
+  if (requestHeaders) {
+    requestHeaders.forEach(requestHeaderObject => {
+      fetchHeaders.append(requestHeaderObject.key, requestHeaderObject.value);
+    });
+  }
+
   let netsPaymentId: string = '';
   try {
     await fetch(`${server}/Payment/${paymentId}/attempts`, {
       method: 'POST',
       body: JSON.stringify(body),
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: fetchHeaders,
     })
       .then(response => response.json())
       .then(json => {

@@ -9,8 +9,10 @@ import {
   reload,
   close,
 } from './ScreenChange';
+import { RequestHeader } from './RequestHeader';
 
 export let isDevEnv: boolean;
+export let requestHeaders: [RequestHeader] | undefined;
 
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
@@ -21,12 +23,17 @@ export class BccPay extends LitElement {
   @property({ type: String }) server = 'https://localhost:5001';
   @property({ type: String }) netsCheckoutKey = '#checkout_key#';
   @property({ type: Boolean }) isDevEnv: boolean = false;
+  @property({ type: [RequestHeader] }) requestHeaders:
+    | [RequestHeader]
+    | undefined;
 
   paymentId: string = '';
 
   loadNestScript() {
-    let script = document.createElement('script');
     isDevEnv = this.isDevEnv;
+    requestHeaders = this.requestHeaders;
+
+    let script = document.createElement('script');
     if (isDevEnv === true) {
       script.src = 'https://test.checkout.dibspayment.eu/v1/checkout.js?v=1';
     } else {

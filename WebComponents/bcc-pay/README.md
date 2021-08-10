@@ -70,3 +70,29 @@ HTML
   netsCheckoutKey="#netsCheckoutKey#"
 ></bcc-pay>
 ```
+
+You can also pass additional headers for requests:
+
+Request model
+
+```TypeScript
+export class RequestHeader {
+  key: string;
+  value: string;
+  }
+```
+
+Sample in JS
+
+```Javascript
+const requestHeaders = [{ key: 'new_key', value: 'new_value' }],
+```
+
+HTML
+
+```html
+<bcc-pay
+  requestHeaders="${this.requestHeaders}"
+  netsCheckoutKey="#netsCheckoutKey#"
+></bcc-pay>
+```
