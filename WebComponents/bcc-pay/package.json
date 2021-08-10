@@ -75,7 +75,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged ; echo elo"
+      "pre-commit": "lint-staged ; npm run versionCheck"
     }
   },
   "lint-staged": {
