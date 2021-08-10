@@ -30,7 +30,7 @@ jobs:
           tokenSuffix: "}#"
           files: '["UI/WebComponents/bcc-pay/.npmrc"]'
         env:
-          npm_auth_token: ${{ secrets.NPM_AUTH_TOKEN_OSKAR }}
+          npmAuthToken: ${{ secrets.NPM_AUTH_TOKEN_OSKAR }}
 
       - name: Webcomponent build & publish
         run: |
