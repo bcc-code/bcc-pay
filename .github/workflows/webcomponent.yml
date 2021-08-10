@@ -42,6 +42,7 @@ jobs:
           cd ./WebComponents/bcc-pay/
           cat .npmrc
           npm install
+          npm run versionCheck
           npm version patch
           npm run build
           npm publish
@@ -68,14 +69,13 @@ jobs:
           gcloud builds submit --tag gcr.io/myshare-dev-317106/bcc-pay-front-dev
           gcloud run deploy bcc-pay-front-dev --image gcr.io/myshare-dev-317106/bcc-pay-front-dev --platform=managed --region=europe-west1 --project=myshare-dev-317106 --allow-unauthenticated
 
-      - name: Backend variables substitution
-      uses: microsoft/variable-substitution@v1 
-      with:
-        files: "MyShare.Api/appsettings.json,MyShare.Core.Api/appsettings.core.json"
-      env:
-        RavenSettings.CertFilePath: ${{ secrets.CERT_FILE_PATH_DEV }}
-        RavenSettings.CertPassword: ${{ secrets.CERT_PASSWORD_DEV }}
-        SecretKey: ${{ secrets.NETS_SECRET_KEY_DEV }}
+      - uses: microsoft/variable-substitution@v1
+        with:
+          files: "./Api/BccPay.Core.Sample/appsettings.Development.json"
+        env:
+          RavenSettings.CertFilePath: ${{ secrets.CERT_FILE_PATH_DEV }}
+          RavenSettings.CertPassword: ${{ secrets.CERT_PASSWORD_DEV }}
+          SecretKey: ${{ secrets.Origins }}
 
       - name: Backend deploy
         run: |
