@@ -40,9 +40,13 @@ namespace BccPay.Core.Sample
                 options.Nets.BaseAddress = "https://test.api.dibspayment.eu";
                 options.Nets.CheckoutPageUrl = "/";
                 options.Nets.TermsUrl = "http://localhost:8000";
-                options.Nets.SecretKey = Configuration["SecretKey"];
+                options.Nets.SecretKey = Configuration["NetsSecretKey"];
                 options.Nets.NotificationUrl = "https://localhost:5001/Payment/webhook";
-                options.Fixer.BaseAddress = "http://data.fixer.io/api";
+                options.Mollie.BaseAddress = "https://api.mollie.com";
+                options.Mollie.AuthToken = Configuration["MollieSecretKey"];
+                options.Mollie.RedirectUrl = "https://test.api.samvirk.com/redirect";
+                options.Mollie.WebhookUrl = "https://test.api.samvirk.com/webhook";
+                options.Fixer.BaseAddress = "https://data.fixer.io";
             });
 
             services.ConfigureBccCoreCqrs();

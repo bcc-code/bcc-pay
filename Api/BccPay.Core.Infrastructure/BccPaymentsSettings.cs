@@ -6,5 +6,6 @@ namespace BccPay.Core.Infrastructure
     {
         public NetsProviderOptions Nets { get; } = new NetsProviderOptions();
         public FixerProviderOptions Fixer { get; } = new FixerProviderOptions();
+        public MollieProviderOptions Mollie { get; } = new MollieProviderOptions();
     }
 }
