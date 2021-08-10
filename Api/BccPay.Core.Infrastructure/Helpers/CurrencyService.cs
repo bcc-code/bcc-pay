@@ -31,6 +31,15 @@ namespace BccPay.Core.Infrastructure.Helpers
                 ?? throw new ArgumentNullException(nameof(configuration));
         }
 
+        public Task<CurrencyExchangeResult> Exchange(string fromCurrency, string toCurrency, decimal amount, decimal exchangeRateMarkup = 0)
+        {
+            if (Enum.TryParse<Currencies>(fromCurrency, out Currencies fromCurrencyResult) && Enum.TryParse<Currencies>(toCurrency, out Currencies toCurrencyResult))
+            {
+                return Exchange(fromCurrencyResult, toCurrencyResult, amount, exchangeRateMarkup);
+            }
+            throw new CurrencyExchangeOperationException("Unable to convert values.");
+        }
+
         public async Task<CurrencyExchangeResult> Exchange(Currencies fromCurrency, Currencies toCurrency, decimal amount, decimal exchangeRateMarkup = 0)
         {
             if (fromCurrency == toCurrency || amount <= 0)
