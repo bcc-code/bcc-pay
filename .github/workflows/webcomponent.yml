@@ -23,6 +23,15 @@ jobs:
 
       - uses: actions/checkout@v2
 
+      - name: Replace NPM Auth Token
+        uses: cschleiden/replace-tokens@v1
+        with:
+          tokenPrefix: "#{"
+          tokenSuffix: "}#"
+          files: '["UI/WebComponents/bcc-pay/.npmrc"]'
+        env:
+          npm_auth_token: ${{secrets.NPM_AUTH_TOKEN_OSKAR}}
+
       - name: Webcomponent build & publish
         run: |
           cd ./WebComponents/bcc-pay/
@@ -30,8 +39,6 @@ jobs:
           npm version patch
           npm run build
           npm publish
-        env:
-          NPM_AUTH_TOKEN_OSKAR: ${{ secrets.NPM_AUTH_TOKEN_OSKAR }}
 
       - name: Replace Ai Token & API Url
         uses: cschleiden/replace-tokens@v1

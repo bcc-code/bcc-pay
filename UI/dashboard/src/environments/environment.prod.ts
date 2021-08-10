@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  bccPayUrl: '#{#bccPayUrl}#',
-  netsCheckoutKey: '#{#netsCheckoutKey}#',
+  bccPayUrl: '#{bccPayUrl}#',
+  netsCheckoutKey: '#{netsCheckoutKey}#',
 };

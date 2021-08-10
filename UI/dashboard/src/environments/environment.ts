@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  bccPayUrl: '#{#bccPayUrl}#',
-  netsCheckoutKey: '#{#netsCheckoutKey}#',
+  bccPayUrl: '#{bccPayUrl}#',
+  netsCheckoutKey: '#{netsCheckoutKey}#',
 };
 
 /*
