@@ -5,7 +5,11 @@ using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.Helpers;
+using BccPay.Core.Infrastructure.PaymentModels.Response.Mollie;
+using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders;
+using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations;
 using BccPay.Core.Infrastructure.RefitClients;
+using Refit;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
 {
@@ -41,7 +45,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
                                     paymentRequest.Currency,
                                     Currencies.EUR.ToString(),
                                     paymentRequest.Amount,
-                                    0.015M);
+                                    _options.RateMarkup);
 
                 request.Amount.Value = currencyConversion.Gross.ToString();
             }
@@ -50,14 +54,32 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
 
             return new MollieStatusDetails
             {
-                PaymentId = paymentResult.Id,
+                MolliePaymentId = paymentResult.Id,
                 CheckoutUrl = paymentResult.Links?.Checkout?.Href,
                 Description = paymentResult.Description,
                 ExpiresAt = paymentResult.ExpiresAt,
                 CurrencyConversionResult = currencyConversion,
                 WebhookUrl = paymentResult.WebhookUrl,
-                IsSuccessful = true
+                IsSuccess = true
             };
+        }
+
+        public async Task<IPaymentResponse> GetPayment(string paymentId)
+        {
+            try
+            {
+                var result = await _mollieClient.GetPaymentInformation(paymentId);
+                result.IsSuccess = true;
+                return result;
+            }
+            catch (ApiException exception)
+            {
+                return new MollieGetPaymentResponse
+                {
+                    IsSuccess = false,
+                    Error = exception.Content
+                };
+            }
         }
 
         private IMollieRequestBuilder CreateRequestBuilder(PaymentSettings settings)

@@ -5,9 +5,12 @@ using Refit;
 
 namespace BccPay.Core.Infrastructure.RefitClients
 {
-    public interface IMollieClient
+    internal interface IMollieClient
     {
         [Post("/v2/payments")]
-        public Task<MolliePaymentResponse> CreatePayment(MolliePaymentRequest paymentRequest);
+        public Task<MollieCreatePaymentResponse> CreatePayment(MolliePaymentRequest paymentRequest);
+
+        [Get("/v2/payments/{id}")]
+        public Task<MollieGetPaymentResponse> GetPaymentInformation([AliasAs("id")] string paymentId);
     }
 }

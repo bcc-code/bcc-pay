@@ -1,7 +1,7 @@
-﻿using BccPay.Core.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BccPay.Core.Enums;
 
 namespace BccPay.Core.Domain.Entities
 {
@@ -74,6 +74,10 @@ namespace BccPay.Core.Domain.Entities
             {
                 attemptToUpdate.IsActive = false;
                 PaymentStatus = PaymentStatus.Canceled;
+            }
+            if (attempt.AttemptStatus == AttemptStatus.Expired)
+            {
+                attemptToUpdate.IsActive = false;
             }
             if (attempt.AttemptStatus == AttemptStatus.PaymentIsSuccessful)
             {

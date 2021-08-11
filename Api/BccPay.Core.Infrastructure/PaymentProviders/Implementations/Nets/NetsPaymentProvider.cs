@@ -6,7 +6,8 @@ using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Dtos;
-using BccPay.Core.Infrastructure.PaymentProviders.Implementations.Nets;
+using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders;
+using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations;
 using BccPay.Core.Infrastructure.RefitClients;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
@@ -49,7 +50,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 
                 return new NetsStatusDetails
                 {
-                    IsSuccessful = true,
+                    IsSuccess = true,
                     PaymentCheckoutId = result.PaymentId
                 };
             }
@@ -60,7 +61,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                     var result = await _netsClient.CreatePaymentAsync(_headers, requestBuilder.BuildNetsPaymentRequest(paymentRequest, host, isUserDataValid: false));
                     return new NetsStatusDetails
                     {
-                        IsSuccessful = true,
+                        IsSuccess = true,
                         PaymentCheckoutId = result.PaymentId,
                         Error = "{\"notValidUserBillingDataInTheSystem\":" + retryException?.Content + "}"
                     };
@@ -69,11 +70,16 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                 {
                     return new NetsStatusDetails
                     {
-                        IsSuccessful = false,
+                        IsSuccess = false,
                         Error = exception?.Content
                     };
                 }
             }
+        }
+
+        public Task<IPaymentResponse> GetPayment(string paymentId)
+        {
+            throw new NotImplementedException();
         }
 
         private INetsPaymentRequestBuilder CreateRequestBuilder(PaymentSettings settings)

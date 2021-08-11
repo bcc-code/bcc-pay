@@ -1,22 +1,21 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentModels.MollieNodes;
-using Newtonsoft.Json;
 
 namespace BccPay.Core.Infrastructure.PaymentModels.Response.Mollie
 {
-    public class MolliePaymentResponse
+    public class MollieGetPaymentResponse : IPaymentResponse
     {
         public string Resource { get; set; }
         public string Id { get; set; }
         public string Mode { get; set; }
         public DateTime CreatedAt { get; set; }
-        public MollieAmount Amount { get; set; }
         public string Description { get; set; }
         public object Method { get; set; }
-        public MollieMetadata Metadata { get; set; }
         public string Status { get; set; }
         public bool IsCancelable { get; set; }
+        public string Locale { get; set; }
+        public string RestrictPaymentMethodsToCountry { get; set; }
         public DateTime ExpiresAt { get; set; }
         public object Details { get; set; }
         public string ProfileId { get; set; }
@@ -24,7 +23,11 @@ namespace BccPay.Core.Infrastructure.PaymentModels.Response.Mollie
         public string RedirectUrl { get; set; }
         public string WebhookUrl { get; set; }
 
-        [JsonPropertyName("_links")]
         public MollieLinks Links { get; set; }
+        public MollieAmount Amount { get; set; }
+
+
+        public bool IsSuccess { get; set; }
+        public string Error { get; set; }
     }
 }

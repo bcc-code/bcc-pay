@@ -5,6 +5,6 @@
         public string PaymentCheckoutId { get; set; }
         public string WebhookStatus { get; set; }
         public string Error { get; set; }
-        public bool IsSuccessful { get; set; }
+        public bool IsSuccess { get; set; }
     }
 }

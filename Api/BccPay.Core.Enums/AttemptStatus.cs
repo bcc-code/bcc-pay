@@ -5,6 +5,7 @@
         ProcessingPayment,
         WaitingForCharge,
         RejectedEitherCancelled,
-        PaymentIsSuccessful
+        PaymentIsSuccessful,
+        Expired
     }
 }
