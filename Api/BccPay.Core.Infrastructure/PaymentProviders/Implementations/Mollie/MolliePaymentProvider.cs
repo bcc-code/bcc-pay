@@ -34,15 +34,17 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
 
             var request = requestBuilder.BuildMolliePaymentRequest(paymentRequest);
 
+            CurrencyConversionRecord currencyConversion = null;
+
             if (settings.PaymentMethod == PaymentMethod.Giropay)
             {
-                var exchangeResult = await _currencyService.Exchange(
+                currencyConversion = await _currencyService.Exchange(
                                     paymentRequest.Currency,
                                     Currencies.EUR.ToString(),
                                     paymentRequest.Amount,
                                     0.015M);
 
-                request.Amount.Value = exchangeResult.Gross.ToString();
+                request.Amount.Value = currencyConversion.Gross.ToString();
             }
 
             var paymentResult = await _mollieClient.CreatePayment(request);
@@ -55,6 +57,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
                     CheckoutUrl = paymentResult?.Links?.Checkout?.Href,
                     Description = paymentResult.Description,
                     ExpiresAt = paymentResult.ExpiresAt,
+                    CurrencyConversionResult = currencyConversion,
                     IsSuccessful = true
                 };
             }
