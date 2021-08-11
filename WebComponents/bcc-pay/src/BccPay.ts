@@ -26,8 +26,7 @@ export class BccPay extends LitElement {
   @property({ type: [RequestHeader] }) requestHeaders:
     | [RequestHeader]
     | undefined;
-
-  paymentId: string = '';
+  @property({ type: String }) paymentId: string = '';
 
   loadNestScript() {
     isDevEnv = this.isDevEnv;
@@ -53,12 +52,14 @@ export class BccPay extends LitElement {
   }
 
   async init() {
-    this.paymentId = await initPayment(
-      this.currency,
-      this.country,
-      this.amount,
-      this.server
-    );
+    if (this.paymentId === '') {
+      this.paymentId = await initPayment(
+        this.currency,
+        this.country,
+        this.amount,
+        this.server
+      );
+    }
 
     if (this.paymentId === '') {
       displayErrorPage();

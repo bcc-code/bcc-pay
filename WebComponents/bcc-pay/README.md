@@ -94,5 +94,6 @@ HTML
 <bcc-pay
   requestHeaders="${this.requestHeaders}"
   netsCheckoutKey="#netsCheckoutKey#"
+  isDevEnv="true"
 ></bcc-pay>
 ```

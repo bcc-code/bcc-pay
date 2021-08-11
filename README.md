@@ -16,9 +16,19 @@ To use webComponent in application type:
 
 You have to always pass your netsCheckoutKey from nets admin panel. Sample uses of component:
 
+```html
 <bcc-pay netsCheckoutKey="#netsCheckoutKey#" amount="12"></bcc-pay>
 
-<bcc-pay item="Subscpription" currency="NOK" country="NOR" amount="10" server="https://localhost:5001" netsCheckoutKey="#netsCheckoutKey#" isDevEnv="true"></bcc-pay>
+<bcc-pay
+  item="Subscpription"
+  currency="NOK"
+  country="NOR"
+  amount="10"
+  server="https://localhost:5001"
+  netsCheckoutKey="#netsCheckoutKey#"
+  isDevEnv="true"
+></bcc-pay>
+```
 
 You can also pass user object to component:
 
