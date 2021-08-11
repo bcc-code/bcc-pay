@@ -84,6 +84,10 @@ export const textInputStyle = css`
     border-color: dodgerBlue;
     box-shadow: 0 0 8px 0 dodgerBlue;
   }
+
+  .country-select {
+    margin-top: 16px;
+  }
 `;
 
 export function applyStyles() {

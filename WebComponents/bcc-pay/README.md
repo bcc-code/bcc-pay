@@ -97,3 +97,21 @@ HTML
   isDevEnv="true"
 ></bcc-pay>
 ```
+
+List of possible parameters and default values:
+
+```Typescript
+  @property({ type: String }) item = 'Subscription';
+  @property({ type: Number }) amount = 5;
+  @property({ type: String }) currency = 'EUR';
+  @property({ type: String }) country = 'DE';
+  @property({ type: User }) user: User = {};
+  @property({ type: String }) server = 'https://localhost:5001';
+  @property({ type: String }) netsCheckoutKey = '#checkout_key#';
+  @property({ type: Boolean }) isDevEnv: boolean = false;
+  @property({ type: [RequestHeader] }) requestHeaders:
+    | [RequestHeader]
+    | undefined;
+  @property({ type: String }) paymentId: string = '';
+  @property({ type: String }) paymentConfigurationId: string = 'nets-cc-eur';
+```

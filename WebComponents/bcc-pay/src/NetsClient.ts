@@ -1,5 +1,5 @@
 import { User } from './User';
-import { isDevEnv, requestHeaders } from './BccPay';
+import { isDevEnv, paymentConfigurationId, requestHeaders } from './BccPay';
 import { displayErrorPage, paymentCompleted } from './ScreenChange';
 
 var checkout: any;
@@ -43,7 +43,7 @@ export async function initNetsPayment(
   server: string
 ): Promise<string> {
   const body = {
-    paymentConfigurationId: 'nets-cc-eur',
+    paymentConfigurationId: paymentConfigurationId,
     email: user.email === null ? undefined : user.email,
     phoneNumber: user.phoneNumber === null ? undefined : user.phoneNumber,
     firstName: user.firstName === null ? undefined : user.firstName,

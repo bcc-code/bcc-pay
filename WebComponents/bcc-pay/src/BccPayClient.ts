@@ -1,5 +1,37 @@
 import { requestHeaders } from './BccPay';
 
+export async function getPaymentConfigurations(
+  country: string,
+  server: string
+) {
+  let possibleConfigurations: string = '';
+
+  const fetchHeaders = new Headers();
+  fetchHeaders.append('Content-Type', 'application/json');
+  if (requestHeaders) {
+    requestHeaders.forEach(requestHeaderObject => {
+      fetchHeaders.append(requestHeaderObject.key, requestHeaderObject.value);
+    });
+  }
+
+  try {
+    await fetch(`${server}​/payment-configurations?countryCode=${country}`, {
+      method: 'GET',
+      headers: fetchHeaders,
+    })
+      .then(response => response.json())
+      .then(json => {
+        possibleConfigurations = json;
+        console.log(
+          'Possible configurations: ' + JSON.stringify(possibleConfigurations)
+        );
+      });
+    return possibleConfigurations;
+  } catch (e) {
+    return '';
+  }
+}
+
 export async function initPayment(
   currency: string,
   country: string,

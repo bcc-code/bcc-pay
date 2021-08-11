@@ -1,7 +1,7 @@
 import { html, LitElement, property } from 'lit-element';
 import { applyStyles } from './SharedStyles';
 import { startNetsPayment } from './NetsClient';
-import { initPayment } from './BccPayClient';
+import { getPaymentConfigurations, initPayment } from './BccPayClient';
 import { User } from './User';
 import {
   displayChangeUserDataPage,
@@ -13,6 +13,7 @@ import { RequestHeader } from './RequestHeader';
 
 export let isDevEnv: boolean;
 export let requestHeaders: [RequestHeader] | undefined;
+export let paymentConfigurationId: string;
 
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
@@ -27,32 +28,35 @@ export class BccPay extends LitElement {
     | [RequestHeader]
     | undefined;
   @property({ type: String }) paymentId: string = '';
+  @property({ type: String }) paymentConfigurationId: string = 'nets-cc-eur';
 
   loadNestScript() {
     isDevEnv = this.isDevEnv;
     requestHeaders = this.requestHeaders;
+    paymentConfigurationId = this.paymentConfigurationId;
 
-    let script = document.createElement('script');
+    let nestScript = document.createElement('script');
     if (isDevEnv === true) {
-      script.src = 'https://test.checkout.dibspayment.eu/v1/checkout.js?v=1';
+      nestScript.src =
+        'https://test.checkout.dibspayment.eu/v1/checkout.js?v=1';
     } else {
-      script.src = 'https://checkout.dibspayment.eu/v1/checkout.js?v=1';
+      nestScript.src = 'https://checkout.dibspayment.eu/v1/checkout.js?v=1';
     }
 
-    return script;
+    return nestScript;
   }
 
   createRenderRoot() {
     return this;
   }
 
-  async applyStyles() {
+  async applyCssStyles() {
     await this.updateComplete;
     applyStyles();
   }
 
   async init() {
-    if (this.paymentId === '') {
+    if (this.paymentId === '' || this.paymentId === undefined) {
       this.paymentId = await initPayment(
         this.currency,
         this.country,
@@ -68,12 +72,13 @@ export class BccPay extends LitElement {
     if (isDevEnv === true) {
       console.log('Bcc pay payment id: ' + this.paymentId);
     }
+    getPaymentConfigurations(this.country, this.server);
   }
 
   render() {
     return html`
       <div style="display: none">
-        ${this.loadNestScript()} ${this.applyStyles()} ${this.init()}
+        ${this.loadNestScript()} ${this.applyCssStyles()} ${this.init()}
       </div>
       <div class="card-square" id="main-div">
         <div id="first-screen">
@@ -86,6 +91,20 @@ export class BccPay extends LitElement {
           <div class="card-price">
             <span class="card-tag">Price</span>
             <span class="card-cost">${this.amount} ${this.currency} </span>
+          </div>
+
+          <div>
+            <select
+              class="country-select"
+              value="${this.country}"
+              @change="${(e: any) => (this.country = e.target.value)}"
+            >
+              <option value="">Select your country</option>
+              <option value="NOR">Norway</option>
+              <option value="DE">Germany</option>
+              <option value="UA">Ukraine</option>
+              <option value="PL">Poland</option>
+            </select>
           </div>
           <button
             class="nets-button"
