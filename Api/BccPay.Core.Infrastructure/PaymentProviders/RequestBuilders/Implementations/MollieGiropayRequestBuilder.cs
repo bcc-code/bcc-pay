@@ -1,10 +1,9 @@
-﻿using System;
-using BccPay.Core.Enums;
+﻿using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentModels.MollieNodes;
 using BccPay.Core.Infrastructure.PaymentModels.Request.Mollie;
 
-namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
+namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations
 {
     internal class MollieGiropayRequestBuilder : IMollieRequestBuilder
     {
@@ -23,11 +22,11 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
                     Currency = Currencies.EUR.ToString(),
                     Value = paymentRequest.Amount.ToString()
                 },
-                Locale = "de_DE",
+                Locale = "nb_NO",
                 Method = new string[] { PaymentMethod.Giropay.ToString().ToLower() },
-                Description = $"{paymentRequest.FirstName}-{paymentRequest.LastName}-{Guid.NewGuid()}",
+                Description = string.IsNullOrWhiteSpace(paymentRequest.Description) ? $"Payment {paymentRequest.Amount} NOK" : paymentRequest.Description,
                 RedirectUrl = _options.RedirectUrl,
-                WebhookUrl = _options.WebhookUrl,
+                WebhookUrl = _options.WebhookUrl + $"/{paymentRequest.PaymentId}",
                 Links = new { }
             };
         }

@@ -1,17 +1,17 @@
-﻿using BccPay.Core.Domain.Entities;
+﻿using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
+using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Exceptions;
 using BccPay.Core.Infrastructure.Helpers;
 using BccPay.Core.Infrastructure.PaymentModels.Webhooks;
 using MediatR;
 using Raven.Client.Documents.Session;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using static BccPay.Core.Infrastructure.Constants.PaymentProviderConstants.Nets;
 
-namespace BccPay.Core.Cqrs.Commands
+namespace BccPay.Core.Cqrs.Commands.Webhooks
 {
     public class UpdateNetsPaymentStatusCommand : IRequest<bool>
     {
@@ -51,20 +51,20 @@ namespace BccPay.Core.Cqrs.Commands
                     .FirstOrDefault()
                     ?? throw new UpdatePaymentAttemptForbiddenException("Attempt is inactive.");
 
-            var (webhookEvent, webhookStatus) = Webhooks.Messages
+            var (webhookEvent, webhookStatus) = PaymentProviderConstants.Nets.Webhooks.Messages
                 .Where(x => x.Key == request.Webhook.Event.ToLower())
                 .FirstOrDefault();
 
             actualAttempt.AttemptStatus = webhookEvent switch
             {
-                Webhooks.PaymentCreated => actualAttempt.AttemptStatus = AttemptStatus.ProcessingPayment,
-                Webhooks.CheckoutCompleted => actualAttempt.AttemptStatus = AttemptStatus.WaitingForCharge,
-                Webhooks.ChargeCreated => actualAttempt.AttemptStatus = AttemptStatus.PaymentIsSuccessful,
-                Webhooks.ChargeFailed => actualAttempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled,
+                PaymentProviderConstants.Nets.Webhooks.PaymentCreated => actualAttempt.AttemptStatus = AttemptStatus.ProcessingPayment,
+                PaymentProviderConstants.Nets.Webhooks.CheckoutCompleted => actualAttempt.AttemptStatus = AttemptStatus.WaitingForCharge,
+                PaymentProviderConstants.Nets.Webhooks.ChargeCreated => actualAttempt.AttemptStatus = AttemptStatus.PaymentIsSuccessful,
+                PaymentProviderConstants.Nets.Webhooks.ChargeFailed => actualAttempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled,
                 _ => actualAttempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled,
             };
 
-            var statusDetails = StatusDetailsDeserializer<NetsStatusDetails>.GetStatusDetailsType(actualAttempt.StatusDetails);
+            var statusDetails = ReverseAbstraction<NetsStatusDetails, IStatusDetails>.GetImplementationFromAbstraction(actualAttempt.StatusDetails);
             statusDetails.WebhookStatus = webhookStatus;
             actualAttempt.StatusDetails = statusDetails;
 

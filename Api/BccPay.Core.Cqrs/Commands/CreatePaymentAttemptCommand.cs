@@ -90,6 +90,7 @@ namespace BccPay.Core.Cqrs.Commands
 
             var paymentRequest = new PaymentRequestDto
             {
+                PaymentId = payment.PaymentId.ToString(),
                 Amount = decimal.Round(payment.Amount, 2, MidpointRounding.AwayFromZero),
                 Address = new AddressDto
                 {
@@ -116,8 +117,8 @@ namespace BccPay.Core.Cqrs.Commands
             {
                 PaymentAttemptId = Guid.NewGuid(),
                 PaymentMethod = paymentConfiguration.Settings.PaymentMethod,
-                AttemptStatus = providerResult.IsSuccessful ? AttemptStatus.WaitingForCharge : AttemptStatus.RejectedEitherCancelled,
-                IsActive = providerResult.IsSuccessful,
+                AttemptStatus = providerResult.IsSuccess ? AttemptStatus.WaitingForCharge : AttemptStatus.RejectedEitherCancelled,
+                IsActive = providerResult.IsSuccess,
                 Created = DateTime.Now,
                 StatusDetails = providerResult,
                 NotificationAccessToken = paymentRequest.NotificationAccessToken

@@ -45,7 +45,8 @@ namespace BccPay.Core.Sample
                 options.Mollie.BaseAddress = "https://api.mollie.com";
                 options.Mollie.AuthToken = Configuration["MollieSecretKey"];
                 options.Mollie.RedirectUrl = "https://test.api.samvirk.com/redirect";
-                options.Mollie.WebhookUrl = "https://test.api.samvirk.com/webhook";
+                options.Mollie.WebhookUrl = "https://en46nkjh5kbngpp.m.pipedream.net";
+                options.Mollie.RateMarkup = 0.015M;
                 options.Fixer.BaseAddress = "https://data.fixer.io";
             });
 

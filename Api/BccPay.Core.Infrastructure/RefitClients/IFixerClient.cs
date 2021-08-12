@@ -7,6 +7,6 @@ namespace BccPay.Core.Infrastructure.RefitClients
     public interface IFixerClient
     {
         [Get("/latest")]
-        public Task<FixerCurrencyRateResponse> GetRatesByBaseCurrency([AliasAs("access_key")] string accessKey, [AliasAs("base")]string baseCurrency);
+        public Task<FixerCurrencyRateResponse> GetRatesByBaseCurrency([AliasAs("access_key")] string accessKey, [AliasAs("base")] string baseCurrency);
     }
 }
