@@ -123,6 +123,7 @@ namespace BccPay.Core.Cqrs.Commands
                 IsActive = providerResult.IsSuccessful,
                 Created = DateTime.Now,
                 StatusDetails = providerResult,
+                CountryCode = countryCode,
                 NotificationAccessToken = paymentRequest.NotificationAccessToken
             };
 
