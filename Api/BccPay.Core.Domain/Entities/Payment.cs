@@ -17,6 +17,7 @@ namespace BccPay.Core.Domain.Entities
         public string CurrencyCode { get; set; }
         public string CountryCode { get; set; }
         public decimal Amount { get; set; }
+        public string Description { get; set; }
 
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
@@ -27,7 +28,8 @@ namespace BccPay.Core.Domain.Entities
             string payerId,
             string currencyCode,
             string countryCode,
-            decimal amount)
+            decimal amount,
+            string description)
         {
             PaymentId = Guid.NewGuid();
             PayerId = payerId;
@@ -36,6 +38,7 @@ namespace BccPay.Core.Domain.Entities
             Amount = amount;
             PaymentStatus = PaymentStatus.Open;
             Created = DateTime.Now;
+            Description = description;
         }
 
         public void Update(string currency,
