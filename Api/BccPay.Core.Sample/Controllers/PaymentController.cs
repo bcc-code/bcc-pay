@@ -5,7 +5,6 @@ using BccPay.Core.Contracts.Responses;
 using BccPay.Core.Cqrs.Commands;
 using BccPay.Core.Cqrs.Queries;
 using BccPay.Core.Domain.Entities;
-using BccPay.Core.Infrastructure.PaymentModels.Webhooks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -41,16 +40,23 @@ namespace BccPay.Core.Sample.Controllers
         }
 
         [HttpPost("{paymentId}/attempts")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IStatusDetails))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IPaymentAttemptResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreatePaymentAttempt(Guid paymentId, [FromBody] CreatePaymentAttemptRequest request)
         {
             CreatePaymentAttemptCommand command = Mapper.Map<CreatePaymentAttemptCommand>(request);
+
+            if (HttpContext.Request.Headers.TryGetValue(HeaderNames.AcceptLanguage, out var userLanguage))
+            {
+                command.AcceptLanguage = userLanguage.ToString().Substring(0, 5);
+            }
             command.PaymentId = paymentId;
 
             var result = await Mediator.Send(command);
+            
+            var mapResult = Mapper.Map<IPaymentAttemptResponse>(result);
 
-            return Ok(result);
+            return Ok(mapResult);
         }
 
         [HttpGet("{paymentId}")]
@@ -63,22 +69,6 @@ namespace BccPay.Core.Sample.Controllers
             var result = await Mediator.Send(query);
 
             return Ok(Mapper.Map<GetPaymentResponse>(result));
-        }
-
-        [HttpPost("nets/status")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateNetsPaymentStatus([FromBody] NetsWebhook request)
-        {
-            var auth = HttpContext.Request.Headers[HeaderNames.Authorization];
-
-            var command = new UpdateNetsPaymentStatusCommand(auth, request);
-
-            var result = await Mediator.Send(command);
-
-            return result
-                ? Ok()
-                : BadRequest();
         }
     }
 }

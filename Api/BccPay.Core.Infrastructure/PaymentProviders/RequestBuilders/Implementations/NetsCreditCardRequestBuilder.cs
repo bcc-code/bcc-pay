@@ -5,9 +5,9 @@ using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
 using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
 
-namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Nets
+namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations
 {
-    public class NetsCreditCardRequestBuilder : INetsPaymentRequestBuilder
+    internal class NetsCreditCardRequestBuilder : INetsPaymentRequestBuilder
     {
         private readonly NetsProviderOptions _options;
 

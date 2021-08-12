@@ -18,14 +18,17 @@ namespace BccPay.Core.Cqrs.Commands
         public CreatePaymentCommand(string payerId,
             string currencyCode,
             decimal amount,
-            string countryCode)
+            string countryCode,
+            string description)
         {
             PayerId = payerId;
             Amount = amount;
             CurrencyCode = currencyCode;
             CountryCode = countryCode;
+            Description = description;
         }
 
+        public string Description { get; set; }
         public string PayerId { get; set; }
         public string CurrencyCode { get; set; }
         public string CountryCode { get; set; }
@@ -66,7 +69,7 @@ namespace BccPay.Core.Cqrs.Commands
         {
             var payment = new Payment();
 
-            payment.Create(request.PayerId, request.CurrencyCode, request.CountryCode, request.Amount);
+            payment.Create(request.PayerId, request.CurrencyCode, request.CountryCode, request.Amount, request.Description);
 
             await _documentSession.StoreAsync(payment, cancellationToken);
             await _documentSession.SaveChangesAsync(cancellationToken);

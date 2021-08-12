@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
-using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.Exceptions;
 using BccPay.Core.Infrastructure.RefitClients;
 using BccPay.Core.Shared.Converters;
@@ -31,12 +30,21 @@ namespace BccPay.Core.Infrastructure.Helpers
                 ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        public async Task<CurrencyExchangeResult> Exchange(Currencies fromCurrency, Currencies toCurrency, decimal amount, decimal exchangeRateMarkup = 0)
+        public Task<CurrencyConversionRecord> Exchange(string fromCurrency, string toCurrency, decimal amount, decimal exchangeRateMarkup = 0)
         {
-            if (fromCurrency == toCurrency || amount <= 0)
+            if (Enum.TryParse<Currencies>(fromCurrency, out Currencies fromCurrencyResult) && Enum.TryParse<Currencies>(toCurrency, out Currencies toCurrencyResult))
+            {
+                return Exchange(fromCurrencyResult, toCurrencyResult, amount, exchangeRateMarkup);
+            }
+            throw new CurrencyExchangeOperationException("Unable to convert values.");
+        }
+
+        public async Task<CurrencyConversionRecord> Exchange(Currencies fromCurrency, Currencies toCurrency, decimal amount, decimal exchangeRateMarkup = 0)
+        {
+            if (amount <= 0)
                 throw new CurrencyExchangeOperationException("Unable to convert values.");
 
-            var (currencyRate, fromOpposite) = await GetExhangeRateByCurrency(fromCurrency, toCurrency);
+            var (currencyRate, fromOpposite, updateTime) = await GetExhangeRateByCurrency(fromCurrency, toCurrency);
 
             decimal exchangeResultNetto = 0;
             if (fromOpposite)
@@ -50,19 +58,23 @@ namespace BccPay.Core.Infrastructure.Helpers
                 decimal markup = Decimal.Multiply(exchangeResultNetto, exchangeRateMarkup);
                 decimal exchangeResultGross = exchangeResultNetto + markup;
 
-                return new CurrencyExchangeResult(
-                fromCurrency,
-                toCurrency,
-                amount,
-                exchangeResultGross.TwoDigitsAfterPoint(),
-                exchangeResultNetto.TwoDigitsAfterPoint());
+                return new CurrencyConversionRecord(
+                    updateTime,
+                    fromCurrency,
+                    toCurrency,
+                    currencyRate,
+                    currencyRate + exchangeRateMarkup,
+                    amount,
+                    exchangeResultGross.TwoDigitsAfterPoint());
             }
 
-            return new CurrencyExchangeResult(
+            return new CurrencyConversionRecord(
+                updateTime,
                 fromCurrency,
                 toCurrency,
+                currencyRate,
+                currencyRate + exchangeRateMarkup,
                 amount,
-                exchangeResultNetto.TwoDigitsAfterPoint(),
                 exchangeResultNetto.TwoDigitsAfterPoint());
         }
 
@@ -100,7 +112,7 @@ namespace BccPay.Core.Infrastructure.Helpers
             await _documentSession.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task<(decimal, bool)> GetExhangeRateByCurrency(Currencies fromCurrency, Currencies toCurrency)
+        private async Task<(decimal, bool, DateTime?)> GetExhangeRateByCurrency(Currencies fromCurrency, Currencies toCurrency)
         {
             var result = await _documentSession
                     .LoadAsync<CurrencyRate>(CurrencyRate.GetCurrencyRateId(fromCurrency));
@@ -123,10 +135,10 @@ namespace BccPay.Core.Infrastructure.Helpers
                     }
                 }
 
-                return (oppositeResult.Rates[fromCurrency], true);
+                return (oppositeResult.Rates[fromCurrency], true, oppositeResult.FixerServerUpdate);
             }
 
-            return (result.Rates[toCurrency], false);
+            return (result.Rates[toCurrency], false, result.FixerServerUpdate);
         }
 
         private bool IsCurrencyRateValid(CurrencyRate currencyRate, int expirationTimeInHours)

@@ -1,13 +1,14 @@
-﻿using BccPay.Core.Domain.Entities;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace BccPay.Core.Infrastructure.Helpers
 {
-    public static class StatusDetailsDeserializer<T> where T : class
+    public static class ReverseAbstraction<Implementation, Abstraction>
+        where Implementation : class
+        where Abstraction : class
     {
-        public static T GetStatusDetailsType(IStatusDetails sourse)
+        public static Implementation GetImplementationFromAbstraction(Abstraction sourse)
         {
-            return JsonConvert.DeserializeObject<T>(
+            return JsonConvert.DeserializeObject<Implementation>(
                         JsonConvert.SerializeObject(sourse, Formatting.Indented, new JsonSerializerSettings
                         {
                             TypeNameHandling = TypeNameHandling.All,

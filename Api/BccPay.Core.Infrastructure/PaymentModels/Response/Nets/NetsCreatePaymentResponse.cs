@@ -1,6 +1,6 @@
 ﻿namespace BccPay.Core.Infrastructure.PaymentModels.Response.Nets
 {
-    public class CreatePaymentResponse
+    public class NetsCreatePaymentResponse
     {
         public string PaymentId { get; set; }
     }

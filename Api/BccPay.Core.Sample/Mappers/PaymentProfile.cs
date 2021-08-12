@@ -20,7 +20,17 @@ namespace BccPay.Core.Sample.Mappers
                 .ForMember(destination
                 => destination.StatusDetails, options
                     => options.MapFrom(source
-                        => StatusDetailsDeserializer<object>.GetStatusDetailsType(source.StatusDetails)));
+                        => ReverseAbstraction<object, IStatusDetails>.GetImplementationFromAbstraction(source.StatusDetails)));
+
+            CreateMap<MolliePaymentAttemptResponse, MollieStatusDetails>()
+                .ReverseMap();
+            CreateMap<NetsPaymentAttemptResponse, NetsStatusDetails>()
+                .ReverseMap();
+
+            CreateMap<IPaymentAttemptResponse, IStatusDetails>()
+                .Include<MolliePaymentAttemptResponse, MollieStatusDetails>()
+                .Include<NetsPaymentAttemptResponse, NetsStatusDetails>()
+                .ReverseMap();
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using BccPay.Core.Enums;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace BccPay.Core.Infrastructure.Dtos

@@ -1,7 +1,7 @@
-﻿using BccPay.Core.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BccPay.Core.Enums;
 
 namespace BccPay.Core.Domain.Entities
 {
@@ -17,6 +17,7 @@ namespace BccPay.Core.Domain.Entities
         public string CurrencyCode { get; set; }
         public string CountryCode { get; set; }
         public decimal Amount { get; set; }
+        public string Description { get; set; }
 
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
@@ -27,7 +28,8 @@ namespace BccPay.Core.Domain.Entities
             string payerId,
             string currencyCode,
             string countryCode,
-            decimal amount)
+            decimal amount,
+            string description)
         {
             PaymentId = Guid.NewGuid();
             PayerId = payerId;
@@ -36,6 +38,7 @@ namespace BccPay.Core.Domain.Entities
             Amount = amount;
             PaymentStatus = PaymentStatus.Open;
             Created = DateTime.Now;
+            Description = description;
         }
 
         public void Update(string currency,
@@ -74,6 +77,10 @@ namespace BccPay.Core.Domain.Entities
             {
                 attemptToUpdate.IsActive = false;
                 PaymentStatus = PaymentStatus.Canceled;
+            }
+            if (attempt.AttemptStatus == AttemptStatus.Expired)
+            {
+                attemptToUpdate.IsActive = false;
             }
             if (attempt.AttemptStatus == AttemptStatus.PaymentIsSuccessful)
             {

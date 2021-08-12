@@ -26,6 +26,7 @@ namespace BccPay.Core.Cqrs.Commands
 
         public Guid PaymentId { get; set; }
         public string PaymentConfigurationId { get; set; }
+        public string AcceptLanguage { get; set; }
 
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
@@ -93,7 +94,8 @@ namespace BccPay.Core.Cqrs.Commands
 
             var paymentRequest = new PaymentRequestDto
             {
-                Amount = payment.Amount.TwoDigitsAfterPoint(),
+                PaymentId = payment.PaymentId.ToString(),
+                Amount = decimal.Round(payment.Amount, 2, MidpointRounding.AwayFromZero),
                 Address = new AddressDto
                 {
                     Country = string.IsNullOrWhiteSpace(countryCode)
@@ -110,7 +112,9 @@ namespace BccPay.Core.Cqrs.Commands
                 PhoneNumberBody = phoneBody,
                 PhoneNumberPrefix = phonePrefix,
                 Currency = payment.CurrencyCode,
-                NotificationAccessToken = Guid.NewGuid().ToString()
+                NotificationAccessToken = Guid.NewGuid().ToString(),
+                AcceptLanguage = request.AcceptLanguage,
+                Description = payment.Description
             };
 
             var providerResult = await provider.CreatePayment(paymentRequest, paymentConfiguration.Settings);
@@ -119,8 +123,8 @@ namespace BccPay.Core.Cqrs.Commands
             {
                 PaymentAttemptId = Guid.NewGuid(),
                 PaymentMethod = paymentConfiguration.Settings.PaymentMethod,
-                AttemptStatus = providerResult.IsSuccessful ? AttemptStatus.WaitingForCharge : AttemptStatus.RejectedEitherCancelled,
-                IsActive = providerResult.IsSuccessful,
+                AttemptStatus = providerResult.IsSuccess ? AttemptStatus.WaitingForCharge : AttemptStatus.RejectedEitherCancelled,
+                IsActive = providerResult.IsSuccess,
                 Created = DateTime.Now,
                 StatusDetails = providerResult,
                 CountryCode = countryCode,
