@@ -10,6 +10,7 @@ import {
   close,
 } from './ScreenChange';
 import { RequestHeader } from './RequestHeader';
+import { startMolliePayment } from './MollieClient';
 
 export let isDevEnv: boolean;
 export let requestHeaders: [RequestHeader] | undefined;
@@ -19,7 +20,7 @@ export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
   @property({ type: Number }) amount = 5;
   @property({ type: String }) currency = 'EUR';
-  @property({ type: String }) country = 'DE';
+  @property({ type: String }) country = 'NOR';
   @property({ type: User }) user: User = {};
   @property({ type: String }) server = 'https://localhost:5001';
   @property({ type: String }) netsCheckoutKey = '#checkout_key#';
@@ -94,6 +95,7 @@ export class BccPay extends LitElement {
             <span class="card-cost">${this.amount} ${this.currency} </span>
           </div>
 
+          Current country: ${this.country}
           <div>
             <select
               class="country-select"
@@ -108,7 +110,8 @@ export class BccPay extends LitElement {
             </select>
           </div>
           <button
-            class="nets-button"
+            id="nets-cc"
+            class="payment-button"
             @click="${() =>
               startNetsPayment(
                 this.paymentId,
@@ -118,6 +121,19 @@ export class BccPay extends LitElement {
               )}"
           >
             PAY WITH NETS
+          </button>
+          <button
+            id="mollie-giropay"
+            class="payment-button"
+            @click="${() =>
+              startMolliePayment(
+                this.paymentId,
+                this.user,
+                this.server,
+                this.netsCheckoutKey
+              )}"
+          >
+            PAY WITH MOLLIE
           </button>
         </div>
 

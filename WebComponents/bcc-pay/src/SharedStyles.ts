@@ -88,6 +88,18 @@ export const textInputStyle = css`
   .country-select {
     margin-top: 16px;
   }
+
+  .payment-button {
+    font-size: 1rem;
+    text-transform: uppercase;
+    background: hsl(258, 71%, 61%);
+    color: white;
+    padding: 12px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: 700;
+    margin-top: 1rem;
+  }
 `;
 
 export function applyStyles() {
@@ -119,10 +131,10 @@ export function applyStyles() {
   const cardTag = document.getElementsByClassName('card-tag')[0] as HTMLElement;
   cardTag.style.cssText = cardTagStyle.toString();
 
-  const netsButton = document.getElementsByClassName(
-    'nets-button'
-  )[0] as HTMLElement;
-  netsButton.style.cssText = nestButtonStyle.toString();
+  // const netsButton = document.getElementsByClassName(
+  //   'nets-button'
+  // )[0] as HTMLElement;
+  // netsButton.style.cssText = nestButtonStyle.toString();
 
   const reloadButtons = document.getElementsByClassName('reload-button');
   Array.from(reloadButtons).forEach(element => {

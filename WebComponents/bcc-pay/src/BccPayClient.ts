@@ -24,7 +24,10 @@ export async function getPaymentConfigurations(
       .then(json => {
         possibleConfigurations = json;
         console.log(
-          'Possible configurations: ' + JSON.stringify(possibleConfigurations)
+          'Possible configurations for country ' +
+            country +
+            ' : ' +
+            JSON.stringify(possibleConfigurations)
         );
       });
     return possibleConfigurations;
