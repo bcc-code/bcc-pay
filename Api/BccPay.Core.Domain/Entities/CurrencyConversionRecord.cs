@@ -8,7 +8,7 @@ namespace BccPay.Core.Domain.Entities
        Currencies FromCurrency,
        Currencies ToCurrency,
        decimal Rate,
-       decimal Amount,
-       decimal Gross,
-       decimal Netto);
+       decimal MidMarketRate,
+       decimal FromAmount,
+       decimal ToAmount);
 }

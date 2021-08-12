@@ -9,6 +9,7 @@ using BccPay.Core.Infrastructure.PaymentModels.Response.Mollie;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations;
 using BccPay.Core.Infrastructure.RefitClients;
+using Newtonsoft.Json.Linq;
 using Refit;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
@@ -47,21 +48,32 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
                                     paymentRequest.Amount,
                                     _options.RateMarkup);
 
-                request.Amount.Value = currencyConversion.Gross.ToString();
+                request.Amount.Value = currencyConversion.ToAmount.ToString();
             }
-
-            var paymentResult = await _mollieClient.CreatePayment(request);
-
-            return new MollieStatusDetails
+            try
             {
-                MolliePaymentId = paymentResult.Id,
-                CheckoutUrl = paymentResult.Links?.Checkout?.Href,
-                Description = paymentResult.Description,
-                ExpiresAt = paymentResult.ExpiresAt,
-                CurrencyConversionResult = currencyConversion,
-                WebhookUrl = paymentResult.WebhookUrl,
-                IsSuccess = true
-            };
+
+                var paymentResult = await _mollieClient.CreatePayment(request);
+
+                return new MollieStatusDetails
+                {
+                    MolliePaymentId = paymentResult.Id,
+                    CheckoutUrl = paymentResult.Links?.Checkout?.Href,
+                    Description = paymentResult.Description,
+                    ExpiresAt = paymentResult.ExpiresAt,
+                    CurrencyConversionResult = currencyConversion,
+                    WebhookUrl = paymentResult.WebhookUrl,
+                    IsSuccess = true
+                };
+            }
+            catch (ApiException exception)
+            {
+                return new MollieStatusDetails
+                {
+                    IsSuccess = false,
+                    Error = exception.Content
+                };
+            }
         }
 
         public async Task<IPaymentResponse> GetPayment(string paymentId)

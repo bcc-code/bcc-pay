@@ -41,7 +41,7 @@ namespace BccPay.Core.Infrastructure.Helpers
 
         public async Task<CurrencyConversionRecord> Exchange(Currencies fromCurrency, Currencies toCurrency, decimal amount, decimal exchangeRateMarkup = 0)
         {
-            if (fromCurrency == toCurrency || amount <= 0)
+            if (amount <= 0)
                 throw new CurrencyExchangeOperationException("Unable to convert values.");
 
             var (currencyRate, fromOpposite, updateTime) = await GetExhangeRateByCurrency(fromCurrency, toCurrency);
@@ -63,9 +63,9 @@ namespace BccPay.Core.Infrastructure.Helpers
                     fromCurrency,
                     toCurrency,
                     currencyRate,
+                    currencyRate + exchangeRateMarkup,
                     amount,
-                    exchangeResultGross.TwoDigitsAfterPoint(),
-                    exchangeResultNetto.TwoDigitsAfterPoint());
+                    exchangeResultGross.TwoDigitsAfterPoint());
             }
 
             return new CurrencyConversionRecord(
@@ -73,8 +73,8 @@ namespace BccPay.Core.Infrastructure.Helpers
                 fromCurrency,
                 toCurrency,
                 currencyRate,
+                currencyRate + exchangeRateMarkup,
                 amount,
-                exchangeResultNetto.TwoDigitsAfterPoint(),
                 exchangeResultNetto.TwoDigitsAfterPoint());
         }
 
