@@ -26,6 +26,8 @@ namespace BccPay.Core.Cqrs.Commands
 
         public Guid PaymentId { get; set; }
         public string PaymentConfigurationId { get; set; }
+        public string AcceptLanguage { get; set; }
+        public string Description { get; set; }
 
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
@@ -108,7 +110,9 @@ namespace BccPay.Core.Cqrs.Commands
                 PhoneNumberBody = phoneBody,
                 PhoneNumberPrefix = phonePrefix,
                 Currency = payment.CurrencyCode,
-                NotificationAccessToken = Guid.NewGuid().ToString()
+                NotificationAccessToken = Guid.NewGuid().ToString(),
+                AcceptLanguage = request.AcceptLanguage,
+                Description = request.Description
             };
 
             var providerResult = await provider.CreatePayment(paymentRequest, paymentConfiguration.Settings);
