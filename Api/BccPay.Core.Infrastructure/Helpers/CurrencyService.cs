@@ -41,16 +41,6 @@ namespace BccPay.Core.Infrastructure.Helpers
 
         public async Task<CurrencyConversionRecord> Exchange(Currencies fromCurrency, Currencies toCurrency, decimal amount, decimal exchangeRateMarkup = 0)
         {
-            if (fromCurrency == toCurrency)
-                return new CurrencyConversionRecord(
-                    null,
-                    fromCurrency,
-                    toCurrency,
-                    0,
-                    0,
-                    amount.TwoDigitsAfterPoint(),
-                    amount.TwoDigitsAfterPoint());
-
             if (amount <= 0)
                 throw new CurrencyExchangeOperationException("Unable to convert values.");
 
