@@ -40,7 +40,7 @@ namespace BccPay.Core.Sample.Controllers
         }
 
         [HttpPost("{paymentId}/attempts")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IPaymentResponse))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IPaymentAttemptResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreatePaymentAttempt(Guid paymentId, [FromBody] CreatePaymentAttemptRequest request)
         {
@@ -54,7 +54,7 @@ namespace BccPay.Core.Sample.Controllers
 
             var result = await Mediator.Send(command);
             
-            var mapResult = Mapper.Map<IPaymentResponse>(result);
+            var mapResult = Mapper.Map<IPaymentAttemptResponse>(result);
 
             return Ok(mapResult);
         }

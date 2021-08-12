@@ -1,6 +1,6 @@
 ﻿namespace BccPay.Core.Contracts.Responses
 {
-    public class NetsPaymentAttemptResponse: IPaymentResponse
+    public class NetsPaymentAttemptResponse: IPaymentAttemptResponse
     {
         public string PaymentCheckoutId { get; set; }
     }

@@ -27,7 +27,7 @@ namespace BccPay.Core.Sample.Mappers
             CreateMap<NetsPaymentAttemptResponse, NetsStatusDetails>()
                 .ReverseMap();
 
-            CreateMap<IPaymentResponse, IStatusDetails>()
+            CreateMap<IPaymentAttemptResponse, IStatusDetails>()
                 .Include<MolliePaymentAttemptResponse, MollieStatusDetails>()
                 .Include<NetsPaymentAttemptResponse, NetsStatusDetails>()
                 .ReverseMap();
