@@ -15,7 +15,8 @@ export async function getPaymentConfigurations(
   }
 
   try {
-    await fetch(`${server}​/payment-configurations?countryCode=${country}`, {
+    const url = `${server}/payment-configurations?countryCode=${country}`;
+    await fetch(url, {
       method: 'GET',
       headers: fetchHeaders,
     })
@@ -28,6 +29,8 @@ export async function getPaymentConfigurations(
       });
     return possibleConfigurations;
   } catch (e) {
+    console.log('getPaymentConfigurations exception: ' + e);
+
     return '';
   }
 }
