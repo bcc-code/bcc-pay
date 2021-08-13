@@ -54,7 +54,7 @@ namespace BccPay.Core.Cqrs.Commands
     {
         private readonly IAsyncDocumentSession _documentSession;
         private readonly IPaymentProviderFactory _paymentProviderFactory;
-        private IMediator _mediator;
+        private readonly IMediator _mediator;
 
         public CreatePaymentAttemptCommandHandler(
             IPaymentProviderFactory paymentProviderFactory,
