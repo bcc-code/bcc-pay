@@ -76,6 +76,8 @@ jobs:
           RavenSettings.CertFilePath: ${{ secrets.CERT_FILE_PATH_DEV }}
           RavenSettings.CertPassword: ${{ secrets.CERT_PASSWORD_DEV }}
           NetsSecretKey: ${{ secrets.NETS_SECRET_KEY_DEV }}
+          MollieSecretKey: ${{ secrets.MOLLIE_SECRET_KEY_DEV }}
+          FixerApiKey: ${{ secrets.FIXER_API_KEY_DEV }}
 
       - name: Backend deploy
         run: |
