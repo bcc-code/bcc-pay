@@ -9,7 +9,7 @@ export async function startMolliePayment(
   user: User,
   server: string,
   checkoutKey: string
-): Promise<boolean> {
+): Promise<string> {
   const firstScreenElement = document.getElementById(
     'first-screen'
   ) as HTMLElement;
@@ -21,22 +21,26 @@ export async function startMolliePayment(
   changeUserDataScreenElement.style.display = 'none';
 
   const netsScreenElement = document.getElementById(
-    'nets-payment-screen'
+    'mollie-payment-screen'
   ) as HTMLElement;
   netsScreenElement.style.display = 'block';
 
-  const molliePaymentId = await initMolliePayment(paymentId, user, server);
+  const mollieCheckoutUrl = await initMolliePayment(paymentId, user, server);
   if (isDevEnv === true) {
-    console.log('Mollie payment id is: ' + molliePaymentId);
+    console.log('Mollie checkoutUrl is: ' + mollieCheckoutUrl);
   }
 
-  if (molliePaymentId === null || molliePaymentId === undefined) {
+  if (mollieCheckoutUrl === null || mollieCheckoutUrl === '') {
     displayErrorPage();
-    return false;
+    return '';
   }
 
-  return true;
-  // return await processMolliePayment(molliePaymentId, checkoutKey);
+  const mollieIframe = document.getElementById(
+    'mollie-iframe'
+  ) as HTMLIFrameElement;
+  mollieIframe.src = mollieCheckoutUrl;
+
+  return mollieCheckoutUrl;
 }
 
 export async function initMolliePayment(
@@ -46,6 +50,7 @@ export async function initMolliePayment(
 ): Promise<string> {
   const body = {
     paymentConfigurationId: 'mollie-giropay-eur',
+    description: 'Test description',
     email: user.email === null ? undefined : user.email,
     phoneNumber: user.phoneNumber === null ? undefined : user.phoneNumber,
     firstName: user.firstName === null ? undefined : user.firstName,
@@ -64,7 +69,7 @@ export async function initMolliePayment(
     });
   }
 
-  let netsPaymentId: string = '';
+  let mollieCheckoutUrl: string = '';
   try {
     await fetch(`${server}/Payment/${paymentId}/attempts`, {
       method: 'POST',
@@ -73,46 +78,46 @@ export async function initMolliePayment(
     })
       .then(response => response.json())
       .then(json => {
-        netsPaymentId = json.paymentCheckoutId;
+        mollieCheckoutUrl = json.checkoutUrl;
       });
   } catch (e) {
     displayErrorPage();
   }
-  return netsPaymentId;
+  return mollieCheckoutUrl;
 }
 
-export async function processNetsPayment(
-  paymentId: string,
-  checkoutKey: string
-): Promise<boolean> {
-  if (paymentId) {
-    const checkoutOptions = {
-      checkoutKey: checkoutKey,
-      paymentId: paymentId,
-      containerId: 'checkout-container-div',
-    };
+// export async function processNetsPayment(
+//   paymentId: string,
+//   checkoutKey: string
+// ): Promise<boolean> {
+//   if (paymentId) {
+//     const checkoutOptions = {
+//       checkoutKey: checkoutKey,
+//       paymentId: paymentId,
+//       containerId: 'checkout-container-div',
+//     };
 
-    // @ts-ignore
-    checkout = new Dibs.Checkout(checkoutOptions);
-    await checkout.on('payment-completed', function (response: any) {
-      if (isDevEnv === true) {
-        console.log('Completed!' + JSON.stringify(response));
-      }
-      paymentCompleted();
-      return true;
-    });
+//     // @ts-ignore
+//     checkout = new Dibs.Checkout(checkoutOptions);
+//     await checkout.on('payment-completed', function (response: any) {
+//       if (isDevEnv === true) {
+//         console.log('Completed!' + JSON.stringify(response));
+//       }
+//       paymentCompleted();
+//       return true;
+//     });
 
-    if (isDevEnv === true) {
-      console.log('Not completed!');
-    }
-    return false;
-  } else {
-    if (isDevEnv === true) {
-      console.log('Expected a paymentId');
-    }
-    return false;
-  }
-}
+//     if (isDevEnv === true) {
+//       console.log('Not completed!');
+//     }
+//     return false;
+//   } else {
+//     if (isDevEnv === true) {
+//       console.log('Expected a paymentId');
+//     }
+//     return false;
+//   }
+// }
 
 export async function cleanupNetsPayment() {
   checkout.cleanup();

@@ -31,6 +31,8 @@ export class BccPay extends LitElement {
   @property({ type: String }) paymentId: string = '';
   @property({ type: String }) paymentConfigurationId: string = 'nets-cc-eur';
 
+  mollieUrl: string = '';
+
   loadNestScript() {
     isDevEnv = this.isDevEnv;
     requestHeaders = this.requestHeaders;
@@ -75,6 +77,15 @@ export class BccPay extends LitElement {
     if (isDevEnv === true) {
       console.log('Bcc pay payment id: ' + this.paymentId);
     }
+  }
+
+  async initMolliePayment() {
+    this.mollieUrl = await startMolliePayment(
+      this.paymentId,
+      this.user,
+      this.server,
+      this.netsCheckoutKey
+    );
   }
 
   render() {
@@ -125,13 +136,7 @@ export class BccPay extends LitElement {
           <button
             id="mollie-giropay"
             class="payment-button"
-            @click="${() =>
-              startMolliePayment(
-                this.paymentId,
-                this.user,
-                this.server,
-                this.netsCheckoutKey
-              )}"
+            @click="${() => this.initMolliePayment()}"
           >
             PAY WITH MOLLIE
           </button>
@@ -168,6 +173,25 @@ export class BccPay extends LitElement {
             </h5>
           </div>
           <div id="checkout-container-div"></div>
+        </div>
+
+        <div id="mollie-payment-screen" style="display: none">
+          <div class="card-subtitle">
+            <h5>Mollie payment</h5>
+          </div>
+
+          <button
+            class="payment-button"
+            @click="${() => console.log('Url: ' + this.mollieUrl)}"
+          >
+            Mollie payment page
+          </button>
+
+          <iframe
+            id="mollie-iframe"
+            src="${this.mollieUrl}"
+            title="mollie-iframe"
+          ></iframe>
         </div>
 
         <div id="change-user-data-screen" style="display: none">
