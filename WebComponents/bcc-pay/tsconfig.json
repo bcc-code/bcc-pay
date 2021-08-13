@@ -16,7 +16,9 @@
     "rootDir": "./",
     "declaration": true,
     "declarationMap": true,
-    "incremental": true
+    "incremental": true,
+    "resolveJsonModule": true,
+    "noImplicitAny": false
   },
   "include": ["**/*.ts"]
 }

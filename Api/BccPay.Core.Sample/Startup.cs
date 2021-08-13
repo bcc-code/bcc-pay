@@ -38,7 +38,7 @@ namespace BccPay.Core.Sample
             services.ConfigureBccPayInfrastructureServices(options =>
             {
                 options.Nets.BaseAddress = "https://test.api.dibspayment.eu";
-                options.Nets.CheckoutPageUrl = "/checkout";
+                options.Nets.CheckoutPageUrl = "/";
                 options.Nets.TermsUrl = "http://localhost:8000";
                 options.Nets.SecretKey = Configuration["NetsSecretKey"];
                 options.Nets.NotificationUrl = "https://localhost:5001/Payment/webhook";

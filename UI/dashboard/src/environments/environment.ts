@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  bccPayUrl: 'https://localhost:5001',
+  bccPayUrl: '#{bccPayUrl}#',
+  netsCheckoutKey: '#{netsCheckoutKey}#',
 };
 
 /*

@@ -1,6 +1,6 @@
 {
   "name": "bcc-pay",
-  "version": "0.0.13",
+  "version": "0.0.17",
   "description": "Webcomponent bcc-pay following open-wc recommendations",
   "author": "bcc-pay-devteam",
   "license": "MIT",
@@ -20,7 +20,8 @@
     "test": "tsc && wtr --coverage",
     "test:watch": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wtr --watch\"",
     "storybook": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds -c .storybook/server.mjs\"",
-    "storybook:build": "tsc && build-storybook"
+    "storybook:build": "tsc && build-storybook",
+    "versionCheck": "VERSION=$(npm show bcc-pay version) && npm version $VERSION --allow-same-version"
   },
   "dependencies": {
     "axios": "^0.21.1",

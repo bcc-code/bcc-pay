@@ -27,9 +27,18 @@ Then you can use webComponent with one of options presented below, you have to a
 > Integration
 > Checkout key
 
+```html
 <bcc-pay netsCheckoutKey="#netsCheckoutKey#" isDevEnv="true"></bcc-pay>
 
-<bcc-pay item="Subscpription" currency="NOK" country="NOR" amount="10" server="https://localhost:5001" netsCheckoutKey="#netsCheckoutKey#"></bcc-pay>
+<bcc-pay
+  item="Subscpription"
+  currency="NOK"
+  country="NOR"
+  amount="10"
+  server="https://localhost:5001"
+  netsCheckoutKey="#netsCheckoutKey#"
+></bcc-pay>
+```
 
 You can also pass user object to component:
 

@@ -30,17 +30,21 @@ interface ArgTypes {
   netsCheckoutKey?: string;
   isDevEnv?: boolean;
   slot?: TemplateResult;
+  requestHeaders?: [{ key: string; value: string }];
+  paymentId?: string;
 }
 
 const Template: Story<ArgTypes> = ({
   item = 'Subscription',
-  amount = 6,
+  amount = 12,
   currency = 'NOK',
-  country = 'DE',
+  country = 'NOR',
   server = 'https://localhost:5001',
   netsCheckoutKey = '#netsCheckoutKey#',
   isDevEnv = true,
   slot,
+  requestHeaders = [{ key: 'new_key', value: 'new_value' }],
+  paymentId,
 }: ArgTypes) => html`
   <bcc-pay
     .item=${item}
@@ -50,6 +54,8 @@ const Template: Story<ArgTypes> = ({
     .server=${server}
     .netsCheckoutKey=${netsCheckoutKey}
     .isDevEnv=${isDevEnv}
+    .requestHeaders=${requestHeaders}
+    .paymentId=${paymentId}
   >
     ${slot}
   </bcc-pay>
