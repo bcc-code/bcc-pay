@@ -1,11 +1,14 @@
-﻿using BccPay.Core.Domain.Entities;
-using FluentValidation;
-using MediatR;
-using Raven.Client.Documents.Session;
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using BccPay.Core.DataAccess.Indexes;
+using BccPay.Core.Domain.Entities;
+using FluentValidation;
+using MediatR;
+using Raven.Client.Documents;
+using Raven.Client.Documents.Linq;
+using Raven.Client.Documents.Session;
 
 namespace BccPay.Core.Cqrs.Commands
 {
@@ -67,6 +70,17 @@ namespace BccPay.Core.Cqrs.Commands
 
         public async Task<string> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
         {
+            var result = await _documentSession.Query<PaymentsIndex.Result, PaymentsIndex>()
+                        .Where(x => x.PayerId == request.PayerId
+                                    && x.Amount == request.Amount
+                                    && x.CurrencyCode == request.CurrencyCode)
+                        .OrderByDescending(x => x.CreationDate)
+                        .Select(x => x.PaymentId)
+                        .FirstOrDefaultAsync(cancellationToken);
+
+            if (result != Guid.Empty)
+                return result.ToString();
+
             var payment = new Payment();
 
             payment.Create(request.PayerId, request.CurrencyCode, request.CountryCode, request.Amount, request.Description);
