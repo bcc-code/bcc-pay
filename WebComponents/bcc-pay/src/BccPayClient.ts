@@ -15,6 +15,8 @@ export async function getPaymentConfigurations(
   }
 
   try {
+    disablePayments();
+
     const url = `${server}/payment-configurations?countryCode=${country}`;
     await fetch(url, {
       method: 'GET',
@@ -30,12 +32,34 @@ export async function getPaymentConfigurations(
             JSON.stringify(possibleConfigurations)
         );
       });
+
+    const possibleConfigurationsObject = JSON.parse(
+      JSON.stringify(possibleConfigurations)
+    );
+    possibleConfigurationsObject.forEach(element => {
+      enablePossiblePayments(element.provider);
+    });
     return possibleConfigurations;
   } catch (e) {
     console.log('getPaymentConfigurations exception: ' + e);
 
     return '';
   }
+}
+
+export function enablePossiblePayments(provider: string) {
+  const paymentButton = document.getElementById(provider) as HTMLButtonElement;
+  if (paymentButton) {
+    paymentButton.disabled = false;
+  }
+}
+
+export function disablePayments() {
+  const netsButton = document.getElementById('Nets') as HTMLButtonElement;
+  netsButton.disabled = true;
+
+  const mollyButton = document.getElementById('Mollie') as HTMLButtonElement;
+  mollyButton.disabled = true;
 }
 
 export async function initPayment(
@@ -49,6 +73,7 @@ export async function initPayment(
     currencyCode: currency,
     countryCode: country,
     amount: amount,
+    description: 'Test description',
   };
   let paymentId: string = '';
 

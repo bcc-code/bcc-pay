@@ -11,6 +11,7 @@ import {
 } from './ScreenChange';
 import { RequestHeader } from './RequestHeader';
 import { startMolliePayment } from './MollieClient';
+import { Spinner, SpinnerShow, SpinnerHide } from './Spinner';
 
 export let isDevEnv: boolean;
 export let requestHeaders: [RequestHeader] | undefined;
@@ -31,7 +32,7 @@ export class BccPay extends LitElement {
   @property({ type: String }) paymentId: string = '';
   @property({ type: String }) paymentConfigurationId: string = 'nets-cc-eur';
 
-  mollieUrl: string = '';
+  @property({ type: String }) mollieUrl: string = '';
 
   loadNestScript() {
     isDevEnv = this.isDevEnv;
@@ -86,6 +87,13 @@ export class BccPay extends LitElement {
       this.server,
       this.netsCheckoutKey
     );
+
+    if (this.mollieUrl !== '') {
+      const mollyButton = document.getElementById(
+        'mollie-payment-button'
+      ) as HTMLButtonElement;
+      mollyButton.disabled = false;
+    }
   }
 
   render() {
@@ -106,22 +114,24 @@ export class BccPay extends LitElement {
             <span class="card-cost">${this.amount} ${this.currency} </span>
           </div>
 
-          Current country: ${this.country}
-          <div>
-            <select
-              class="country-select"
-              value="${this.country}"
-              @change="${(e: any) => (this.country = e.target.value)}"
-            >
-              <option value="">Select your country</option>
-              <option value="NOR">Norway</option>
-              <option value="DE">Germany</option>
-              <option value="UA">Ukraine</option>
-              <option value="PL">Poland</option>
-            </select>
+          <div class="country-container">
+            Current country: ${this.country}
+            <div>
+              <select
+                class="country-select"
+                value="${this.country}"
+                @change="${(e: any) => (this.country = e.target.value)}"
+              >
+                <option value="">Change country</option>
+                <option value="NOR">Norway</option>
+                <option value="DE">Germany</option>
+                <option value="UA">Ukraine</option>
+                <option value="PL">Poland</option>
+              </select>
+            </div>
           </div>
           <button
-            id="nets-cc"
+            id="Nets"
             class="payment-button"
             @click="${() =>
               startNetsPayment(
@@ -134,7 +144,7 @@ export class BccPay extends LitElement {
             PAY WITH NETS
           </button>
           <button
-            id="mollie-giropay"
+            id="Mollie"
             class="payment-button"
             @click="${() => this.initMolliePayment()}"
           >
@@ -181,17 +191,13 @@ export class BccPay extends LitElement {
           </div>
 
           <button
+            id="mollie-payment-button"
             class="payment-button"
-            @click="${() => console.log('Url: ' + this.mollieUrl)}"
+            @click="${() => window.open(this.mollieUrl)}"
+            disabled
           >
-            Mollie payment page
+            Open Mollie payment page
           </button>
-
-          <iframe
-            id="mollie-iframe"
-            src="${this.mollieUrl}"
-            title="mollie-iframe"
-          ></iframe>
         </div>
 
         <div id="change-user-data-screen" style="display: none">

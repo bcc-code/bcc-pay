@@ -43,7 +43,7 @@ export async function initNetsPayment(
   server: string
 ): Promise<string> {
   const body = {
-    paymentConfigurationId: paymentConfigurationId,
+    paymentConfigurationId: 'nets-cc-nok',
     email: user.email === null ? undefined : user.email,
     phoneNumber: user.phoneNumber === null ? undefined : user.phoneNumber,
     firstName: user.firstName === null ? undefined : user.firstName,

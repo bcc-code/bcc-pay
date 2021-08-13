@@ -36,9 +36,9 @@ interface ArgTypes {
 
 const Template: Story<ArgTypes> = ({
   item = 'Subscription',
-  amount = 6,
+  amount = 12,
   currency = 'NOK',
-  country = 'DE',
+  country = 'NOR',
   server = 'https://localhost:5001',
   netsCheckoutKey = '#netsCheckoutKey#',
   isDevEnv = true,

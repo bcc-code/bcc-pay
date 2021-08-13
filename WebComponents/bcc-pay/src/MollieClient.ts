@@ -35,11 +35,6 @@ export async function startMolliePayment(
     return '';
   }
 
-  const mollieIframe = document.getElementById(
-    'mollie-iframe'
-  ) as HTMLIFrameElement;
-  mollieIframe.src = mollieCheckoutUrl;
-
   return mollieCheckoutUrl;
 }
 
@@ -50,7 +45,6 @@ export async function initMolliePayment(
 ): Promise<string> {
   const body = {
     paymentConfigurationId: 'mollie-giropay-eur',
-    description: 'Test description',
     email: user.email === null ? undefined : user.email,
     phoneNumber: user.phoneNumber === null ? undefined : user.phoneNumber,
     firstName: user.firstName === null ? undefined : user.firstName,
@@ -85,39 +79,6 @@ export async function initMolliePayment(
   }
   return mollieCheckoutUrl;
 }
-
-// export async function processNetsPayment(
-//   paymentId: string,
-//   checkoutKey: string
-// ): Promise<boolean> {
-//   if (paymentId) {
-//     const checkoutOptions = {
-//       checkoutKey: checkoutKey,
-//       paymentId: paymentId,
-//       containerId: 'checkout-container-div',
-//     };
-
-//     // @ts-ignore
-//     checkout = new Dibs.Checkout(checkoutOptions);
-//     await checkout.on('payment-completed', function (response: any) {
-//       if (isDevEnv === true) {
-//         console.log('Completed!' + JSON.stringify(response));
-//       }
-//       paymentCompleted();
-//       return true;
-//     });
-
-//     if (isDevEnv === true) {
-//       console.log('Not completed!');
-//     }
-//     return false;
-//   } else {
-//     if (isDevEnv === true) {
-//       console.log('Expected a paymentId');
-//     }
-//     return false;
-//   }
-// }
 
 export async function cleanupNetsPayment() {
   checkout.cleanup();
