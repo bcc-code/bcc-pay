@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BccPay.Core.DataAccess.Indexes;
 using BccPay.Core.Domain.Entities;
+using BccPay.Core.Enums;
 using FluentValidation;
 using MediatR;
 using Raven.Client.Documents;
@@ -74,7 +75,7 @@ namespace BccPay.Core.Cqrs.Commands
                         .Where(x => x.PayerId == request.PayerId
                                     && x.Amount == request.Amount
                                     && x.CurrencyCode == request.CurrencyCode
-                                    && x.PaymentStatus != Enums.PaymentStatus.Canceled)
+                                    && x.PaymentStatus == PaymentStatus.Open)
                         .OrderByDescending(x => x.CreationDate)
                         .Select(x => x.PaymentId)
                         .FirstOrDefaultAsync(cancellationToken);
