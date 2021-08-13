@@ -1,5 +1,5 @@
 import { User } from './User';
-import { isDevEnv, paymentConfigurationId, requestHeaders } from './BccPay';
+import { isDevEnv, requestHeaders } from './BccPay';
 import { displayErrorPage, paymentCompleted } from './ScreenChange';
 
 var checkout: any;

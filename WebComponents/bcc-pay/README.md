@@ -113,5 +113,4 @@ List of possible parameters and default values:
     | [RequestHeader]
     | undefined;
   @property({ type: String }) paymentId: string = '';
-  @property({ type: String }) paymentConfigurationId: string = 'nets-cc-eur';
 ```

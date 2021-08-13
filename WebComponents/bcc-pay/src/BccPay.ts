@@ -15,7 +15,6 @@ import { Spinner, SpinnerShow, SpinnerHide } from './Spinner';
 
 export let isDevEnv: boolean;
 export let requestHeaders: [RequestHeader] | undefined;
-export let paymentConfigurationId: string;
 
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
@@ -30,14 +29,12 @@ export class BccPay extends LitElement {
     | [RequestHeader]
     | undefined;
   @property({ type: String }) paymentId: string = '';
-  @property({ type: String }) paymentConfigurationId: string = 'nets-cc-eur';
 
   @property({ type: String }) mollieUrl: string = '';
 
   loadNestScript() {
     isDevEnv = this.isDevEnv;
     requestHeaders = this.requestHeaders;
-    paymentConfigurationId = this.paymentConfigurationId;
 
     let nestScript = document.createElement('script');
     if (isDevEnv === true) {
