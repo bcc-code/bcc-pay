@@ -27,12 +27,12 @@ namespace BccPay.Core.Cqrs.Commands
         public Guid PaymentId { get; set; }
         public string PaymentConfigurationId { get; set; }
         public string AcceptLanguage { get; set; }
-        public string Description { get; set; }
 
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string CountryCode { get; set; }
 
         public string City { get; set; }
         public string AddressLine1 { get; set; }
@@ -74,17 +74,19 @@ namespace BccPay.Core.Cqrs.Commands
                         Payment.GetPaymentId(request.PaymentId), cancellationToken)
                     ?? throw new NotFoundException("Invalid payment ID");
 
+            var countryCode = request.CountryCode ?? payment.CountryCode;
+
             var paymentConfiguration = await _documentSession.LoadAsync<PaymentConfiguration>(
                     PaymentConfiguration.GetDocumentId(request.PaymentConfigurationId), cancellationToken)
                     ?? throw new Exception("Invalid payment configuration ID");
 
-            var countryAvailableConfigurations = await _mediator.Send(new GetCountryPaymentConfigurationsQuery(payment.CountryCode));
+            var countryAvailableConfigurations = await _mediator.Send(new GetCountryPaymentConfigurationsQuery(countryCode));
 
             if (payment.Attempts?.Where(x => x.IsActive).Any() == true)
                 throw new Exception("One of the attempts is still active.");
 
             if (!countryAvailableConfigurations.Any(x => x.Id == request.PaymentConfigurationId))
-                throw new InvalidPaymentException($"The payment configuration {request.PaymentConfigurationId} is not available for the country '{payment.CountryCode}'");
+                throw new InvalidPaymentException($"The payment configuration {request.PaymentConfigurationId} is not available for the country '{countryCode}'");
 
             var (phonePrefix, phoneBody) = PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);
 
@@ -96,9 +98,9 @@ namespace BccPay.Core.Cqrs.Commands
                 Amount = decimal.Round(payment.Amount, 2, MidpointRounding.AwayFromZero),
                 Address = new AddressDto
                 {
-                    Country = string.IsNullOrWhiteSpace(payment.CountryCode)
+                    Country = string.IsNullOrWhiteSpace(countryCode)
                         ? string.Empty
-                        : AddressConverter.ConvertCountry(payment.CountryCode, CountryCodeFormat.Alpha3),
+                        : AddressConverter.ConvertCountry(countryCode, CountryCodeFormat.Alpha3),
                     City = request.City,
                     AddressLine1 = request.AddressLine1,
                     AddressLine2 = request.AddressLine2,
@@ -112,7 +114,7 @@ namespace BccPay.Core.Cqrs.Commands
                 Currency = payment.CurrencyCode,
                 NotificationAccessToken = Guid.NewGuid().ToString(),
                 AcceptLanguage = request.AcceptLanguage,
-                Description = request.Description
+                Description = payment.Description
             };
 
             var providerResult = await provider.CreatePayment(paymentRequest, paymentConfiguration.Settings);
@@ -125,6 +127,7 @@ namespace BccPay.Core.Cqrs.Commands
                 IsActive = providerResult.IsSuccess,
                 Created = DateTime.Now,
                 StatusDetails = providerResult,
+                CountryCode = countryCode,
                 NotificationAccessToken = paymentRequest.NotificationAccessToken
             };
 
