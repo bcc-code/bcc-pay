@@ -73,7 +73,8 @@ namespace BccPay.Core.Cqrs.Commands
             var result = await _documentSession.Query<PaymentsIndex.Result, PaymentsIndex>()
                         .Where(x => x.PayerId == request.PayerId
                                     && x.Amount == request.Amount
-                                    && x.CurrencyCode == request.CurrencyCode)
+                                    && x.CurrencyCode == request.CurrencyCode
+                                    && x.PaymentStatus != Enums.PaymentStatus.Canceled)
                         .OrderByDescending(x => x.CreationDate)
                         .Select(x => x.PaymentId)
                         .FirstOrDefaultAsync(cancellationToken);

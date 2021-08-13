@@ -18,7 +18,8 @@ namespace BccPay.Core.DataAccess.Indexes
                                             Amount = payment.Amount,
                                             Description = payment.Description,
                                             CurrencyCode = payment.CurrencyCode,
-                                            CreationDate = payment.Created
+                                            CreationDate = payment.Created,
+                                            PaymentStatus = payment.PaymentStatus
                                         });
         }
 
@@ -29,6 +30,7 @@ namespace BccPay.Core.DataAccess.Indexes
             public Guid PaymentId { get; set; }
             public decimal Amount { get; set; }
             public string Description { get; set; }
+            public PaymentStatus PaymentStatus { get; set; }
             public DateTime CreationDate { get; set; }
         }
     }
