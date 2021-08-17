@@ -60,7 +60,7 @@ jobs:
       - name: Update version of bcc-pay package
         run: |
           cd ./UI/dashboard/
-          npm install bcc-pay
+          npm install bcc-pay@latest
           npm install
 
       - name: Dashboard deploy
