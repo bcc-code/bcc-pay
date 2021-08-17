@@ -172,7 +172,7 @@ export class BccPay extends LitElement {
 
         <div id="nets-payment-screen" style="display: none">
           <div class="card-subtitle">
-            <h5 id="payment-issue">
+            <h5 id="payment-provider-change">
               Other payment method?
               <button class="link-button" @click="${() => goToFirstScreen()}">
                 Change provider
@@ -184,7 +184,7 @@ export class BccPay extends LitElement {
 
         <div id="mollie-payment-screen" style="display: none">
           <div class="card-subtitle">
-            <h5 id="payment-issue">
+            <h5 id="payment-provider-change">
               Other payment method?
               <button class="link-button" @click="${() => goToFirstScreen()}">
                 Change provider
