@@ -2,6 +2,7 @@
 using BccPay.Core.Infrastructure;
 using BccPay.Core.Infrastructure.Configuration;
 using BccPay.Core.Infrastructure.Helpers;
+using BccPay.Core.Infrastructure.Helpers.Implementation;
 using BccPay.Core.Infrastructure.PaymentProviders;
 using BccPay.Core.Infrastructure.PaymentProviders.Implementations;
 using BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie;
@@ -50,6 +51,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddRefitClient<IFixerClient>()
                 .ConfigureHttpClient(client => client.BaseAddress = new Uri(defaultOptions.Fixer.BaseAddress));
 
+            services.AddScoped<IPaymentAttemptValidationService, PaymentAttemptValidationService>();
             services.AddTransient<ICurrencyService, CurrencyService>();
             return services;
         }

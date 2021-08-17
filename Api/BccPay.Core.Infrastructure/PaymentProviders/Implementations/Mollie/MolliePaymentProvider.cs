@@ -33,6 +33,11 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
 
         public PaymentProvider PaymentProvider => PaymentProvider.Mollie;
 
+        public Task<bool> CancelPayment(string paymentId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSettings settings)
         {
             IMollieRequestBuilder requestBuilder = CreateRequestBuilder(settings);

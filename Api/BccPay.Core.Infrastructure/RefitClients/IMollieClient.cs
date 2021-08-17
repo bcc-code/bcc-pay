@@ -12,5 +12,8 @@ namespace BccPay.Core.Infrastructure.RefitClients
 
         [Get("/v2/payments/{id}")]
         public Task<MollieGetPaymentResponse> GetPaymentInformation([AliasAs("id")] string paymentId);
+
+        [Delete("/v2/payments/{id}")]
+        Task<MollieGetPaymentResponse> CancelPaymentAsync([AliasAs("id")] string paymentId);
     }
 }

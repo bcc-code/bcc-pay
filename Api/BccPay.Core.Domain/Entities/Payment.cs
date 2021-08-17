@@ -59,6 +59,11 @@ namespace BccPay.Core.Domain.Entities
             Updated = DateTime.UtcNow;
         }
 
+        public void CancelPayment()
+        {
+            PaymentStatus = PaymentStatus.Canceled;
+        }
+
         public void AddAttempt(
             List<Attempt> attempts)
         {

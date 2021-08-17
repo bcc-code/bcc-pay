@@ -12,5 +12,6 @@ namespace BccPay.Core.Infrastructure.PaymentProviders
 
         Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSettings settings);
         Task<IPaymentResponse> GetPayment(string paymentId);
+        Task<bool> CancelPayment(string paymentId);
     }
 }
