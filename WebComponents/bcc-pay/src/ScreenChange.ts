@@ -17,6 +17,12 @@ export function displayNetsPayment() {
   showNetsPaymentScreen();
 }
 
+export function displayMolliePayment() {
+  hideFirstScreen();
+  hideNetsPaymentScreen();
+  showMolliePaymentScreen();
+}
+
 export function displayFirstScreen() {
   hideMolliePaymentScreen();
   hideNetsPaymentScreen();
@@ -38,28 +44,6 @@ export function close() {
   mainElement.style.display = 'none';
 }
 
-export function goToFirstScreen() {
-  const netsPaymentScreenElement = document.getElementById(
-    'nets-payment-screen'
-  ) as HTMLElement;
-  netsPaymentScreenElement.style.display = 'none';
-
-  const molliePaymentScreenElement = document.getElementById(
-    'mollie-payment-screen'
-  ) as HTMLElement;
-  molliePaymentScreenElement.style.display = 'none';
-
-  const errorScreenElement = document.getElementById(
-    'payment-provider-change'
-  ) as HTMLElement;
-  errorScreenElement.style.display = 'none';
-
-  const firstScreenElement = document.getElementById(
-    'first-screen'
-  ) as HTMLElement;
-  firstScreenElement.style.display = 'block';
-}
-
 function showErrorPageScreen() {
   const errorScreenElement = document.getElementById(
     'payment-error-screen'
@@ -74,6 +58,12 @@ function hideErrorPageScreen() {
   errorScreenElement.style.display = 'none';
 }
 
+function showMolliePaymentScreen() {
+  const netsScreenElement = document.getElementById(
+    'mollie-payment-screen'
+  ) as HTMLElement;
+  netsScreenElement.style.display = 'block';
+}
 function hideMolliePaymentScreen() {
   const molliePaymentScreenElement = document.getElementById(
     'mollie-payment-screen'

@@ -8,7 +8,7 @@ import {
   displayErrorPage,
   reload,
   close,
-  goToFirstScreen,
+  displayFirstScreen,
 } from './ScreenChange';
 import { RequestHeader } from './RequestHeader';
 import { startMolliePayment } from './MollieClient';
@@ -84,8 +84,7 @@ export class BccPay extends LitElement {
     this.mollieUrl = await startMolliePayment(
       this.paymentId,
       this.user,
-      this.server,
-      this.netsCheckoutKey
+      this.server
     );
 
     if (this.mollieUrl !== '') {
@@ -174,7 +173,10 @@ export class BccPay extends LitElement {
           <div class="card-subtitle">
             <h5 id="payment-provider-change">
               Other payment method?
-              <button class="link-button" @click="${() => goToFirstScreen()}">
+              <button
+                class="link-button"
+                @click="${() => displayFirstScreen()}"
+              >
                 Change provider
               </button>
             </h5>
@@ -186,7 +188,10 @@ export class BccPay extends LitElement {
           <div class="card-subtitle">
             <h5 id="payment-provider-change">
               Other payment method?
-              <button class="link-button" @click="${() => goToFirstScreen()}">
+              <button
+                class="link-button"
+                @click="${() => displayFirstScreen()}"
+              >
                 Change provider
               </button>
             </h5>

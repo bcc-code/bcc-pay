@@ -1,29 +1,15 @@
 import { User } from './User';
 import { country, isDevEnv, requestHeaders } from './BccPay';
-import { displayErrorPage, paymentCompleted } from './ScreenChange';
+import { displayErrorPage, displayMolliePayment } from './ScreenChange';
 
 var checkout: any;
 
 export async function startMolliePayment(
   paymentId: string,
   user: User,
-  server: string,
-  checkoutKey: string
+  server: string
 ): Promise<string> {
-  const firstScreenElement = document.getElementById(
-    'first-screen'
-  ) as HTMLElement;
-  firstScreenElement.style.display = 'none';
-
-  const changeUserDataScreenElement = document.getElementById(
-    'change-user-data-screen'
-  ) as HTMLElement;
-  changeUserDataScreenElement.style.display = 'none';
-
-  const netsScreenElement = document.getElementById(
-    'mollie-payment-screen'
-  ) as HTMLElement;
-  netsScreenElement.style.display = 'block';
+  displayMolliePayment();
 
   const mollieCheckoutUrl = await initMolliePayment(paymentId, user, server);
   if (isDevEnv === true) {
@@ -80,8 +66,4 @@ export async function initMolliePayment(
   }
   if (mollieCheckoutUrl === undefined) displayErrorPage();
   return mollieCheckoutUrl;
-}
-
-export async function cleanupNetsPayment() {
-  checkout.cleanup();
 }
