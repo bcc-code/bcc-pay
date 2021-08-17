@@ -8,6 +8,7 @@ import {
   displayErrorPage,
   reload,
   close,
+  goToFirstScreen,
 } from './ScreenChange';
 import { RequestHeader } from './RequestHeader';
 import { startMolliePayment } from './MollieClient';
@@ -15,6 +16,7 @@ import { Spinner, SpinnerShow, SpinnerHide } from './Spinner';
 
 export let isDevEnv: boolean;
 export let requestHeaders: [RequestHeader] | undefined;
+export let country: string;
 
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
@@ -29,12 +31,13 @@ export class BccPay extends LitElement {
     | [RequestHeader]
     | undefined;
   @property({ type: String }) paymentId: string = '';
-
   @property({ type: String }) mollieUrl: string = '';
+  @property({ type: String }) primaryColor: string = '';
 
   loadNestScript() {
     isDevEnv = this.isDevEnv;
     requestHeaders = this.requestHeaders;
+    country = this.country;
 
     let nestScript = document.createElement('script');
     if (isDevEnv === true) {
@@ -170,12 +173,9 @@ export class BccPay extends LitElement {
         <div id="nets-payment-screen" style="display: none">
           <div class="card-subtitle">
             <h5 id="payment-issue">
-              Issue with payment?
-              <button
-                class="link-button"
-                @click="${() => displayChangeUserDataPage()}"
-              >
-                Edit personal data
+              Other payment method?
+              <button class="link-button" @click="${() => goToFirstScreen()}">
+                Change provider
               </button>
             </h5>
           </div>
@@ -184,7 +184,12 @@ export class BccPay extends LitElement {
 
         <div id="mollie-payment-screen" style="display: none">
           <div class="card-subtitle">
-            <h5>Mollie payment</h5>
+            <h5 id="payment-issue">
+              Other payment method?
+              <button class="link-button" @click="${() => goToFirstScreen()}">
+                Change provider
+              </button>
+            </h5>
           </div>
 
           <button

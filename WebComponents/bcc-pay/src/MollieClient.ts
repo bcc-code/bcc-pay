@@ -1,5 +1,5 @@
 import { User } from './User';
-import { isDevEnv, requestHeaders } from './BccPay';
+import { country, isDevEnv, requestHeaders } from './BccPay';
 import { displayErrorPage, paymentCompleted } from './ScreenChange';
 
 var checkout: any;
@@ -53,6 +53,7 @@ export async function initMolliePayment(
     addressLine2: user.addressLine2 === null ? undefined : user.addressLine2,
     city: user.city === null ? undefined : user.city,
     postalCode: user.postalCode === null ? undefined : user.postalCode,
+    countryCode: country,
   };
 
   const fetchHeaders = new Headers();
@@ -77,6 +78,7 @@ export async function initMolliePayment(
   } catch (e) {
     displayErrorPage();
   }
+  if (mollieCheckoutUrl === undefined) displayErrorPage();
   return mollieCheckoutUrl;
 }
 

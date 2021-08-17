@@ -4,6 +4,16 @@ export function displayErrorPage() {
   ) as HTMLElement;
   firstScreenElement.style.display = 'none';
 
+  const netsScreenElement = document.getElementById(
+    'nets-payment-screen'
+  ) as HTMLElement;
+  netsScreenElement.style.display = 'none';
+
+  const molliePaymentScreenElement = document.getElementById(
+    'mollie-payment-screen'
+  ) as HTMLElement;
+  molliePaymentScreenElement.style.display = 'none';
+
   const errorScreenElement = document.getElementById(
     'payment-error-screen'
   ) as HTMLElement;
@@ -46,4 +56,26 @@ export function reload() {
 export function close() {
   const mainElement = document.getElementById('main-div') as HTMLElement;
   mainElement.style.display = 'none';
+}
+
+export function goToFirstScreen() {
+  const netsPaymentScreenElement = document.getElementById(
+    'nets-payment-screen'
+  ) as HTMLElement;
+  netsPaymentScreenElement.style.display = 'none';
+
+  const molliePaymentScreenElement = document.getElementById(
+    'mollie-payment-screen'
+  ) as HTMLElement;
+  molliePaymentScreenElement.style.display = 'none';
+
+  const errorScreenElement = document.getElementById(
+    'payment-issue'
+  ) as HTMLElement;
+  errorScreenElement.style.display = 'none';
+
+  const firstScreenElement = document.getElementById(
+    'first-screen'
+  ) as HTMLElement;
+  firstScreenElement.style.display = 'block';
 }

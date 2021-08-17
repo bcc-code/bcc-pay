@@ -1,5 +1,5 @@
 import { User } from './User';
-import { isDevEnv, requestHeaders } from './BccPay';
+import { country, isDevEnv, requestHeaders } from './BccPay';
 import { displayErrorPage, paymentCompleted } from './ScreenChange';
 
 var checkout: any;
@@ -42,6 +42,7 @@ export async function initNetsPayment(
   user: User,
   server: string
 ): Promise<string> {
+  console.log('Nets payment country: ' + country);
   const body = {
     paymentConfigurationId: 'nets-cc-nok',
     email: user.email === null ? undefined : user.email,
@@ -52,6 +53,7 @@ export async function initNetsPayment(
     addressLine2: user.addressLine2 === null ? undefined : user.addressLine2,
     city: user.city === null ? undefined : user.city,
     postalCode: user.postalCode === null ? undefined : user.postalCode,
+    countryCode: country,
   };
 
   const fetchHeaders = new Headers();
