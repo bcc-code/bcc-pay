@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BccPay.Core.Messages
+namespace BccPay.Core.Notifications
 {
     public record PaymentCompletedNotification(Guid PaymentId) : IBccPayNotification
     {

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using BccPay.Core.Messages;
 
 namespace BccPay.Core.Notifications
 {

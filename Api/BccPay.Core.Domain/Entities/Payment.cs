@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using BccPay.Core.Enums;
-using BccPay.Core.Messages;
 using BccPay.Core.Notifications;
 
 namespace BccPay.Core.Domain.Entities
