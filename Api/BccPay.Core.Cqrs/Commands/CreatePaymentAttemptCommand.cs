@@ -38,6 +38,7 @@ namespace BccPay.Core.Cqrs.Commands
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
         public string PostalCode { get; set; }
+        public bool IsMobile { get; set; }
     }
 
     public class CreatePaymentAttemptValidator : AbstractValidator<CreatePaymentAttemptCommand>
@@ -114,7 +115,8 @@ namespace BccPay.Core.Cqrs.Commands
                 Currency = payment.CurrencyCode,
                 NotificationAccessToken = Guid.NewGuid().ToString(),
                 AcceptLanguage = request.AcceptLanguage,
-                Description = payment.Description
+                Description = payment.Description,
+                IsMobile = request.IsMobile
             };
 
             var providerResult = await provider.CreatePayment(paymentRequest, paymentConfiguration.Settings);

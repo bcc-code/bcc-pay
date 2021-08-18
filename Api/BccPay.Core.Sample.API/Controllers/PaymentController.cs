@@ -4,7 +4,6 @@ using BccPay.Core.Contracts.Requests;
 using BccPay.Core.Contracts.Responses;
 using BccPay.Core.Cqrs.Commands;
 using BccPay.Core.Cqrs.Queries;
-using BccPay.Core.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -50,10 +49,17 @@ namespace BccPay.Core.Sample.Controllers
             {
                 command.AcceptLanguage = userLanguage.ToString().Substring(0, 5);
             }
+
+            if (HttpContext.Request.Headers.TryGetValue("is-mobile-app", out var isMobileApp))
+            {
+                if (Boolean.TryParse(isMobileApp, out bool isMobile))
+                    command.IsMobile = isMobile;
+            }
+
             command.PaymentId = paymentId;
 
             var result = await Mediator.Send(command);
-            
+
             var mapResult = Mapper.Map<IPaymentAttemptResponse>(result);
 
             return Ok(mapResult);
