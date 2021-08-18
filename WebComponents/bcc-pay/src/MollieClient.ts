@@ -1,23 +1,31 @@
 import { User } from './User';
 import { country, isDevEnv, requestHeaders } from './BccPay';
-import { displayErrorPage, displayMolliePayment } from './ScreenChange';
+import { displayErrorPage } from './ScreenChange';
 
 export async function startMolliePayment(
   paymentId: string,
   user: User,
   server: string
 ): Promise<string> {
-  displayMolliePayment();
+  const mollieButton = document.getElementById('Mollie');
+  mollieButton!.classList.add('payment-button--loading');
 
   const mollieCheckoutUrl = await initMolliePayment(paymentId, user, server);
   if (isDevEnv === true) {
     console.log('Mollie checkoutUrl is: ' + mollieCheckoutUrl);
   }
 
-  if (mollieCheckoutUrl === null || mollieCheckoutUrl === '') {
+  if (
+    mollieCheckoutUrl === null ||
+    mollieCheckoutUrl === '' ||
+    mollieCheckoutUrl === undefined
+  ) {
     displayErrorPage();
     return '';
   }
+
+  mollieButton!.classList.remove('payment-button--loading');
+  window.open(mollieCheckoutUrl, '_system');
 
   return mollieCheckoutUrl;
 }

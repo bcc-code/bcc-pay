@@ -5,13 +5,12 @@ import { getPaymentConfigurations, initPayment } from './BccPayClient';
 import { User } from './User';
 import {
   displayErrorPage,
-  reload,
-  close,
   displayFirstScreen,
+  closeComponent,
+  reloadPage,
 } from './ScreenChange';
 import { RequestHeader } from './RequestHeader';
 import { startMolliePayment } from './MollieClient';
-import { Spinner, SpinnerShow, SpinnerHide } from './Spinner';
 
 export let isDevEnv: boolean;
 export let requestHeaders: [RequestHeader] | undefined;
@@ -105,7 +104,7 @@ export class BccPay extends LitElement {
         ${this.loadNestScript()} ${this.applyCssStyles()} ${this.init()}
       </div>
       <div class="card-square" id="main-div">
-        <div id="first-screen">
+        <div id="first-screen" class="screen">
           <div class="card-subtitle">
             <h5>you are paying for</h5>
           </div>
@@ -144,36 +143,38 @@ export class BccPay extends LitElement {
                 this.netsCheckoutKey
               )}"
           >
-            PAY WITH NETS
+            <span class="payment-button-text">CREDIT CARD</span>
           </button>
           <button
             id="Mollie"
             class="payment-button"
             @click="${() => this.initMolliePayment()}"
           >
-            PAY WITH MOLLIE
+            <span class="payment-button-text">GIROPAY</span>
           </button>
         </div>
 
-        <div id="payment-error-screen" style="display: none">
+        <div id="payment-error-screen" class="screen" style="display: none">
           <div class="card-subtitle">
             <h5>
               There is an issue with starting payment, please try again later.
             </h5>
           </div>
-          <button class="reload-button" @click="${() => reload()}">
+          <button class="reload-button" @click="${() => reloadPage()}">
             RELOAD
           </button>
         </div>
 
-        <div id="payment-completed-screen" style="display: none">
+        <div id="payment-completed-screen" class="screen" style="display: none">
           <div class="card-subtitle">
             <h5>Payment success</h5>
           </div>
-          <button class="reload-button" @click="${() => close()}">Close</button>
+          <button class="reload-button" @click="${() => closeComponent()}">
+            Close
+          </button>
         </div>
 
-        <div id="nets-payment-screen" style="display: none">
+        <div id="nets-payment-screen" class="screen" style="display: none">
           <div class="card-subtitle">
             <h5 id="payment-provider-change">
               Other payment method?
@@ -188,30 +189,7 @@ export class BccPay extends LitElement {
           <div id="checkout-container-div"></div>
         </div>
 
-        <div id="mollie-payment-screen" style="display: none">
-          <div class="card-subtitle">
-            <h5 id="payment-provider-change">
-              Other payment method?
-              <button
-                class="link-button"
-                @click="${() => displayFirstScreen()}"
-              >
-                Change provider
-              </button>
-            </h5>
-          </div>
-
-          <button
-            id="mollie-payment-button"
-            class="payment-button"
-            @click="${() => window.open(this.mollieUrl, '_blank')}"
-            disabled
-          >
-            Open Mollie payment page
-          </button>
-        </div>
-
-        <div id="change-user-data-screen" style="display: none">
+        <div id="change-user-data-screen" class="screen" style="display: none">
           <div class="card-subtitle">
             <h5>Changing user data:</h5>
           </div>

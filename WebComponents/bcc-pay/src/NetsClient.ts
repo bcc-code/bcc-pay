@@ -14,8 +14,13 @@ export async function startNetsPayment(
   server: string,
   checkoutKey: string
 ): Promise<boolean> {
-  displayNetsPayment();
+  const netsButton = document.getElementById('Nets');
+  netsButton!.classList.add('payment-button--loading');
   const netsPaymentId = await initNetsPayment(paymentId, user, server);
+  netsButton!.classList.remove('payment-button--loading');
+
+  displayNetsPayment();
+
   if (isDevEnv === true) {
     console.log('Nets payment id is: ' + netsPaymentId);
   }
