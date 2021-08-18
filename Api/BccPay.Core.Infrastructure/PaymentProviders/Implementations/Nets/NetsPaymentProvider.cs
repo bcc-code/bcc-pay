@@ -67,10 +67,29 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
         {
             try
             {
-                await _netsClient.TerminatePayment(_headers, statusDetails.PaymentCheckoutId);
+                var providerResult = await _netsClient.TerminatePayment(_headers, statusDetails.PaymentCheckoutId);
 
-                statusDetails.IsSuccess = false;
-                return statusDetails;
+                if (providerResult.StatusCode == System.Net.HttpStatusCode.NoContent)
+                {
+                    statusDetails.IsSuccess = true;
+                    return statusDetails;
+                }
+                else
+                {
+                    if (statusDetails.Errors is null)
+                    {
+                        statusDetails.Errors = new List<string>
+                        {
+                           await providerResult.Content.ReadAsStringAsync()
+                        };
+                    }
+                    else
+                    {
+                        statusDetails.Errors.Add(await providerResult.Content.ReadAsStringAsync());
+                    }
+                    statusDetails.IsSuccess = false;
+                    return statusDetails;
+                }
             }
             catch (ApiException exception)
             {
