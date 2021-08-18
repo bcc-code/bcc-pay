@@ -2,8 +2,6 @@ import { User } from './User';
 import { country, isDevEnv, requestHeaders } from './BccPay';
 import { displayErrorPage, displayMolliePayment } from './ScreenChange';
 
-var checkout: any;
-
 export async function startMolliePayment(
   paymentId: string,
   user: User,

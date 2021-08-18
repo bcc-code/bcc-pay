@@ -4,7 +4,6 @@ import { startNetsPayment } from './NetsClient';
 import { getPaymentConfigurations, initPayment } from './BccPayClient';
 import { User } from './User';
 import {
-  displayChangeUserDataPage,
   displayErrorPage,
   reload,
   close,
@@ -17,6 +16,8 @@ import { Spinner, SpinnerShow, SpinnerHide } from './Spinner';
 export let isDevEnv: boolean;
 export let requestHeaders: [RequestHeader] | undefined;
 export let country: string;
+export let primaryColor: string;
+export let secondaryColor: string;
 
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
@@ -32,12 +33,15 @@ export class BccPay extends LitElement {
     | undefined;
   @property({ type: String }) paymentId: string = '';
   @property({ type: String }) mollieUrl: string = '';
-  @property({ type: String }) primaryColor: string = '';
+  @property({ type: String }) primaryColor: string = 'hsl(258, 71%, 61%)';
+  @property({ type: String }) secondaryColor: string = '';
 
   loadNestScript() {
     isDevEnv = this.isDevEnv;
     requestHeaders = this.requestHeaders;
     country = this.country;
+    primaryColor = this.primaryColor;
+    secondaryColor = this.secondaryColor;
 
     let nestScript = document.createElement('script');
     if (isDevEnv === true) {
@@ -200,7 +204,7 @@ export class BccPay extends LitElement {
           <button
             id="mollie-payment-button"
             class="payment-button"
-            @click="${() => window.open(this.mollieUrl)}"
+            @click="${() => window.open(this.mollieUrl, '_blank')}"
             disabled
           >
             Open Mollie payment page

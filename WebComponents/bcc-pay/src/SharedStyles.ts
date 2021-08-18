@@ -1,6 +1,16 @@
-import { css } from 'lit-element';
+import { css, unsafeCSS } from 'lit-element';
+import { primaryColor, secondaryColor } from './BccPay';
 
 export const componentStyle = css`
+  :root {
+    --baseFg: dimgray;
+    --baseBg: white;
+    --accentFg: #006fc2;
+    --accentBg: #bae1ff;
+    --primaryColor: ${unsafeCSS('hsl(258, 71%, 61%)')};
+    --secondaryColor: ${unsafeCSS('')};
+  }
+
   .card-square {
     box-sizing: border-box;
     display: grid;
@@ -64,7 +74,7 @@ export const componentStyle = css`
   .payment-button {
     font-size: 1rem;
     text-transform: uppercase;
-    background: hsl(258, 71%, 61%);
+    background: var(--primaryColor);
     color: white;
     padding: 12px;
     border-radius: 5px;
@@ -80,7 +90,7 @@ export const componentStyle = css`
   .reload-button {
     font-size: 1rem;
     text-transform: uppercase;
-    background: hsl(258, 71%, 61%);
+    background: var(--primaryColor);
     color: white;
     padding: 23px;
     border-radius: 5px;
@@ -110,14 +120,6 @@ export const componentStyle = css`
   .country-select {
   }
 
-  :root {
-    --radius: 2px;
-    --baseFg: dimgray;
-    --baseBg: white;
-    --accentFg: #006fc2;
-    --accentBg: #bae1ff;
-  }
-
   select {
     font: 400 12px/1.3 sans-serif;
     -webkit-appearance: none;
@@ -127,7 +129,7 @@ export const componentStyle = css`
     line-height: 1;
     outline: 0;
     padding: 0.65em 2.5em 0.55em 0.75em;
-    border-radius: var(--radius);
+    border-radius: 2px;
     background-color: var(--baseBg);
     background-image: linear-gradient(var(--baseFg), var(--baseFg)),
       linear-gradient(-135deg, transparent 50%, var(--accentBg) 50%),
