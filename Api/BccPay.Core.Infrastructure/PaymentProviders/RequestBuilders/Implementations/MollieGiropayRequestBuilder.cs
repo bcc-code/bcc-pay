@@ -26,10 +26,18 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
                 Locale = GetLocale(paymentRequest.AcceptLanguage),
                 Method = new string[] { PaymentMethod.Giropay.ToString().ToLower() },
                 Description = paymentRequest.Description,
-                RedirectUrl = _options.RedirectUrl,
+                RedirectUrl = GetRedirectUrl(paymentRequest.IsMobile),
                 WebhookUrl = _options.WebhookUrl + $"/{paymentRequest.PaymentId}",
                 Links = new { }
             };
+        }
+
+        private string GetRedirectUrl(bool isMobile)
+        {
+            if (isMobile)
+                return _options.RedirectUrlMobileApp;
+            else
+                return _options.RedirectUrl;
         }
 
         private string GetLocale(string browserLanguage)
