@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using BccPay.Core.Enums;
 using BccPay.Core.Messages;
+using BccPay.Core.Notifications;
 
 namespace BccPay.Core.Domain.Entities
 {
-    public class Payment : INotifications
+    public class Payment : INotificationsStore
     {
         public static string GetDocumentId(Guid paymentId)
             => $"payments/{paymentId}";
