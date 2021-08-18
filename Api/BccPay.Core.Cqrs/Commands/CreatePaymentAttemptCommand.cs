@@ -9,7 +9,6 @@ using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.Exceptions;
-using BccPay.Core.Infrastructure.Helpers;
 using BccPay.Core.Infrastructure.PaymentProviders;
 using BccPay.Core.Shared.Converters;
 using BccPay.Core.Shared.Helpers;
@@ -56,21 +55,17 @@ namespace BccPay.Core.Cqrs.Commands
         private readonly IAsyncDocumentSession _documentSession;
         private readonly IPaymentProviderFactory _paymentProviderFactory;
         private readonly IMediator _mediator;
-        private readonly IPaymentAttemptValidationService _paymentAttemptValidation;
 
         public CreatePaymentAttemptCommandHandler(
             IPaymentProviderFactory paymentProviderFactory,
             IAsyncDocumentSession documentSession,
-            IMediator mediator,
-            IPaymentAttemptValidationService paymentAttemptValidation)
+            IMediator mediator)
         {
             _documentSession = documentSession
                 ?? throw new ArgumentNullException(nameof(documentSession));
             _paymentProviderFactory = paymentProviderFactory
                 ?? throw new ArgumentNullException(nameof(paymentProviderFactory));
             _mediator = mediator;
-            _paymentAttemptValidation = paymentAttemptValidation
-                ?? throw new ArgumentNullException(nameof(paymentAttemptValidation));
         }
 
         public async Task<IStatusDetails> Handle(CreatePaymentAttemptCommand request, CancellationToken cancellationToken)
@@ -92,10 +87,14 @@ namespace BccPay.Core.Cqrs.Commands
 
             var provider = _paymentProviderFactory.GetPaymentProvider(paymentConfiguration.Provider);
 
-            if (payment.Attempts != null && payment.Attempts.Where(x => x.IsActive).Any())
+            if (payment.Attempts?.Count >= 1)
             {
-                if (!await _paymentAttemptValidation.TryCancelPreviousPaymentAttempt(payment))
+                var attempt = payment.Attempts.Last();
+
+                var paymentProvider = _paymentProviderFactory.GetPaymentProvider(attempt.PaymentProvider);
+                if (await paymentProvider.TryCancelPreviousPaymentAttempt(attempt) == AttemptCancellationResult.AlreadyCompleted)
                 {
+                    payment.UpdatePaymentStatus(PaymentStatus.Completed);
                     await _documentSession.SaveChangesAsync(cancellationToken);
                     throw new UpdatePaymentAttemptForbiddenException("Attempt is completed.");
                 }
@@ -142,7 +141,8 @@ namespace BccPay.Core.Cqrs.Commands
                 Created = DateTime.Now,
                 StatusDetails = providerResult,
                 CountryCode = countryCode,
-                NotificationAccessToken = paymentRequest.NotificationAccessToken
+                NotificationAccessToken = paymentRequest.NotificationAccessToken,
+                PaymentProvider = paymentConfiguration.Provider
             };
 
             payment.Updated = DateTime.Now;

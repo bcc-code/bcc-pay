@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
+using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations;
@@ -38,51 +39,61 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 
         public PaymentProvider PaymentProvider => PaymentProvider.Nets;
 
-        public async Task<IStatusDetails> CancelPayment(IStatusDetails statusDetails)
+        public async Task<AttemptCancellationResult> TryCancelPreviousPaymentAttempt(Attempt attempt)
         {
-            var netsStatusDetails = (NetsStatusDetails)statusDetails;
+            var details = (NetsStatusDetails)attempt.StatusDetails;
 
+            if (details.WebhookStatus == PaymentProviderConstants.Nets.Webhooks.ChargeCreated)
+            {
+                attempt.AttemptStatus = AttemptStatus.PaymentIsSuccessful;
+                attempt.IsActive = false;
+
+                return AttemptCancellationResult.AlreadyCompleted;
+            }
+            else
+            {
+                attempt.IsActive = false;
+                attempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled;
+
+                var netsCancelDetails = await CancelPayment(details);
+
+                return netsCancelDetails.IsSuccess
+                    ? AttemptCancellationResult.SuccessfullyCancelled
+                    : AttemptCancellationResult.ProviderFailedCancellation;
+            }
+        }
+
+        private async Task<IStatusDetails> CancelPayment(NetsStatusDetails statusDetails)
+        {
             try
             {
-                var result = await _netsClient.TerminatePayment(_headers, netsStatusDetails.PaymentCheckoutId);
+                var result = await _netsClient.TerminatePayment(_headers, statusDetails.PaymentCheckoutId);
 
-                if (result.StatusCode == System.Net.HttpStatusCode.NoContent)
+                if (result.StatusCode == (int)System.Net.HttpStatusCode.NoContent)
                 {
-                    netsStatusDetails.IsSuccess = true;
-                    return netsStatusDetails;
+                    statusDetails.IsSuccess = true;
+                    return statusDetails;
                 }
 
-                if (netsStatusDetails.Errors is null)
-                {
-                    netsStatusDetails.Errors = new List<string>
-                    {
-                        result.Error?.ToString()
-                    };
-                }
-                else
-                {
-                    netsStatusDetails.Errors.Add(result.Error?.ToString());
-                }
-
-                netsStatusDetails.IsSuccess = false;
-                return netsStatusDetails;
+                statusDetails.IsSuccess = false;
+                return statusDetails;
             }
             catch (ApiException exception)
             {
-                if (netsStatusDetails.Errors is null)
+                if (statusDetails.Errors is null)
                 {
-                    netsStatusDetails.Errors = new List<string>
+                    statusDetails.Errors = new List<string>
                     {
                         exception.Content?.ToString()
                     };
                 }
                 else
                 {
-                    netsStatusDetails.Errors.Add(exception.Content?.ToString());
+                    statusDetails.Errors.Add(exception.Content?.ToString());
                 }
 
-                netsStatusDetails.IsSuccess = false;
-                return netsStatusDetails;
+                statusDetails.IsSuccess = false;
+                return statusDetails;
             }
         }
 
@@ -129,7 +140,6 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
         {
             throw new NotImplementedException();
         }
-
         private INetsPaymentRequestBuilder CreateRequestBuilder(PaymentSettings settings)
         {
             // create a builder depending on the settings

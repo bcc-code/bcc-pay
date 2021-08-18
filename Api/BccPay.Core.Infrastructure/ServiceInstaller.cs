@@ -51,7 +51,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddRefitClient<IFixerClient>()
                 .ConfigureHttpClient(client => client.BaseAddress = new Uri(defaultOptions.Fixer.BaseAddress));
 
-            services.AddScoped<IPaymentAttemptValidationService, PaymentAttemptValidationService>();
             services.AddTransient<ICurrencyService, CurrencyService>();
             return services;
         }
