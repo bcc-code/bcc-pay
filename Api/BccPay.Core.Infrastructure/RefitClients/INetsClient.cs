@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
 using BccPay.Core.Infrastructure.PaymentModels.Response.Nets;
@@ -13,6 +14,9 @@ namespace BccPay.Core.Infrastructure.RefitClients
 
         [Get("/v1/payments/{paymentId}")]
         Task<NetsRetrievePaymentResponse> RetrievePayment([HeaderCollection] IDictionary<string, string> headers, [Query] string paymentId);
+
+        [Put("/v1/payments/{paymentId}/terminate")]
+        Task<HttpResponseMessage> TerminatePayment([HeaderCollection] IDictionary<string, string> headers, [AliasAs("paymentId")] string paymentId);
     }
 }
 

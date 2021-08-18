@@ -67,6 +67,11 @@ namespace BccPay.Core.Domain.Entities
             }
         }
 
+        public void CancelPayment()
+        {
+            PaymentStatus = PaymentStatus.Canceled;
+        }
+
         public void AddAttempt(
             List<Attempt> attempts)
         {

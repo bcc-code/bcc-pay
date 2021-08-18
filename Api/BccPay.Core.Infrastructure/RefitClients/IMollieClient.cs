@@ -8,9 +8,12 @@ namespace BccPay.Core.Infrastructure.RefitClients
     internal interface IMollieClient
     {
         [Post("/v2/payments")]
-        public Task<MollieCreatePaymentResponse> CreatePayment(MolliePaymentRequest paymentRequest);
+        Task<MollieCreatePaymentResponse> CreatePayment(MolliePaymentRequest paymentRequest);
 
         [Get("/v2/payments/{id}")]
-        public Task<MollieGetPaymentResponse> GetPaymentInformation([AliasAs("id")] string paymentId);
+        Task<MollieGetPaymentResponse> GetPaymentInformation([AliasAs("id")] string paymentId);
+
+        [Delete("/v2/payments/{id}")]
+        Task<ApiResponse<object>> CancelPaymentAsync([AliasAs("id")] string paymentId);
     }
 }
