@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace BccPay.Core.Contracts.Responses
+namespace BccPay.Core.Sample.Contracts.Responses
 {
     public class GetPaymentResponse
     {

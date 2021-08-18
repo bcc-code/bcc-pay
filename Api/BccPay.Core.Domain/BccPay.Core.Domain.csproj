@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BccPay.Core.Enums\BccPay.Core.Enums.csproj" />
-    <ProjectReference Include="..\BccPay.Core.Messages\BccPay.Core.Notifications.csproj" />
+    <ProjectReference Include="..\BccPay.Core.Notifications\BccPay.Core.Notifications.csproj" />
   </ItemGroup>
 
 </Project>

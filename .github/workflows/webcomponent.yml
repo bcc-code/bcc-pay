@@ -1,86 +1,86 @@
 name: WebComponent build & deploy
 
 on:
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
+    pull_request:
+        branches:
+            - main
+    workflow_dispatch:
 
 env:
-  BUILD_CONFIGURATION: "Release"
-  DOTNET_VERSION: "5.0.x"
+    BUILD_CONFIGURATION: "Release"
+    DOTNET_VERSION: "5.0.x"
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@master
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_DEV }}
-          service_account_key: ${{ secrets.GCP_GITHUB_KEY_DEV }}
-          export_default_credentials: true
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Set up Cloud SDK
+              uses: google-github-actions/setup-gcloud@master
+              with:
+                  project_id: ${{ secrets.GCP_PROJECT_DEV }}
+                  service_account_key: ${{ secrets.GCP_GITHUB_KEY_DEV }}
+                  export_default_credentials: true
 
-      - uses: actions/checkout@v2
+            - uses: actions/checkout@v2
 
-      - name: Cat npm rc
-        run: |
-          cd ./WebComponents/bcc-pay/
-          cat .npmrc
+            - name: Cat npm rc
+              run: |
+                  cd ./WebComponents/bcc-pay/
+                  cat .npmrc
 
-      - name: Replace NPM Auth Token
-        uses: cschleiden/replace-tokens@v1
-        with:
-          tokenPrefix: "#{"
-          tokenSuffix: "}#"
-          files: '["./WebComponents/bcc-pay/.npmrc"]'
-        env:
-          npmAuthToken: ${{ secrets.NPM_AUTH_TOKEN_OSKAR }}
+            - name: Replace NPM Auth Token
+              uses: cschleiden/replace-tokens@v1
+              with:
+                  tokenPrefix: "#{"
+                  tokenSuffix: "}#"
+                  files: '["./WebComponents/bcc-pay/.npmrc"]'
+              env:
+                  npmAuthToken: ${{ secrets.NPM_AUTH_TOKEN_OSKAR }}
 
-      - name: Webcomponent build & publish
-        run: |
-          cd ./WebComponents/bcc-pay/
-          cat .npmrc
-          npm install
-          npm run versionCheck
-          npm version patch
-          npm run build
-          npm publish
+            - name: Webcomponent build & publish
+              run: |
+                  cd ./WebComponents/bcc-pay/
+                  cat .npmrc
+                  npm install
+                  npm run versionCheck
+                  npm version patch
+                  npm run build
+                  npm publish
 
-      - name: Replace Ai Token & API Url
-        uses: cschleiden/replace-tokens@v1
-        with:
-          tokenPrefix: "#{"
-          tokenSuffix: "}#"
-          files: '["UI/dashboard/src/environments/environment.prod.ts","UI/dashboard/src/environments/environment.ts"]'
-        env:
-          bccPayUrl: ${{secrets.BCC_PAY_URL_DEV}}
-          netsCheckoutKey: ${{secrets.NETS_CHECKOUT_KEY_DEV}}
+            - name: Replace Ai Token & API Url
+              uses: cschleiden/replace-tokens@v1
+              with:
+                  tokenPrefix: "#{"
+                  tokenSuffix: "}#"
+                  files: '["UI/dashboard/src/environments/environment.prod.ts","UI/dashboard/src/environments/environment.ts"]'
+              env:
+                  bccPayUrl: ${{secrets.BCC_PAY_URL_DEV}}
+                  netsCheckoutKey: ${{secrets.NETS_CHECKOUT_KEY_DEV}}
 
-      - name: Update version of bcc-pay package
-        run: |
-          cd ./UI/dashboard/
-          npm install bcc-pay
-          npm install
+            - name: Update version of bcc-pay package
+              run: |
+                  cd ./UI/dashboard/
+                  npm install bcc-pay
+                  npm install
 
-      - name: Dashboard deploy
-        run: |
-          cd ./UI/dashboard/
-          gcloud builds submit --tag gcr.io/myshare-dev-317106/bcc-pay-front-dev
-          gcloud run deploy bcc-pay-front-dev --image gcr.io/myshare-dev-317106/bcc-pay-front-dev --platform=managed --region=europe-west1 --project=myshare-dev-317106 --allow-unauthenticated
+            - name: Dashboard deploy
+              run: |
+                  cd ./UI/dashboard/
+                  gcloud builds submit --tag gcr.io/myshare-dev-317106/bcc-pay-front-dev
+                  gcloud run deploy bcc-pay-front-dev --image gcr.io/myshare-dev-317106/bcc-pay-front-dev --platform=managed --region=europe-west1 --project=myshare-dev-317106 --allow-unauthenticated
 
-      - uses: microsoft/variable-substitution@v1
-        with:
-          files: "./Api/BccPay.Core.Sample/appsettings.Development.json"
-        env:
-          RavenSettings.CertFilePath: ${{ secrets.CERT_FILE_PATH_DEV }}
-          RavenSettings.CertPassword: ${{ secrets.CERT_PASSWORD_DEV }}
-          NetsSecretKey: ${{ secrets.NETS_SECRET_KEY_DEV }}
-          MollieSecretKey: ${{ secrets.MOLLIE_SECRET_KEY_DEV }}
-          FixerApiKey: ${{ secrets.FIXER_API_KEY_DEV }}
+            - uses: microsoft/variable-substitution@v1
+              with:
+                  files: "./Api/BccPay.Core.Sample.API/appsettings.Development.json"
+              env:
+                  RavenSettings.CertFilePath: ${{ secrets.CERT_FILE_PATH_DEV }}
+                  RavenSettings.CertPassword: ${{ secrets.CERT_PASSWORD_DEV }}
+                  NetsSecretKey: ${{ secrets.NETS_SECRET_KEY_DEV }}
+                  MollieSecretKey: ${{ secrets.MOLLIE_SECRET_KEY_DEV }}
+                  FixerApiKey: ${{ secrets.FIXER_API_KEY_DEV }}
 
-      - name: Backend deploy
-        run: |
-          cd ./Api/
-          gcloud builds submit --tag gcr.io/myshare-dev-317106/bcc-pay-sample-api-dev
-          gcloud run deploy bcc-pay-sample-api-dev --image gcr.io/myshare-dev-317106/bcc-pay-sample-api-dev --platform=managed --region=europe-west1 --project=myshare-dev-317106 --allow-unauthenticated
+            - name: Backend deploy
+              run: |
+                  cd ./Api/
+                  gcloud builds submit --tag gcr.io/myshare-dev-317106/bcc-pay-sample-api-dev
+                  gcloud run deploy bcc-pay-sample-api-dev --image gcr.io/myshare-dev-317106/bcc-pay-sample-api-dev --platform=managed --region=europe-west1 --project=myshare-dev-317106 --allow-unauthenticated

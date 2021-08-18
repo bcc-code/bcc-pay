@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 
-namespace BccPay.Core.Sample.Controllers
+namespace BccPay.Core.Sample.API.Controllers
 {
     public class PaymentWebhooksController : BaseController
     {
