@@ -1,8 +1,9 @@
 ﻿using System;
+using MediatR;
 
 namespace BccPay.Core.Messages
 {
-    public interface IBccPayNotification
+    public interface IBccPayNotification : INotification
     {
         DateTime When { get; }
     }
