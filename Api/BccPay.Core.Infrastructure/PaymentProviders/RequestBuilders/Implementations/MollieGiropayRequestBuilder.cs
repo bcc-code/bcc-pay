@@ -33,12 +33,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
         }
 
         private string GetRedirectUrl(bool isMobile)
-        {
-            if (isMobile)
-                return _options.RedirectUrlMobileApp;
-            else
-                return _options.RedirectUrl;
-        }
+            => isMobile ? _options.RedirectUrlMobileApp : _options.RedirectUrl;
 
         private string GetLocale(string browserLanguage)
         {
