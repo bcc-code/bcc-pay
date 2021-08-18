@@ -31,7 +31,7 @@ namespace BccPay.Core.Cqrs.Queries
 
         public async Task<Payment> Handle(GetPaymentByIdQuery request, CancellationToken cancellationToken)
         {
-            var payment = await _documentSession.LoadAsync<Payment>(Payment.GetPaymentId(request.PaymentId), cancellationToken)
+            var payment = await _documentSession.LoadAsync<Payment>(Payment.GetDocumentId(request.PaymentId), cancellationToken)
                     ?? throw new NotFoundException("Invalid payment ID");
 
             return payment;

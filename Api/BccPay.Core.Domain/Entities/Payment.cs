@@ -8,10 +8,10 @@ namespace BccPay.Core.Domain.Entities
 {
     public class Payment : INotifications
     {
-        public static string GetPaymentId(Guid paymentId)
+        public static string GetDocumentId(Guid paymentId)
             => $"payments/{paymentId}";
 
-        public string Id => GetPaymentId(PaymentId);
+        public string Id => GetDocumentId(PaymentId);
 
         public Guid PaymentId { get; set; }
         public string PayerId { get; set; }
@@ -46,7 +46,9 @@ namespace BccPay.Core.Domain.Entities
         public void UpdatePaymentStatus(PaymentStatus paymentProgress)
         {
             if (paymentProgress == PaymentStatus.Canceled || paymentProgress == PaymentStatus.Completed)
-                Attempts.LastOrDefault().IsActive = false;
+            {
+                this.CancelLastAttempt();
+            }
 
             PaymentStatus = paymentProgress;
 
@@ -92,6 +94,9 @@ namespace BccPay.Core.Domain.Entities
         }
 
         public void CancelLastAttempt()
-            => Attempts.LastOrDefault().IsActive = false;
+        {
+            var lastAttempt = Attempts?.LastOrDefault();
+            if (lastAttempt != null) lastAttempt.IsActive = false;
+        }
     }
 }

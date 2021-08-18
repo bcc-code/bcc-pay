@@ -46,7 +46,7 @@ namespace BccPay.Core.Cqrs.Commands.Webhooks
         public async Task<bool> Handle(UpdateMolliePaymentStatusCommand request, CancellationToken cancellationToken)
         {
             var payment = await _documentSession.LoadAsync<Payment>(
-                    Payment.GetPaymentId(Guid.Parse(request.PaymentId)), cancellationToken)
+                    Payment.GetDocumentId(Guid.Parse(request.PaymentId)), cancellationToken)
                 ?? throw new NotFoundException("Invalid payment ID");
 
             var actualAttempt = payment.Attempts
