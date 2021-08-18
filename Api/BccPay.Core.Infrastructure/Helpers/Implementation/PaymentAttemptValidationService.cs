@@ -74,6 +74,11 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
                 }
             }
 
+            // NOTE: case with failing is unreachable if webhooks works properly
+            //lastAttempt.IsActive = false;
+            //lastAttempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled;
+            //payment.Updated = DateTime.UtcNow;
+            //payment.PaymentStatus = PaymentStatus.Canceled;
             return false;
         }
     }
