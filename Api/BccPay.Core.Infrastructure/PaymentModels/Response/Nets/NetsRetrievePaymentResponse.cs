@@ -9,7 +9,7 @@ namespace BccPay.Core.Infrastructure.PaymentModels.Response.Nets
         public Summary Summary { get; set; }
         public Consumer Consumer { get; set; }
         public PaymentDetails PaymentDetails { get; set; }
-        public OrderDetails MyProperty { get; set; }
+        public OrderDetails Order { get; set; }
         public CheckoutOnRetrieve Checkout { get; set; }
         public string Created { get; set; }
         public List<Refund> Refunds { get; set; }

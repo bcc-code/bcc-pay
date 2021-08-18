@@ -8,6 +8,7 @@ namespace BccPay.Core.Domain.Entities
         public Guid PaymentAttemptId { get; set; }
         public bool IsActive { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
+        public PaymentProvider PaymentProvider { get; set; }
         public string CountryCode { get; set; }
         public DateTime Created { get; set; }
         public AttemptStatus AttemptStatus { get; set; }

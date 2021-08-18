@@ -10,7 +10,7 @@ using BccPay.Core.Shared.Converters;
 using Microsoft.Extensions.Configuration;
 using Raven.Client.Documents.Session;
 
-namespace BccPay.Core.Infrastructure.Helpers
+namespace BccPay.Core.Infrastructure.Helpers.Implementation
 {
     public class CurrencyService : ICurrencyService
     {

@@ -40,14 +40,11 @@ namespace BccPay.Core.Cqrs.Commands.Webhooks
                     Payment.GetPaymentId(Guid.Parse(request.Webhook.Data.PaymentId)), cancellationToken)
                 ?? throw new NotFoundException("Invalid payment ID");
 
-            if (payment.PaymentStatus == PaymentStatus.Canceled || payment.PaymentStatus == PaymentStatus.Completed)
-                throw new InvalidPaymentException("Payment is not valid.");
-
             if (!payment.Attempts.Where(x => x.NotificationAccessToken.Contains(request.AccessToken)).Any())
                 throw new UnauthorizedException();
 
             var actualAttempt = payment.Attempts
-                    .Where(x => x.IsActive && x.NotificationAccessToken.Contains(request.AccessToken))
+                    .Where(x => x.NotificationAccessToken.Contains(request.AccessToken))
                     .FirstOrDefault()
                     ?? throw new UpdatePaymentAttemptForbiddenException("Attempt is inactive.");
 

@@ -1,15 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
+using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.Helpers;
 using BccPay.Core.Infrastructure.PaymentModels.Response.Mollie;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations;
 using BccPay.Core.Infrastructure.RefitClients;
-using Newtonsoft.Json.Linq;
+using Raven.Client.Documents.Operations.Backups;
 using Refit;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
@@ -32,6 +34,77 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
         }
 
         public PaymentProvider PaymentProvider => PaymentProvider.Mollie;
+
+        public async Task<AttemptCancellationResult> TryCancelPreviousPaymentAttempt(Attempt attempt)
+        {
+            var details = (MollieStatusDetails)attempt.StatusDetails;
+            var paymentResult = (MollieGetPaymentResponse)await GetPayment(details.MolliePaymentId);
+
+            if (paymentResult.Status == PaymentProviderConstants.Mollie.Webhook.Paid)
+            {
+                attempt.AttemptStatus = AttemptStatus.PaymentIsSuccessful;
+                attempt.IsActive = false;
+
+                return AttemptCancellationResult.AlreadyCompleted;
+            }
+            else
+            {
+                attempt.IsActive = false;
+                attempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled;
+
+                var mollieCancelDetails = await CancelPayment(details);
+
+                return mollieCancelDetails.IsSuccess
+                    ? AttemptCancellationResult.SuccessfullyCancelled
+                    : AttemptCancellationResult.ProviderFailedCancellation;
+            }
+        }
+
+        private async Task<IStatusDetails> CancelPayment(MollieStatusDetails statusDetails)
+        {
+            try
+            {
+                var result = await _mollieClient.CancelPaymentAsync(statusDetails.MolliePaymentId);
+
+                if (result.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    statusDetails.IsSuccess = true;
+                    return statusDetails;
+                }
+
+                if (statusDetails.Errors is null)
+                {
+                    statusDetails.Errors = new List<string>
+                    {
+                        result.Error?.Content?.ToString()
+                    };
+                }
+                else
+                {
+                    statusDetails.Errors.Add(result.Error?.Content?.ToString());
+                }
+
+                statusDetails.IsSuccess = false;
+                return statusDetails;
+            }
+            catch (ApiException exception)
+            {
+                if (statusDetails.Errors is null)
+                {
+                    statusDetails.Errors = new List<string>
+                    {
+                        exception.Content?.ToString()
+                    };
+                }
+                else
+                {
+                    statusDetails.Errors.Add(exception.Content?.ToString());
+                }
+
+                statusDetails.IsSuccess = false;
+                return statusDetails;
+            }
+        }
 
         public async Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSettings settings)
         {
@@ -71,7 +144,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
                 return new MollieStatusDetails
                 {
                     IsSuccess = false,
-                    Error = exception.Content
+                    Errors = new List<string> { exception.Content }
                 };
             }
         }
