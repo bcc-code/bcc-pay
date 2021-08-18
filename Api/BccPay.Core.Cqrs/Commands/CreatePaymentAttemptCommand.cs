@@ -93,9 +93,8 @@ namespace BccPay.Core.Cqrs.Commands
             {
                 if (!await _paymentAttemptValidation.TryCancelPreviousPaymentAttempt(payment))
                 {
-                    payment.CancelPayment();
                     await _documentSession.SaveChangesAsync(cancellationToken);
-                    throw new UpdatePaymentAttemptForbiddenException("One of the attempts is still active and cannot be canceled automatically.");
+                    throw new UpdatePaymentAttemptForbiddenException("One of the attempts is still active and cannot be canceled automatically either payment is completed.");
                 }
             }
 

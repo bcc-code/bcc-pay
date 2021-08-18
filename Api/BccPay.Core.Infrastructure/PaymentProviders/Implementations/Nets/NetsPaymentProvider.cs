@@ -38,9 +38,17 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 
         public PaymentProvider PaymentProvider => PaymentProvider.Nets;
 
-        public Task<bool> CancelPayment(string paymentId)
+        public async Task<bool> CancelPayment(string paymentId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await _netsClient.CancelPaymentAsync(_headers, paymentId);
+                return result.StatusCode == System.Net.HttpStatusCode.NoContent;
+            }
+            catch (ApiException)
+            {
+                return false;
+            }
         }
 
         public async Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSettings settings)

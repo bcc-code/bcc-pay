@@ -9,7 +9,6 @@ using BccPay.Core.Infrastructure.PaymentModels.Response.Mollie;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations;
 using BccPay.Core.Infrastructure.RefitClients;
-using Newtonsoft.Json.Linq;
 using Refit;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
@@ -33,9 +32,17 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
 
         public PaymentProvider PaymentProvider => PaymentProvider.Mollie;
 
-        public Task<bool> CancelPayment(string paymentId)
+        public async Task<bool> CancelPayment(string paymentId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await _mollieClient.CancelPaymentAsync(paymentId);
+                return result.StatusCode == System.Net.HttpStatusCode.OK;
+            }
+            catch (ApiException)
+            {
+                return false;
+            }
         }
 
         public async Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSettings settings)
