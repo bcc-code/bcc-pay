@@ -23,10 +23,10 @@ namespace BccPay.Core.DataAccess
         {
             if (e.Entity is INotifications notifications)
             {
-                foreach (var notification in notifications.Notifications)
-                {
-                    Task.Run(async () => await _mediator.Publish(notification)).Wait();
-                }
+                notifications.Notifications?.ForEach(
+                    notification => Task.Run(async () => await _mediator.Publish(notification)).Wait());
+
+                notifications.Notifications?.Clear();
             }
         }
     }

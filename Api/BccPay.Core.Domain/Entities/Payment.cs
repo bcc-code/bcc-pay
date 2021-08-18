@@ -43,15 +43,6 @@ namespace BccPay.Core.Domain.Entities
             Description = description;
         }
 
-        public void Update(string currency,
-            decimal amount)
-        {
-            CurrencyCode = currency;
-            Amount = amount;
-            Updated = DateTime.UtcNow;
-            PaymentStatus = PaymentStatus.Open;
-        }
-
         public void UpdatePaymentStatus(PaymentStatus paymentProgress)
         {
             if (paymentProgress == PaymentStatus.Canceled || paymentProgress == PaymentStatus.Completed)
@@ -65,11 +56,6 @@ namespace BccPay.Core.Domain.Entities
             {
                 this.Notifications.Add(new PaymentCompletedNotification(this.PaymentId));
             }
-        }
-
-        public void CancelPayment()
-        {
-            PaymentStatus = PaymentStatus.Canceled;
         }
 
         public void AddAttempt(
