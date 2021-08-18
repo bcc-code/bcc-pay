@@ -14,8 +14,8 @@ namespace BccPay.Core.Infrastructure.RefitClients
         [Get("/v1/payments/{paymentId}")]
         Task<NetsRetrievePaymentResponse> RetrievePayment([HeaderCollection] IDictionary<string, string> headers, [Query] string paymentId);
 
-        [Post("/v1/payments/{paymentId}/cancels")]
-        Task<ApiResponse<object>> CancelPaymentAsync([HeaderCollection] IDictionary<string, string> headers, [AliasAs("paymentId")] string paymentId);
+        [Put("/v1/payments/{paymentId}/terminate")]
+        Task<IApiResponse> TerminatePayment([HeaderCollection] IDictionary<string, string> headers, [AliasAs("paymentId")] string paymentId);
     }
 }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
@@ -32,16 +33,51 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
 
         public PaymentProvider PaymentProvider => PaymentProvider.Mollie;
 
-        public async Task<bool> CancelPayment(string paymentId)
+        public async Task<IStatusDetails> CancelPayment(IStatusDetails statusDetails)
         {
+            var mollieStatusDetails = (MollieStatusDetails)statusDetails;
+
             try
             {
-                var result = await _mollieClient.CancelPaymentAsync(paymentId);
-                return result.StatusCode == System.Net.HttpStatusCode.OK;
+                var result = await _mollieClient.CancelPaymentAsync(mollieStatusDetails.MolliePaymentId);
+
+                if (result.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    mollieStatusDetails.IsSuccess = true;
+                    return mollieStatusDetails;
+                }
+
+                if (mollieStatusDetails.Errors is null)
+                {
+                    mollieStatusDetails.Errors = new List<string>
+                    {
+                        result.Content?.ToString()
+                    };
+                }
+                else
+                {
+                    mollieStatusDetails.Errors.Add(result.Content?.ToString());
+                }
+
+                mollieStatusDetails.IsSuccess = false;
+                return mollieStatusDetails;
             }
-            catch (ApiException)
+            catch (ApiException exception)
             {
-                return false;
+                if (mollieStatusDetails.Errors is null)
+                {
+                    mollieStatusDetails.Errors = new List<string>
+                    {
+                        exception.Content?.ToString()
+                    };
+                }
+                else
+                {
+                    mollieStatusDetails.Errors.Add(exception.Content?.ToString());
+                }
+
+                mollieStatusDetails.IsSuccess = false;
+                return mollieStatusDetails;
             }
         }
 
@@ -83,7 +119,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
                 return new MollieStatusDetails
                 {
                     IsSuccess = false,
-                    Error = exception.Content
+                    Errors = new List<string> { exception.Content }
                 };
             }
         }

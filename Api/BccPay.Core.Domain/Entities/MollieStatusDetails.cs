@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace BccPay.Core.Domain.Entities
 {
@@ -13,6 +14,6 @@ namespace BccPay.Core.Domain.Entities
         public CurrencyConversionRecord CurrencyConversionResult { get; set; }
 
         public bool IsSuccess { get; set; }
-        public string Error { get; set; }
+        public List<string> Errors { get; set; }
     }
 }

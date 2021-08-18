@@ -38,16 +38,51 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 
         public PaymentProvider PaymentProvider => PaymentProvider.Nets;
 
-        public async Task<bool> CancelPayment(string paymentId)
+        public async Task<IStatusDetails> CancelPayment(IStatusDetails statusDetails)
         {
+            var netsStatusDetails = (NetsStatusDetails)statusDetails;
+
             try
             {
-                var result = await _netsClient.CancelPaymentAsync(_headers, paymentId);
-                return result.StatusCode == System.Net.HttpStatusCode.NoContent;
+                var result = await _netsClient.TerminatePayment(_headers, netsStatusDetails.PaymentCheckoutId);
+
+                if (result.StatusCode == System.Net.HttpStatusCode.NoContent)
+                {
+                    netsStatusDetails.IsSuccess = true;
+                    return netsStatusDetails;
+                }
+
+                if (netsStatusDetails.Errors is null)
+                {
+                    netsStatusDetails.Errors = new List<string>
+                    {
+                        result.Error?.ToString()
+                    };
+                }
+                else
+                {
+                    netsStatusDetails.Errors.Add(result.Error?.ToString());
+                }
+
+                netsStatusDetails.IsSuccess = false;
+                return netsStatusDetails;
             }
-            catch (ApiException)
+            catch (ApiException exception)
             {
-                return false;
+                if (netsStatusDetails.Errors is null)
+                {
+                    netsStatusDetails.Errors = new List<string>
+                    {
+                        exception.Content?.ToString()
+                    };
+                }
+                else
+                {
+                    netsStatusDetails.Errors.Add(exception.Content?.ToString());
+                }
+
+                netsStatusDetails.IsSuccess = false;
+                return netsStatusDetails;
             }
         }
 
@@ -76,7 +111,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                     {
                         IsSuccess = true,
                         PaymentCheckoutId = result.PaymentId,
-                        Error = "{\"notValidUserBillingDataInTheSystem\":" + retryException?.Content + "}"
+                        Errors = new List<string> { "{\"notValidUserBillingDataInTheSystem\":" + retryException?.Content + "}" }
                     };
                 }
                 catch (ApiException exception)
@@ -84,7 +119,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                     return new NetsStatusDetails
                     {
                         IsSuccess = false,
-                        Error = exception?.Content
+                        Errors = new List<string> { exception?.Content }
                     };
                 }
             }

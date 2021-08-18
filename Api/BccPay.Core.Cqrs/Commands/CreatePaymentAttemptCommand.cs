@@ -79,6 +79,9 @@ namespace BccPay.Core.Cqrs.Commands
                         Payment.GetPaymentId(request.PaymentId), cancellationToken)
                     ?? throw new NotFoundException("Invalid payment ID");
 
+            if (payment.PaymentStatus == PaymentStatus.Canceled || payment.PaymentStatus == PaymentStatus.Completed)
+                throw new UpdatePaymentAttemptForbiddenException("Payment is completed.");
+
             var countryCode = request.CountryCode ?? payment.CountryCode;
 
             var paymentConfiguration = await _documentSession.LoadAsync<PaymentConfiguration>(
@@ -94,7 +97,7 @@ namespace BccPay.Core.Cqrs.Commands
                 if (!await _paymentAttemptValidation.TryCancelPreviousPaymentAttempt(payment))
                 {
                     await _documentSession.SaveChangesAsync(cancellationToken);
-                    throw new UpdatePaymentAttemptForbiddenException("One of the attempts is still active and cannot be canceled automatically either payment is completed.");
+                    throw new UpdatePaymentAttemptForbiddenException("Attempt is completed.");
                 }
             }
 

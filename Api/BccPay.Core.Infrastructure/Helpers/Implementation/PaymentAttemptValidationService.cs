@@ -6,20 +6,16 @@ using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.PaymentModels.Response.Mollie;
 using BccPay.Core.Infrastructure.PaymentProviders;
-using Microsoft.Extensions.Logging;
 
 namespace BccPay.Core.Infrastructure.Helpers.Implementation
 {
     public class PaymentAttemptValidationService : IPaymentAttemptValidationService
     {
         private readonly IPaymentProviderFactory _paymentProviderFactory;
-        private readonly ILogger<PaymentAttemptValidationService> _logger;
 
-        public PaymentAttemptValidationService(IPaymentProviderFactory paymentProviderFactory,
-            ILogger<PaymentAttemptValidationService> logger)
+        public PaymentAttemptValidationService(IPaymentProviderFactory paymentProviderFactory)
         {
             _paymentProviderFactory = paymentProviderFactory;
-            _logger = logger;
         }
 
         public async Task<bool> TryCancelPreviousPaymentAttempt(Payment payment)
@@ -46,7 +42,7 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
                     lastAttempt.IsActive = false;
                     lastAttempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled;
 
-                    await mollieProvider.CancelPayment(details.MolliePaymentId); // case with failing is unreachable if webhooks works properly
+                    var mollieCancelDetails = await mollieProvider.CancelPayment(details); // case with failing is unreachable if webhooks works properly
                     return true;
                 }
             }
@@ -69,16 +65,10 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
                     lastAttempt.IsActive = false;
                     lastAttempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled;
 
-                    await netsProvider.CancelPayment(details.PaymentCheckoutId); // case with failing is unreachable if webhooks works properly
+                    var netsCancelDetails = await netsProvider.CancelPayment(details); // case with failing is unreachable if webhooks works properly
                     return true;
                 }
             }
-
-            // NOTE: case with failing is unreachable if webhooks works properly
-            //lastAttempt.IsActive = false;
-            //lastAttempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled;
-            //payment.Updated = DateTime.UtcNow;
-            //payment.PaymentStatus = PaymentStatus.Canceled;
             return false;
         }
     }

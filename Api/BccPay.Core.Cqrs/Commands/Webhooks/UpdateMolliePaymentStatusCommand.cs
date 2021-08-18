@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -53,7 +54,7 @@ namespace BccPay.Core.Cqrs.Commands.Webhooks
 
             var actualAttempt = payment.Attempts
                     .Where(x => x.IsActive)
-                    .OrderByDescending(x => x.Created)      
+                    .OrderByDescending(x => x.Created)
                     .FirstOrDefault()
                     ?? throw new UpdatePaymentAttemptForbiddenException("Attempt is inactive.");
 
@@ -82,9 +83,13 @@ namespace BccPay.Core.Cqrs.Commands.Webhooks
                 };
                 mollieStatusDetails.WebhookStatus = PaymentProviderConstants.Mollie.Webhook.Messages[molliePaymentResponse.Status];
 
-                if (!string.IsNullOrWhiteSpace(mollieStatusDetails.Error))
+                if (mollieStatusDetails.Errors != null)
                 {
-                    mollieStatusDetails.Error = molliePaymentResponse.Error;
+                    mollieStatusDetails.Errors.Add(molliePaymentResponse.Error);
+                }
+                else
+                {
+                    mollieStatusDetails.Errors = new List<string> { molliePaymentResponse.Error };
                 }
             }
 
