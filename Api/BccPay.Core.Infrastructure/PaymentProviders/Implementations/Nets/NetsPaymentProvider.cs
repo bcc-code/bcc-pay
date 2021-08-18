@@ -67,13 +67,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
         {
             try
             {
-                var result = await _netsClient.TerminatePayment(_headers, statusDetails.PaymentCheckoutId);
-
-                if (result.StatusCode == (int)System.Net.HttpStatusCode.NoContent)
-                {
-                    statusDetails.IsSuccess = true;
-                    return statusDetails;
-                }
+                await _netsClient.TerminatePayment(_headers, statusDetails.PaymentCheckoutId);
 
                 statusDetails.IsSuccess = false;
                 return statusDetails;
