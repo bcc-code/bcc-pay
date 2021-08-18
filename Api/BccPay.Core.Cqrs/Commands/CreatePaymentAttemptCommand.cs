@@ -125,13 +125,13 @@ namespace BccPay.Core.Cqrs.Commands
                 PaymentMethod = paymentConfiguration.Settings.PaymentMethod,
                 AttemptStatus = providerResult.IsSuccess ? AttemptStatus.WaitingForCharge : AttemptStatus.RejectedEitherCancelled,
                 IsActive = providerResult.IsSuccess,
-                Created = DateTime.Now,
+                Created = DateTime.UtcNow,
                 StatusDetails = providerResult,
                 CountryCode = countryCode,
                 NotificationAccessToken = paymentRequest.NotificationAccessToken
             };
 
-            payment.Updated = DateTime.Now;
+            payment.Updated = DateTime.UtcNow;
             payment.AddAttempt(new List<Attempt> { attemptToAdd });
             await _documentSession.SaveChangesAsync(cancellationToken);
 

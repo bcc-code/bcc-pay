@@ -104,7 +104,7 @@ namespace BccPay.Core.Sample
                 endpoints.MapControllers();
             });
 
-            app.WarmUpIndexesInRavenDatabase();
+            app.InitRavenDatabase();
 
             app.InitPaymentsConfiguration();
         }

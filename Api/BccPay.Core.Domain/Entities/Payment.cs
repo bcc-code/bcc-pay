@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using BccPay.Core.Enums;
+using BccPay.Core.Messages;
 
 namespace BccPay.Core.Domain.Entities
 {
-    public class Payment
+    public class Payment : INotifications
     {
         public static string GetPaymentId(Guid paymentId)
             => $"payments/{paymentId}";
@@ -23,6 +24,7 @@ namespace BccPay.Core.Domain.Entities
         public DateTime? Updated { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
         public List<Attempt> Attempts { get; set; }
+        public List<IBccPayNotification> Notifications { get; } = new List<IBccPayNotification>();
 
         public void Create(
             string payerId,
@@ -37,7 +39,7 @@ namespace BccPay.Core.Domain.Entities
             CountryCode = countryCode;
             Amount = amount;
             PaymentStatus = PaymentStatus.Open;
-            Created = DateTime.Now;
+            Created = DateTime.UtcNow;
             Description = description;
         }
 
@@ -56,7 +58,13 @@ namespace BccPay.Core.Domain.Entities
                 Attempts.LastOrDefault().IsActive = false;
 
             PaymentStatus = paymentProgress;
+
             Updated = DateTime.UtcNow;
+
+            if (PaymentStatus == PaymentStatus.Completed)
+            {
+                this.Notifications.Add(new PaymentCompletedNotification(this.PaymentId));
+            }
         }
 
         public void AddAttempt(
@@ -72,11 +80,12 @@ namespace BccPay.Core.Domain.Entities
         {
             var attemptToUpdate = Attempts.Find(x => x.PaymentAttemptId == attempt.PaymentAttemptId);
             attemptToUpdate = attempt;
+            var paymentStatus = PaymentStatus;
 
             if (attempt.AttemptStatus == AttemptStatus.RejectedEitherCancelled)
             {
                 attemptToUpdate.IsActive = false;
-                PaymentStatus = PaymentStatus.Canceled;
+                paymentStatus = PaymentStatus.Canceled;
             }
             if (attempt.AttemptStatus == AttemptStatus.Expired)
             {
@@ -85,10 +94,10 @@ namespace BccPay.Core.Domain.Entities
             if (attempt.AttemptStatus == AttemptStatus.PaymentIsSuccessful)
             {
                 attemptToUpdate.IsActive = false;
-                PaymentStatus = PaymentStatus.Completed;
+                paymentStatus = PaymentStatus.Completed;
             }
 
-            Updated = DateTime.UtcNow;
+            UpdatePaymentStatus(paymentStatus);
         }
 
         public void CancelLastAttempt()
