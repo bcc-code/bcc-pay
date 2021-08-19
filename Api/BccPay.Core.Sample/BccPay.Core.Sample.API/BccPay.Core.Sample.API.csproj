@@ -25,10 +25,4 @@
     <ProjectReference Include="..\BccPay.Core.Sample.Contracts\BccPay.Core.Sample.Contracts.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="..\Dockerfile">
-      <Link>Dockerfile</Link>
-    </Content>
-  </ItemGroup>
-
 </Project>

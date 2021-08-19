@@ -1,13 +1,13 @@
-﻿using BccPay.Core.Domain.Entities;
-using BccPay.Core.Enums;
-using MediatR;
-using Raven.Client.Documents;
-using Raven.Client.Documents.Session;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BccPay.Core.Domain.Entities;
+using BccPay.Core.Enums;
+using MediatR;
+using Raven.Client.Documents;
+using Raven.Client.Documents.Session;
 
 namespace BccPay.Core.Cqrs.Queries
 {
@@ -58,7 +58,7 @@ namespace BccPay.Core.Cqrs.Queries
                                     PaymentStatus = payment.PaymentStatus,
                                     Created = payment.Created,
                                     Updated = payment.Updated,
-                                    AmountOfAttempts = payment.Attempts == null ? 0 :  payment.Attempts.Count
+                                    AmountOfAttempts = payment.Attempts == null ? 0 : payment.Attempts.Count
                                 }).ToListAsync(token: cancellationToken);
 
             return new PaymentsResult(result);
