@@ -10,8 +10,11 @@ import { environment } from 'src/environments/environment';
 export class SampleComponent {
   server: string;
   netsCheckoutKey: string;
+  requestHeaders: [{ key: string; value: string }];
+
   constructor() {
     this.server = environment.bccPayUrl;
     this.netsCheckoutKey = environment.netsCheckoutKey;
+    this.requestHeaders = [{ key: 'is-mobile-app', value: 'true' }];
   }
 }

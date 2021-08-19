@@ -1,15 +1,12 @@
 import { css, unsafeCSS } from 'lit-element';
-import { primaryColor, secondaryColor } from './BccPay';
+import { accentColor, primaryColor, secondaryColor } from './BccPay';
 
 function createComponentStyle(): string {
   return css`
     :root {
-      --baseFg: dimgray;
-      --baseBg: white;
-      --accentFg: #006fc2;
-      --accentBg: #bae1ff;
       --primaryColor: ${unsafeCSS(primaryColor)};
       --secondaryColor: ${unsafeCSS(secondaryColor)};
+      --accentColor: ${unsafeCSS(accentColor)};
     }
 
     .card-square {
@@ -172,17 +169,17 @@ function createComponentStyle(): string {
       font: 400 12px/1.3 sans-serif;
       -webkit-appearance: none;
       appearance: none;
-      color: var(--baseFg);
-      border: 1px solid var(--baseFg);
+      color: dimgray;
+      border: 1px solid dimgray;
       line-height: 1;
       outline: 0;
       padding: 0.65em 2.5em 0.55em 0.75em;
       border-radius: 2px;
-      background-color: var(--baseBg);
-      background-image: linear-gradient(var(--baseFg), var(--baseFg)),
-        linear-gradient(-135deg, transparent 50%, var(--accentBg) 50%),
-        linear-gradient(-225deg, transparent 50%, var(--accentBg) 50%),
-        linear-gradient(var(--accentBg) 42%, var(--accentFg) 42%);
+      background-color: var(--secondaryColor);
+      background-image: linear-gradient(var(--accentColor), var(--accentColor)),
+        linear-gradient(-135deg, transparent 50%, var(--accentColor) 50%),
+        linear-gradient(-225deg, transparent 50%, var(--accentColor) 50%),
+        linear-gradient(var(--accentColor) 42%, var(--primaryColor) 42%);
       background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
       background-size: 1px 100%, 20px 22px, 20px 22px, 20px 100%;
       background-position: right 20px center, right bottom, right bottom,

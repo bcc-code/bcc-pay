@@ -3,7 +3,7 @@
         <div class="min-w-400">
             <div *ngIf="server">
                 <bcc-pay item="Sample Item" amount=70 [server]="server" [netsCheckoutKey]="netsCheckoutKey"
-                    isDevEnv="true">
+                    isDevEnv="true" [requestHeaders]="requestHeaders">
                 </bcc-pay>
             </div>
         </div>
