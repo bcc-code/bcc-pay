@@ -13,7 +13,7 @@ using Raven.Client.Documents.Session;
 
 namespace BccPay.Core.Cqrs.Queries
 {
-    public record GetCountryPaymentConfigurationsQuery(string countryCode) : IRequest<List<PaymentConfigurationResult>>;
+    public record GetCountryPaymentConfigurationsQuery(string CountryCode) : IRequest<List<PaymentConfigurationResult>>;
 
     public class PaymentConfigurationResult
     {
@@ -41,7 +41,7 @@ namespace BccPay.Core.Cqrs.Queries
         public async Task<List<PaymentConfigurationResult>> Handle(GetCountryPaymentConfigurationsQuery request, CancellationToken cancellationToken)
         {
             var configurations = await _documentSession.Query<CountryPaymentConfigurationsIndex.Result, CountryPaymentConfigurationsIndex>()
-                                    .Where(x => x.CountryCode == request.countryCode || x.CountryCode == Country.DefaultCountryCode)
+                                    .Where(x => x.CountryCode == request.CountryCode || x.CountryCode == Country.DefaultCountryCode)
                                     .Select(x => new PaymentConfigurationResult
                                     {
                                         Id = x.ConfigId,

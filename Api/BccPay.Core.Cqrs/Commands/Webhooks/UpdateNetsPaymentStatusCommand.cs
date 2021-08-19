@@ -37,7 +37,7 @@ namespace BccPay.Core.Cqrs.Commands.Webhooks
         public async Task<bool> Handle(UpdateNetsPaymentStatusCommand request, CancellationToken cancellationToken)
         {
             var payment = await _documentSession.LoadAsync<Payment>(
-                    Payment.GetPaymentId(Guid.Parse(request.Webhook.Data.PaymentId)), cancellationToken)
+                    Payment.GetDocumentId(Guid.Parse(request.Webhook.Data.PaymentId)), cancellationToken)
                 ?? throw new NotFoundException("Invalid payment ID");
 
             if (!payment.Attempts.Where(x => x.NotificationAccessToken.Contains(request.AccessToken)).Any())

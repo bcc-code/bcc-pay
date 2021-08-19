@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BccPay.Core.Contracts.Notifications;
 using BccPay.Core.Enums;
+using BccPay.Core.Implementation.Notifications;
 
 namespace BccPay.Core.Domain.Entities
 {
-    public class Payment
+    public class Payment : IBccPayNotificationsStore
     {
-        public static string GetPaymentId(Guid paymentId)
+        public static string GetDocumentId(Guid paymentId)
             => $"payments/{paymentId}";
 
-        public string Id => GetPaymentId(PaymentId);
+        public string Id => GetDocumentId(PaymentId);
 
         public Guid PaymentId { get; set; }
         public string PayerId { get; set; }
@@ -23,6 +25,7 @@ namespace BccPay.Core.Domain.Entities
         public DateTime? Updated { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
         public List<Attempt> Attempts { get; set; }
+        public List<IBccPayNotification> Notifications { get; } = new List<IBccPayNotification>();
 
         public void Create(
             string payerId,
@@ -37,31 +40,25 @@ namespace BccPay.Core.Domain.Entities
             CountryCode = countryCode;
             Amount = amount;
             PaymentStatus = PaymentStatus.Open;
-            Created = DateTime.Now;
+            Created = DateTime.UtcNow;
             Description = description;
-        }
-
-        public void Update(string currency,
-            decimal amount)
-        {
-            CurrencyCode = currency;
-            Amount = amount;
-            Updated = DateTime.UtcNow;
-            PaymentStatus = PaymentStatus.Open;
         }
 
         public void UpdatePaymentStatus(PaymentStatus paymentProgress)
         {
             if (paymentProgress == PaymentStatus.Canceled || paymentProgress == PaymentStatus.Completed)
-                Attempts.LastOrDefault().IsActive = false;
+            {
+                CancelLastAttempt();
+            }
 
             PaymentStatus = paymentProgress;
-            Updated = DateTime.UtcNow;
-        }
 
-        public void CancelPayment()
-        {
-            PaymentStatus = PaymentStatus.Canceled;
+            Updated = DateTime.UtcNow;
+
+            if (PaymentStatus == PaymentStatus.Completed)
+            {
+                Notifications.Add(new PaymentCompletedNotification(PaymentId));
+            }
         }
 
         public void AddAttempt(
@@ -77,11 +74,12 @@ namespace BccPay.Core.Domain.Entities
         {
             var attemptToUpdate = Attempts.Find(x => x.PaymentAttemptId == attempt.PaymentAttemptId);
             attemptToUpdate = attempt;
+            var paymentStatus = PaymentStatus;
 
             if (attempt.AttemptStatus == AttemptStatus.RejectedEitherCancelled)
             {
                 attemptToUpdate.IsActive = false;
-                PaymentStatus = PaymentStatus.Canceled;
+                paymentStatus = PaymentStatus.Canceled;
             }
             if (attempt.AttemptStatus == AttemptStatus.Expired)
             {
@@ -90,13 +88,16 @@ namespace BccPay.Core.Domain.Entities
             if (attempt.AttemptStatus == AttemptStatus.PaymentIsSuccessful)
             {
                 attemptToUpdate.IsActive = false;
-                PaymentStatus = PaymentStatus.Completed;
+                paymentStatus = PaymentStatus.Completed;
             }
 
-            Updated = DateTime.UtcNow;
+            UpdatePaymentStatus(paymentStatus);
         }
 
         public void CancelLastAttempt()
-            => Attempts.LastOrDefault().IsActive = false;
+        {
+            var lastAttempt = Attempts?.LastOrDefault();
+            if (lastAttempt != null) lastAttempt.IsActive = false;
+        }
     }
 }

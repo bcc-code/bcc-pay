@@ -32,7 +32,7 @@ namespace BccPay.Core.Cqrs.Queries
         public int AmountOfAttempts { get; set; }
     }
 
-    public record PaymentsResult(List<PaymentResult> payments);
+    public record PaymentsResult(List<PaymentResult> Payments);
 
     public class GetPaymentsQueryHandler : IRequestHandler<GetPaymentsQuery, PaymentsResult>
     {

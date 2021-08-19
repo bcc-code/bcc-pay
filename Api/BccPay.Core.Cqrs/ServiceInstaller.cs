@@ -17,7 +17,6 @@ namespace BccPay.Core.Cqrs
                 typeof(UpdateNetsPaymentStatusCommand).Assembly,
                 typeof(UpdateMolliePaymentStatusCommand).Assembly
             });
-            services.AddMediatR(typeof(CreatePaymentCommand).Assembly);
 
             services.AddTransient(typeof(IRequestHandler<CreatePaymentAttemptCommand, IStatusDetails>), typeof(CreatePaymentAttemptCommandHandler));
 

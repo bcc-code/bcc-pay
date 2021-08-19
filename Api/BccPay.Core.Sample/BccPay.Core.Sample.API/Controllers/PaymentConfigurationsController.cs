@@ -4,7 +4,7 @@ using BccPay.Core.Cqrs.Queries;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BccPay.Core.Sample.Controllers
+namespace BccPay.Core.Sample.API.Controllers
 {
     [ApiController]
     [Route("payment-configurations")]

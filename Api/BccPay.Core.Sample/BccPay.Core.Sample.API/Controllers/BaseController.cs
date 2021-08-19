@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BccPay.Core.Sample.Controllers
+namespace BccPay.Core.Sample.API.Controllers
 {
     public class BaseController : ControllerBase
     {

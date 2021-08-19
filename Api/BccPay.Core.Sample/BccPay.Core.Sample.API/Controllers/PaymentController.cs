@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
-using BccPay.Core.Contracts.Requests;
-using BccPay.Core.Contracts.Responses;
+using BccPay.Core.Sample.Contracts.Requests;
+using BccPay.Core.Sample.Contracts.Responses;
 using BccPay.Core.Cqrs.Commands;
 using BccPay.Core.Cqrs.Queries;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 
-namespace BccPay.Core.Sample.Controllers
+namespace BccPay.Core.Sample.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]

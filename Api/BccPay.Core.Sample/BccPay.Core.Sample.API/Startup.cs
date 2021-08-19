@@ -24,7 +24,7 @@ namespace BccPay.Core.Sample
         {
             Configuration = configuration;
         }
-        private const string AllowOrigins = "_allowOrigins";
+        private const string _allowOrigins = "_allowOrigins";
 
         public IConfiguration Configuration { get; }
 
@@ -55,7 +55,7 @@ namespace BccPay.Core.Sample
 
             services.AddCors(options =>
             {
-                options.AddPolicy(name: AllowOrigins,
+                options.AddPolicy(name: _allowOrigins,
                     builder =>
                     {
                         builder.WithOrigins(Configuration.GetValue<string>("CorsUrl").Split(','))
@@ -96,7 +96,7 @@ namespace BccPay.Core.Sample
 
             app.UseRouting();
 
-            app.UseCors(AllowOrigins);
+            app.UseCors(_allowOrigins);
 
             app.UseAuthorization();
 
@@ -105,7 +105,7 @@ namespace BccPay.Core.Sample
                 endpoints.MapControllers();
             });
 
-            app.WarmUpIndexesInRavenDatabase();
+            app.InitRavenDatabase();
 
             app.InitPaymentsConfiguration();
         }

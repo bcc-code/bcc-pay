@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using BccPay.Core.Contracts.Requests;
-using BccPay.Core.Contracts.Responses;
+using BccPay.Core.Sample.Contracts.Requests;
+using BccPay.Core.Sample.Contracts.Responses;
 using BccPay.Core.Cqrs.Commands;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Infrastructure.Helpers;
