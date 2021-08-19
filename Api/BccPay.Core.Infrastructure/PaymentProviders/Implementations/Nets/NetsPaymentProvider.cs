@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
+using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations;
@@ -38,6 +39,77 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 
         public PaymentProvider PaymentProvider => PaymentProvider.Nets;
 
+        public async Task<AttemptCancellationResult> TryCancelPreviousPaymentAttempt(Attempt attempt)
+        {
+            var details = (NetsStatusDetails)attempt.StatusDetails;
+
+            if (details.WebhookStatus == PaymentProviderConstants.Nets.Webhooks.ChargeCreated)
+            {
+                attempt.AttemptStatus = AttemptStatus.PaymentIsSuccessful;
+                attempt.IsActive = false;
+
+                return AttemptCancellationResult.AlreadyCompleted;
+            }
+            else
+            {
+                attempt.IsActive = false;
+                attempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled;
+
+                var netsCancelDetails = await CancelPayment(details);
+
+                return netsCancelDetails.IsSuccess
+                    ? AttemptCancellationResult.SuccessfullyCancelled
+                    : AttemptCancellationResult.ProviderFailedCancellation;
+            }
+        }
+
+        private async Task<IStatusDetails> CancelPayment(NetsStatusDetails statusDetails)
+        {
+            try
+            {
+                var providerResult = await _netsClient.TerminatePayment(_headers, statusDetails.PaymentCheckoutId);
+
+                if (providerResult.StatusCode == System.Net.HttpStatusCode.NoContent)
+                {
+                    statusDetails.IsSuccess = true;
+                    return statusDetails;
+                }
+                else
+                {
+                    if (statusDetails.Errors is null)
+                    {
+                        statusDetails.Errors = new List<string>
+                        {
+                           await providerResult.Content.ReadAsStringAsync()
+                        };
+                    }
+                    else
+                    {
+                        statusDetails.Errors.Add(await providerResult.Content.ReadAsStringAsync());
+                    }
+                    statusDetails.IsSuccess = false;
+                    return statusDetails;
+                }
+            }
+            catch (ApiException exception)
+            {
+                if (statusDetails.Errors is null)
+                {
+                    statusDetails.Errors = new List<string>
+                    {
+                        exception.Content?.ToString()
+                    };
+                }
+                else
+                {
+                    statusDetails.Errors.Add(exception.Content?.ToString());
+                }
+
+                statusDetails.IsSuccess = false;
+                return statusDetails;
+            }
+        }
+
         public async Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSettings settings)
         {
             INetsPaymentRequestBuilder requestBuilder = this.CreateRequestBuilder(settings);
@@ -63,7 +135,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                     {
                         IsSuccess = true,
                         PaymentCheckoutId = result.PaymentId,
-                        Error = "{\"notValidUserBillingDataInTheSystem\":" + retryException?.Content + "}"
+                        Errors = new List<string> { "{\"notValidUserBillingDataInTheSystem\":" + retryException?.Content + "}" }
                     };
                 }
                 catch (ApiException exception)
@@ -71,7 +143,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                     return new NetsStatusDetails
                     {
                         IsSuccess = false,
-                        Error = exception?.Content
+                        Errors = new List<string> { exception?.Content }
                     };
                 }
             }
@@ -81,7 +153,6 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
         {
             throw new NotImplementedException();
         }
-
         private INetsPaymentRequestBuilder CreateRequestBuilder(PaymentSettings settings)
         {
             // create a builder depending on the settings

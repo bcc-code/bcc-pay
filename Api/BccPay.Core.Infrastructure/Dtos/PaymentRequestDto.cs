@@ -14,6 +14,7 @@
         public string NotificationAccessToken { get; set; }
         public string Description { get; set; }
         public string AcceptLanguage { get; set; }
+        public bool IsMobile { get; set; }
         public AddressDto Address { get; set; }
     }
 }

@@ -38,6 +38,7 @@ namespace BccPay.Core.Cqrs.Commands
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
         public string PostalCode { get; set; }
+        public bool IsMobile { get; set; }
     }
 
     public class CreatePaymentAttemptValidator : AbstractValidator<CreatePaymentAttemptCommand>
@@ -74,23 +75,36 @@ namespace BccPay.Core.Cqrs.Commands
                         Payment.GetPaymentId(request.PaymentId), cancellationToken)
                     ?? throw new NotFoundException("Invalid payment ID");
 
+            if (payment.PaymentStatus == PaymentStatus.Canceled || payment.PaymentStatus == PaymentStatus.Completed)
+                throw new UpdatePaymentAttemptForbiddenException("Payment is completed.");
+
             var countryCode = request.CountryCode ?? payment.CountryCode;
 
             var paymentConfiguration = await _documentSession.LoadAsync<PaymentConfiguration>(
                     PaymentConfiguration.GetDocumentId(request.PaymentConfigurationId), cancellationToken)
                     ?? throw new Exception("Invalid payment configuration ID");
 
-            var countryAvailableConfigurations = await _mediator.Send(new GetCountryPaymentConfigurationsQuery(countryCode));
+            var countryAvailableConfigurations = await _mediator.Send(new GetCountryPaymentConfigurationsQuery(countryCode), cancellationToken);
 
-            if (payment.Attempts?.Where(x => x.IsActive).Any() == true)
-                throw new Exception("One of the attempts is still active.");
+            var provider = _paymentProviderFactory.GetPaymentProvider(paymentConfiguration.Provider);
+
+            if (payment.Attempts?.Count >= 1)
+            {
+                var attempt = payment.Attempts.Last();
+
+                var paymentProvider = _paymentProviderFactory.GetPaymentProvider(attempt.PaymentProvider);
+                if (await paymentProvider.TryCancelPreviousPaymentAttempt(attempt) == AttemptCancellationResult.AlreadyCompleted)
+                {
+                    payment.UpdatePaymentStatus(PaymentStatus.Completed);
+                    await _documentSession.SaveChangesAsync(cancellationToken);
+                    throw new UpdatePaymentAttemptForbiddenException("Attempt is completed.");
+                }
+            }
 
             if (!countryAvailableConfigurations.Any(x => x.Id == request.PaymentConfigurationId))
                 throw new InvalidPaymentException($"The payment configuration {request.PaymentConfigurationId} is not available for the country '{countryCode}'");
 
             var (phonePrefix, phoneBody) = PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);
-
-            var provider = _paymentProviderFactory.GetPaymentProvider(paymentConfiguration.Provider);
 
             var paymentRequest = new PaymentRequestDto
             {
@@ -114,7 +128,8 @@ namespace BccPay.Core.Cqrs.Commands
                 Currency = payment.CurrencyCode,
                 NotificationAccessToken = Guid.NewGuid().ToString(),
                 AcceptLanguage = request.AcceptLanguage,
-                Description = payment.Description
+                Description = payment.Description,
+                IsMobile = request.IsMobile
             };
 
             var providerResult = await provider.CreatePayment(paymentRequest, paymentConfiguration.Settings);
@@ -128,7 +143,8 @@ namespace BccPay.Core.Cqrs.Commands
                 Created = DateTime.Now,
                 StatusDetails = providerResult,
                 CountryCode = countryCode,
-                NotificationAccessToken = paymentRequest.NotificationAccessToken
+                NotificationAccessToken = paymentRequest.NotificationAccessToken,
+                PaymentProvider = paymentConfiguration.Provider
             };
 
             payment.Updated = DateTime.Now;
