@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using BccPay.Core.Contracts.Notifications;
+using BccPay.Core.Notifications.Contracts;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents.Session;
