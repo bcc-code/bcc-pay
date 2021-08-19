@@ -66,8 +66,6 @@ export class BccPay extends LitElement {
   }
 
   async init() {
-    getPaymentConfigurations(this.country, this.server);
-
     if (this.paymentId === '' || this.paymentId === undefined) {
       this.paymentId = await initPayment(
         this.currency,
@@ -76,6 +74,7 @@ export class BccPay extends LitElement {
         this.server
       );
     }
+    getPaymentConfigurations(this.country, this.server);
 
     if (this.paymentId === '') {
       displayErrorPage();
