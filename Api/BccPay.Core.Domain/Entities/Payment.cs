@@ -4,6 +4,7 @@ using System.Linq;
 using BccPay.Core.Contracts.Notifications;
 using BccPay.Core.Enums;
 using BccPay.Core.Implementation.Notifications;
+using BccPay.Core.Notifications.Implementation;
 
 namespace BccPay.Core.Domain.Entities
 {
@@ -65,9 +66,14 @@ namespace BccPay.Core.Domain.Entities
             List<Attempt> attempts)
         {
             if (Attempts?.Any() == true)
+            {
                 Attempts.AddRange(attempts);
+            }
             else
+            {
                 Attempts = new List<Attempt>(attempts);
+                Notifications.Add(new PaymentInitiatedNotification(PaymentId));
+            }
         }
 
         public void UpdateAttempt(Attempt attempt)
