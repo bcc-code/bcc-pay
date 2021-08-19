@@ -1,9 +1,11 @@
 <div class="w-full h-full flex flex-col justify-center z-10 ">
     <div class="m-5 flex justify-center  ">
         <div class="min-w-400">
-            <bcc-pay item="Sample Item" amount=70 [server]="serverUrl" [netsCheckoutKey]="netsCheckoutKey"
-                isDevEnv="true">
-            </bcc-pay>
+            <div *ngIf="server">
+                <bcc-pay item="Sample Item" amount=70 [server]="server" [netsCheckoutKey]="netsCheckoutKey"
+                    isDevEnv="true" [requestHeaders]="requestHeaders">
+                </bcc-pay>
+            </div>
         </div>
     </div>
 </div>

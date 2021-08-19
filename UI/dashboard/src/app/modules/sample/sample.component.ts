@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import 'bcc-pay/dist/bcc-pay';
 import { environment } from 'src/environments/environment';
 
@@ -7,13 +7,14 @@ import { environment } from 'src/environments/environment';
   templateUrl: './sample.component.html',
   styleUrls: ['./sample.component.scss'],
 })
-export class SampleComponent implements OnInit {
-  serverUrl: string;
+export class SampleComponent {
+  server: string;
   netsCheckoutKey: string;
-  constructor() {
-    this.serverUrl = environment.bccPayUrl;
-    this.netsCheckoutKey = environment.netsCheckoutKey;
-  }
+  requestHeaders: [{ key: string; value: string }];
 
-  ngOnInit(): void {}
+  constructor() {
+    this.server = environment.bccPayUrl;
+    this.netsCheckoutKey = environment.netsCheckoutKey;
+    this.requestHeaders = [{ key: 'is-mobile-app', value: 'true' }];
+  }
 }

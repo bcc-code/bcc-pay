@@ -1,4 +1,4 @@
-# \<bcc-pay>
+# BCC Pay WebComponent
 
 This webcomponent follows the [open-wc](https://github.com/open-wc/open-wc) recommendation.
 
@@ -82,10 +82,10 @@ export class RequestHeader {
   }
 ```
 
-Sample in JS
+Sample request headers created in JS
 
 ```Javascript
-const requestHeaders = [{ key: 'new_key', value: 'new_value' }],
+const requestHeaders = [{ key: 'is-mobile-app', value: 'true' }],
 ```
 
 HTML
@@ -104,7 +104,7 @@ List of possible parameters and default values:
   @property({ type: String }) item = 'Subscription';
   @property({ type: Number }) amount = 5;
   @property({ type: String }) currency = 'EUR';
-  @property({ type: String }) country = 'DE';
+  @property({ type: String }) country = 'NOR';
   @property({ type: User }) user: User = {};
   @property({ type: String }) server = 'https://localhost:5001';
   @property({ type: String }) netsCheckoutKey = '#checkout_key#';
@@ -113,4 +113,18 @@ List of possible parameters and default values:
     | [RequestHeader]
     | undefined;
   @property({ type: String }) paymentId: string = '';
+  @property({ type: String }) primaryColor: string = '#006fc2';
+  @property({ type: String }) secondaryColor: string = 'white';
+  @property({ type: String }) accentColor: string = '#bae1ff';
 ```
+
+# BCC Pay Development
+
+To run webComponent in dev mode go to /webComponent/bcc-pay/
+`npm run storybook`
+
+To use webComponent in external application you have to upgrade version number in package.json and publish component with command (after .npmrc update):
+`npm publish`
+
+In application type:
+`npm install bcc-pay@latest`
