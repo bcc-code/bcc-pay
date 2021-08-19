@@ -141,7 +141,7 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
             return (result.Rates[toCurrency], false, result.FixerServerUpdate);
         }
 
-        private bool IsCurrencyRateValid(CurrencyRate currencyRate, int expirationTimeInHours)
+        private static bool IsCurrencyRateValid(CurrencyRate currencyRate, int expirationTimeInHours)
         {
             if (currencyRate is null)
                 return false;
