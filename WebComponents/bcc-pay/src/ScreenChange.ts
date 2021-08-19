@@ -1,7 +1,6 @@
 export function displayErrorPage() {
   hideFirstScreen();
   hideNetsPaymentScreen();
-  hideMolliePaymentScreen();
   showErrorPageScreen();
 }
 
@@ -13,18 +12,15 @@ export function displayChangeUserDataPage() {
 
 export function displayNetsPayment() {
   hideFirstScreen();
-  hideMolliePaymentScreen();
   showNetsPaymentScreen();
 }
 
 export function displayMolliePayment() {
   hideFirstScreen();
   hideNetsPaymentScreen();
-  showMolliePaymentScreen();
 }
 
 export function displayFirstScreen() {
-  hideMolliePaymentScreen();
   hideNetsPaymentScreen();
   hideErrorPageScreen();
   showFirstScreen();
@@ -56,19 +52,6 @@ function hideErrorPageScreen() {
     'payment-error-screen'
   ) as HTMLElement;
   errorScreenElement.style.display = 'none';
-}
-
-function showMolliePaymentScreen() {
-  const netsScreenElement = document.getElementById(
-    'mollie-payment-screen'
-  ) as HTMLElement;
-  netsScreenElement.style.display = 'block';
-}
-function hideMolliePaymentScreen() {
-  const molliePaymentScreenElement = document.getElementById(
-    'mollie-payment-screen'
-  ) as HTMLElement;
-  molliePaymentScreenElement.style.display = 'none';
 }
 
 function showNetsPaymentScreen() {

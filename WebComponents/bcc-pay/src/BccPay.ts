@@ -90,7 +90,11 @@ export class BccPay extends LitElement {
       this.server
     );
 
-    if (this.mollieUrl !== '') {
+    if (
+      this.mollieUrl !== '' ||
+      this.mollieUrl !== null ||
+      this.mollieUrl !== undefined
+    ) {
       const mollyButton = document.getElementById(
         'mollie-payment-button'
       ) as HTMLButtonElement;

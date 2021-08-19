@@ -25,7 +25,11 @@ export async function startNetsPayment(
     console.log('Nets payment id is: ' + netsPaymentId);
   }
 
-  if (netsPaymentId === null || netsPaymentId === undefined) {
+  if (
+    netsPaymentId === null ||
+    netsPaymentId === undefined ||
+    netsPaymentId === ''
+  ) {
     displayErrorPage();
     return false;
   }
