@@ -63,24 +63,24 @@ jobs:
           npm install bcc-pay@latest
           npm install
 
-            - name: Dashboard deploy
-              run: |
-                  cd ./UI/dashboard/
-                  gcloud builds submit --tag gcr.io/myshare-dev-317106/bcc-pay-front-dev
-                  gcloud run deploy bcc-pay-front-dev --image gcr.io/myshare-dev-317106/bcc-pay-front-dev --platform=managed --region=europe-west1 --project=myshare-dev-317106 --allow-unauthenticated
+      - name: Dashboard deploy
+        run: |
+          cd ./UI/dashboard/
+          gcloud builds submit --tag gcr.io/myshare-dev-317106/bcc-pay-front-dev
+          gcloud run deploy bcc-pay-front-dev --image gcr.io/myshare-dev-317106/bcc-pay-front-dev --platform=managed --region=europe-west1 --project=myshare-dev-317106 --allow-unauthenticated
 
-            - uses: microsoft/variable-substitution@v1
-              with:
-                  files: "./Api/BccPay.Core.Sample/BccPay.Core.Sample.API/appsettings.Development.json"
-              env:
-                  RavenSettings.CertFilePath: ${{ secrets.CERT_FILE_PATH_DEV }}
-                  RavenSettings.CertPassword: ${{ secrets.CERT_PASSWORD_DEV }}
-                  NetsSecretKey: ${{ secrets.NETS_SECRET_KEY_DEV }}
-                  MollieSecretKey: ${{ secrets.MOLLIE_SECRET_KEY_DEV }}
-                  FixerApiKey: ${{ secrets.FIXER_API_KEY_DEV }}
+      - uses: microsoft/variable-substitution@v1
+        with:
+          files: "./Api/BccPay.Core.Sample/BccPay.Core.Sample.API/appsettings.Development.json"
+        env:
+          RavenSettings.CertFilePath: ${{ secrets.CERT_FILE_PATH_DEV }}
+          RavenSettings.CertPassword: ${{ secrets.CERT_PASSWORD_DEV }}
+          NetsSecretKey: ${{ secrets.NETS_SECRET_KEY_DEV }}
+          MollieSecretKey: ${{ secrets.MOLLIE_SECRET_KEY_DEV }}
+          FixerApiKey: ${{ secrets.FIXER_API_KEY_DEV }}
 
-            - name: Backend deploy
-              run: |
-                  cd ./Api/
-                  gcloud builds submit --tag gcr.io/myshare-dev-317106/bcc-pay-sample-api-dev
-                  gcloud run deploy bcc-pay-sample-api-dev --image gcr.io/myshare-dev-317106/bcc-pay-sample-api-dev --platform=managed --region=europe-west1 --project=myshare-dev-317106 --allow-unauthenticated
+      - name: Backend deploy
+        run: |
+          cd ./Api/
+          gcloud builds submit --tag gcr.io/myshare-dev-317106/bcc-pay-sample-api-dev
+          gcloud run deploy bcc-pay-sample-api-dev --image gcr.io/myshare-dev-317106/bcc-pay-sample-api-dev --platform=managed --region=europe-west1 --project=myshare-dev-317106 --allow-unauthenticated
