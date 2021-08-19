@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace BccPay.Core.Notifications
+namespace BccPay.Core.Contracts.Notifications
 {
-    public interface INotificationsStore
+    public interface IBccPayNotificationsStore
     {
         public List<IBccPayNotification> Notifications { get; }
     }

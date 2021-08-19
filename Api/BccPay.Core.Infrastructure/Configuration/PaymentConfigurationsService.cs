@@ -28,9 +28,9 @@ namespace BccPay.Core.Infrastructure.Configuration
 
         public void InitPaymentsConfiguration()
         {
-            this.UpdatePaymentConfigurations(_bccPaymentsConfiguration.Value.PaymentConfigurations);
+            UpdatePaymentConfigurations(_bccPaymentsConfiguration.Value.PaymentConfigurations);
 
-            this.UpdateCountries(_bccPaymentsConfiguration.Value.CountryPaymentConfigurations);
+            UpdateCountries(_bccPaymentsConfiguration.Value.CountryPaymentConfigurations);
 
             _documentSession.SaveChanges();
         }

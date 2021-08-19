@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BccPay.Core.Contracts.Notifications;
 using BccPay.Core.Enums;
-using BccPay.Core.Notifications;
+using BccPay.Core.Implementation.Notifications;
 
 namespace BccPay.Core.Domain.Entities
 {
-    public class Payment : INotificationsStore
+    public class Payment : IBccPayNotificationsStore
     {
         public static string GetDocumentId(Guid paymentId)
             => $"payments/{paymentId}";
@@ -47,7 +48,7 @@ namespace BccPay.Core.Domain.Entities
         {
             if (paymentProgress == PaymentStatus.Canceled || paymentProgress == PaymentStatus.Completed)
             {
-                this.CancelLastAttempt();
+                CancelLastAttempt();
             }
 
             PaymentStatus = paymentProgress;
@@ -56,7 +57,7 @@ namespace BccPay.Core.Domain.Entities
 
             if (PaymentStatus == PaymentStatus.Completed)
             {
-                this.Notifications.Add(new PaymentCompletedNotification(this.PaymentId));
+                Notifications.Add(new PaymentCompletedNotification(PaymentId));
             }
         }
 

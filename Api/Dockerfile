@@ -12,19 +12,19 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR "/src/"
 RUN ls
-COPY ["/BccPay.Core.Sample.Contracts/BccPay.Core.Sample.Contracts.csproj", "./"]
+COPY ["/BccPay.Core.Sample/BccPay.Core.Sample.Contracts/BccPay.Core.Sample.Contracts.csproj", "./BccPay.Core.Sample/"]
 COPY ["/BccPay.Core.Cqrs/BccPay.Core.Cqrs.csproj", "./"]
 COPY ["/BccPay.Core.DataAccess/BccPay.Core.DataAccess.csproj", "./"]
 COPY ["/BccPay.Core.Domain/BccPay.Core.Domain.csproj", "./"]
 COPY ["/BccPay.Core.Enums/BccPay.Core.Enums.csproj", "./"]
 COPY ["/BccPay.Core.Infrastructure/BccPay.Core.Infrastructure.csproj", "./"]
 COPY ["/BccPay.Core.Shared/BccPay.Core.Shared.csproj", "./"]
-COPY ["/BccPay.Core.Sample.API/BccPay.Core.Sample.API.csproj", "./"]
+COPY ["/BccPay.Core.Sample/BccPay.Core.Sample.API/BccPay.Core.Sample.API.csproj", "./BccPay.Core.Sample/"]
 COPY ["/BccPay.Core.Notifications/BccPay.Core.Notifications.csproj", "./"]
 
-RUN dotnet restore "BccPay.Core.Sample.API.csproj"
+RUN dotnet restore "BccPay.Core.Sample/BccPay.Core.Sample.API.csproj"
 COPY . .
-WORKDIR "/src/BccPay.Core.Sample.API/"
+WORKDIR "/src/BccPay.Core.Sample/BccPay.Core.Sample.API/"
 ARG DOTNET_CONFIGURATION
 RUN dotnet build "BccPay.Core.Sample.API.csproj" -c $DOTNET_CONFIGURATION -o /app/build
 
