@@ -1,7 +1,7 @@
 ﻿using System;
 using MediatR;
 
-namespace BccPay.Core.Contracts.Notifications
+namespace BccPay.Core.Notifications.Contracts
 {
     public interface IBccPayNotification : INotification
     {

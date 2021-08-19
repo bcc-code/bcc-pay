@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using BccPay.Core.Contracts.Notifications;
 using BccPay.Core.Enums;
-using BccPay.Core.Implementation.Notifications;
+using BccPay.Core.Notifications.Contracts;
 using BccPay.Core.Notifications.Implementation;
 
 namespace BccPay.Core.Domain.Entities

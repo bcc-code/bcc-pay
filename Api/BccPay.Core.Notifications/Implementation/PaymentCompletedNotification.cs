@@ -1,7 +1,7 @@
 ﻿using System;
-using BccPay.Core.Contracts.Notifications;
+using BccPay.Core.Notifications.Contracts;
 
-namespace BccPay.Core.Implementation.Notifications
+namespace BccPay.Core.Notifications.Implementation
 {
     public record PaymentCompletedNotification(Guid PaymentId) : IBccPayNotification
     {

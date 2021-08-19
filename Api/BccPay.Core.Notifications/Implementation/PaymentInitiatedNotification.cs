@@ -1,5 +1,5 @@
 ﻿using System;
-using BccPay.Core.Contracts.Notifications;
+using BccPay.Core.Notifications.Contracts;
 
 namespace BccPay.Core.Notifications.Implementation
 {
