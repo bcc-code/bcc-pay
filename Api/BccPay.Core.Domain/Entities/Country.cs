@@ -2,7 +2,7 @@
 {
     public class Country
     {
-        public static string DefaultCountryCode = "default";
+        public const string DefaultCountryCode = "default";
 
         public static string GetDocumentId(string countryCode) => $"countries/{countryCode}";
 

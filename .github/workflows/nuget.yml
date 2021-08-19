@@ -42,12 +42,14 @@ jobs:
                   dotnet build Api/BccPay.Core.Enums/BccPay.Core.Enums.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
                   dotnet build Api/BccPay.Core.Shared/BccPay.Core.Shared.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
                   dotnet build Api/BccPay.Core.DataAccess/BccPay.Core.DataAccess.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+                  dotnet build Api/BccPay.Core.Notifications/BccPay.Core.Notifications.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
                   dotnet pack Api/BccPay.Core.Domain/BccPay.Core.Domain.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
                   dotnet pack Api/BccPay.Core.Infrastructure/BccPay.Core.Infrastructure.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
                   dotnet pack Api/BccPay.Core.Cqrs/BccPay.Core.Cqrs.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
                   dotnet pack Api/BccPay.Core.Enums/BccPay.Core.Enums.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
                   dotnet pack Api/BccPay.Core.Shared/BccPay.Core.Shared.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
                   dotnet pack Api/BccPay.Core.DataAccess/BccPay.Core.DataAccess.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
+                  dotnet pack Api/BccPay.Core.Notifications/BccPay.Core.Notifications.csproj -c ${{ env.BUILD_CONFIGURATION }} -p:PackageVersion=${{ steps.build_number.outputs.major }}.${{ steps.build_number.outputs.minor }}.${{ steps.build_number.outputs.increment }}
 
             - name: nuget publish
               run: |
@@ -57,3 +59,4 @@ jobs:
                   dotnet nuget push Api/BccPay.Core.Enums/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
                   dotnet nuget push Api/BccPay.Core.Shared/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
                   dotnet nuget push Api/BccPay.Core.DataAccess/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+                  dotnet nuget push Api/BccPay.Core.Notifications/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate

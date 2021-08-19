@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BccPay.Core.Enums\BccPay.Core.Enums.csproj" />
+    <ProjectReference Include="..\..\BccPay.Core.Enums\BccPay.Core.Enums.csproj" />
   </ItemGroup>
 
 </Project>

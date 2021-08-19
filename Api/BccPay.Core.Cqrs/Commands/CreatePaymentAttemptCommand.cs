@@ -72,7 +72,7 @@ namespace BccPay.Core.Cqrs.Commands
         public async Task<IStatusDetails> Handle(CreatePaymentAttemptCommand request, CancellationToken cancellationToken)
         {
             var payment = await _documentSession.LoadAsync<Payment>(
-                        Payment.GetPaymentId(request.PaymentId), cancellationToken)
+                        Payment.GetDocumentId(request.PaymentId), cancellationToken)
                     ?? throw new NotFoundException("Invalid payment ID");
 
             if (payment.PaymentStatus == PaymentStatus.Canceled || payment.PaymentStatus == PaymentStatus.Completed)
@@ -140,14 +140,14 @@ namespace BccPay.Core.Cqrs.Commands
                 PaymentMethod = paymentConfiguration.Settings.PaymentMethod,
                 AttemptStatus = providerResult.IsSuccess ? AttemptStatus.WaitingForCharge : AttemptStatus.RejectedEitherCancelled,
                 IsActive = providerResult.IsSuccess,
-                Created = DateTime.Now,
+                Created = DateTime.UtcNow,
                 StatusDetails = providerResult,
                 CountryCode = countryCode,
                 NotificationAccessToken = paymentRequest.NotificationAccessToken,
                 PaymentProvider = paymentConfiguration.Provider
             };
 
-            payment.Updated = DateTime.Now;
+            payment.Updated = DateTime.UtcNow;
             payment.AddAttempt(new List<Attempt> { attemptToAdd });
             await _documentSession.SaveChangesAsync(cancellationToken);
 

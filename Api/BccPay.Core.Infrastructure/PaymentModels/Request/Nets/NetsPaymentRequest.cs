@@ -1,5 +1,5 @@
-﻿using BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
 
 namespace BccPay.Core.Infrastructure.PaymentModels.Request.Nets
 {
@@ -9,7 +9,7 @@ namespace BccPay.Core.Infrastructure.PaymentModels.Request.Nets
 
         public CheckoutOnCreate Checkout { get; set; }
 
-        public Notifications Notifications { get; set; }
+        public NetsNodes.Notifications Notifications { get; set; }
 
         public List<PaymentMethod> PaymentMethods { get; set; }
     }

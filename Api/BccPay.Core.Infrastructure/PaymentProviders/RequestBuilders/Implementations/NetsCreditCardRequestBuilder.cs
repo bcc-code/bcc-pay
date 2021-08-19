@@ -31,7 +31,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
                 });
             }
 
-            Notifications notifications = new()
+            PaymentModels.NetsNodes.Notifications notifications = new()
             {
                 Webhooks = webhooks
             };

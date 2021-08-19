@@ -1,4 +1,4 @@
-﻿namespace BccPay.Core.Contracts.Requests
+﻿namespace BccPay.Core.Sample.Contracts.Requests
 {
     public class CreatePaymentRequest
     {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
+using BccPay.Core.DataAccess;
 using Microsoft.AspNetCore.Builder;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Indexes;
@@ -17,22 +18,28 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 if (!string.IsNullOrWhiteSpace(options.Settings.CertFilePath))
                     options.Certificate = new X509Certificate2(Convert.FromBase64String(options.Settings.CertFilePath), options.Settings.CertPassword);
+
             });
             services.AddRavenDbAsyncSession();
             services.AddRavenDbSession();
+            services.AddTransient<IDocumentStoreListener, DocumentStoreListener>();
 
             return services;
         }
 
-        public static IApplicationBuilder WarmUpIndexesInRavenDatabase(
+        public static IApplicationBuilder InitRavenDatabase(
             this IApplicationBuilder app, params Assembly[] assembliesWithIndexes)
         {
             var docStore = app.ApplicationServices.GetRequiredService<IDocumentStore>();
             IndexCreation.CreateIndexes(Assembly.GetExecutingAssembly(), docStore);
+
             foreach (Assembly assembly in assembliesWithIndexes)
             {
                 IndexCreation.CreateIndexes(assembly, docStore);
             }
+
+            var documentStoreListener = app.ApplicationServices.GetRequiredService<IDocumentStoreListener>();
+            docStore.OnAfterSaveChanges += documentStoreListener.OnAfterRavenDbSaveChanges;
 
             return app;
         }
