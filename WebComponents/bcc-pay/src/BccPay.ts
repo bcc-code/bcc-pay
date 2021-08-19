@@ -162,7 +162,7 @@ export class BccPay extends LitElement {
               There is an issue with starting payment, please try again later.
             </h5>
           </div>
-          <button class="reload-button" @click="${() => reloadPage()}">
+          <button class="payment-button" @click="${() => reloadPage()}">
             RELOAD
           </button>
         </div>
@@ -171,7 +171,7 @@ export class BccPay extends LitElement {
           <div class="card-subtitle">
             <h5>Payment success</h5>
           </div>
-          <button class="reload-button" @click="${() => closeComponent()}">
+          <button class="payment-button" @click="${() => closeComponent()}">
             Close
           </button>
         </div>
@@ -269,7 +269,7 @@ export class BccPay extends LitElement {
           </div>
 
           <button
-            class="reload-button"
+            class="payment-button"
             @click="${() =>
               startNetsPayment(
                 this.paymentId,
