@@ -7,15 +7,17 @@ using Raven.Client.Documents.Indexes;
 
 namespace BccPay.Core.DataAccess.Indexes
 {
-    public class ProblematicPaymentsIndex : AbstractMultiMapIndexCreationTask<ProblematicPaymentsIndex.Result>
+    public class PaymentsIndex : AbstractMultiMapIndexCreationTask<PaymentsIndex.Result>
     {
-        public ProblematicPaymentsIndex()
+        public PaymentsIndex()
         {
             AddMap<Payment>(payments => from payment in payments
-                                        where payment.Attempts
-                                            .Where(x => x.AttemptStatus == Enums.AttemptStatus.PaymentIsSuccessful).Count() > 1
+                                        let isProblematicPayment = payment.Attempts
+                                            .Where(x => x.AttemptStatus == AttemptStatus.PaymentIsSuccessful)
+                                            .Count() > 1
                                         select new Result
                                         {
+                                            IsProblematicPayment = isProblematicPayment,
                                             PaymentId = payment.PaymentId,
                                             PayerId = payment.PayerId,
                                             Created = payment.Created,
@@ -24,6 +26,7 @@ namespace BccPay.Core.DataAccess.Indexes
                                             CountryCode = payment.CountryCode,
                                             CurrencyCode = payment.CurrencyCode,
                                             Amount = payment.Amount,
+                                            PaymentStatus = payment.PaymentStatus,
                                             Attempts = payment.Attempts.Select(x => new AttemptResult
                                             {
                                                 AttemptStatus = x.AttemptStatus,
@@ -34,11 +37,14 @@ namespace BccPay.Core.DataAccess.Indexes
                                             }).ToList(),
                                         });
 
+            Store(x => x.IsProblematicPayment, FieldStorage.Yes);
             Store(x => x.Attempts, FieldStorage.Yes);
         }
 
         public class Result
         {
+            public bool IsProblematicPayment { get; set; }
+            public PaymentStatus PaymentStatus { get; set; }
             public string CurrencyCode { get; set; }
             public Guid PaymentId { get; set; }
             public string PayerId { get; set; }

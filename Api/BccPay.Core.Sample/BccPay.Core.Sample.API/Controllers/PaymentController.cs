@@ -15,11 +15,16 @@ namespace BccPay.Core.Sample.API.Controllers
     public class PaymentController : BaseController
     {
         [HttpGet("problematic")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProblematicPaymentsResult))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaymentsResults))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetProblematicPayments([FromQuery] int page = 0, int size = 0)
+        public async Task<IActionResult> GetProblematicPayments([FromQuery] PaymentFilters filters)
         {
-            var query = new GetProblematicPaymentsQuery(page, size);
+            var query = new GetPaymentsWithFiltersQuery(filters.Page,
+                filters.Size,
+                filters.From,
+                filters.To,
+                filters.PaymentStatus,
+                filters.IsProblematicPayment);
 
             var result = await Mediator.Send(query);
 
