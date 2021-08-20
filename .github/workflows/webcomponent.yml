@@ -1,7 +1,7 @@
 name: WebComponent build & deploy
 
 on:
-  pull_request:
+  merge:
     branches:
       - main
   workflow_dispatch:
