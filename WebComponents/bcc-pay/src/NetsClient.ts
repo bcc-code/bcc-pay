@@ -15,10 +15,13 @@ export async function startNetsPayment(
   checkoutKey: string
 ): Promise<boolean> {
   const netsButton = document.getElementById('Nets');
-  netsButton!.classList.add('payment-button--loading');
+  if (netsButton) {
+    netsButton!.classList.add('payment-button--loading');
+  }
   const netsPaymentId = await initNetsPayment(paymentId, user, server);
-  netsButton!.classList.remove('payment-button--loading');
-
+  if (netsButton) {
+    netsButton!.classList.remove('payment-button--loading');
+  }
   displayNetsPayment();
 
   if (isDevEnv === true) {

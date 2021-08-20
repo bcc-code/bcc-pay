@@ -37,7 +37,9 @@ export function reloadPage() {
 
 export function closeComponent() {
   const mainElement = document.getElementById('main-div') as HTMLElement;
-  mainElement.style.display = 'none';
+  if (mainElement) {
+    mainElement.style.display = 'none';
+  }
 }
 
 function showErrorPageScreen() {

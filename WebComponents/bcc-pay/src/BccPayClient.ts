@@ -55,10 +55,14 @@ export function enablePossiblePayments(provider: string) {
 
 export function disablePayments() {
   const netsButton = document.getElementById('Nets') as HTMLButtonElement;
-  netsButton.disabled = true;
+  if (netsButton) {
+    netsButton.disabled = true;
+  }
 
   const mollyButton = document.getElementById('Mollie') as HTMLButtonElement;
-  mollyButton.disabled = true;
+  if (netsButton) {
+    mollyButton.disabled = true;
+  }
 }
 
 export async function initPayment(
