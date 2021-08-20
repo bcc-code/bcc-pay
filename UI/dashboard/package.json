@@ -21,7 +21,7 @@
     "@angular/platform-browser-dynamic": "~12.1.2",
     "@angular/router": "~12.1.2",
     "autoprefixer": "^10.3.1",
-    "bcc-pay": "0.0.56",
+    "bcc-pay": "0.0.75",
     "postcss": "^8.3.5",
     "rxjs": "~6.6.0",
     "tslib": "^2.2.0",
