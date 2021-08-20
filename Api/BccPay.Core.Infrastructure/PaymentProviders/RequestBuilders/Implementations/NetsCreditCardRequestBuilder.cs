@@ -27,7 +27,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
                 {
                     Authorization = paymentRequest.NotificationAccessToken,
                     EventName = webhookEvent.Key,
-                    Url = _options.NotificationUrl
+                    Url = _options.NotificationUrl + paymentRequest.PaymentId
                 });
             }
 

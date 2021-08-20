@@ -15,12 +15,14 @@ namespace BccPay.Core.Cqrs.Commands.Webhooks
 {
     public class UpdateNetsPaymentStatusCommand : IRequest<bool>
     {
-        public UpdateNetsPaymentStatusCommand(string accessToken, NetsWebhook webhook)
+        public UpdateNetsPaymentStatusCommand(Guid paymentId, string accessToken, NetsWebhook webhook)
         {
             AccessToken = accessToken;
             Webhook = webhook;
+            PaymentId = paymentId;
         }
 
+        public Guid PaymentId { get; set; }
         public string AccessToken { get; set; }
         public NetsWebhook Webhook { get; set; }
     }
@@ -37,8 +39,8 @@ namespace BccPay.Core.Cqrs.Commands.Webhooks
         public async Task<bool> Handle(UpdateNetsPaymentStatusCommand request, CancellationToken cancellationToken)
         {
             var payment = await _documentSession.LoadAsync<Payment>(
-                    Payment.GetDocumentId(Guid.Parse(request.Webhook.Data.PaymentId)), cancellationToken)
-                ?? throw new NotFoundException("Invalid payment ID");
+                    Payment.GetDocumentId(request.PaymentId), cancellationToken)
+                ?? throw new NotFoundException($"Invalid payment ID {request.PaymentId}");
 
             if (!payment.Attempts.Where(x => x.NotificationAccessToken.Contains(request.AccessToken)).Any())
                 throw new UnauthorizedException();

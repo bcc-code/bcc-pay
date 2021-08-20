@@ -27,7 +27,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
                 Method = new string[] { PaymentMethod.Giropay.ToString().ToLower() },
                 Description = paymentRequest.Description,
                 RedirectUrl = GetRedirectUrl(paymentRequest.IsMobile),
-                WebhookUrl = _options.WebhookUrl + $"/{paymentRequest.PaymentId}",
+                WebhookUrl = _options.WebhookUrl + paymentRequest.PaymentId,
                 Links = new { }
             };
         }
