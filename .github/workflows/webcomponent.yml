@@ -1,9 +1,9 @@
 name: WebComponent build & deploy
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 env:

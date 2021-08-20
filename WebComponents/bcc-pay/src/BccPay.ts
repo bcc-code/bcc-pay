@@ -66,7 +66,13 @@ export class BccPay extends LitElement {
   }
 
   async init() {
-    if (this.paymentId === '' || this.paymentId === undefined) {
+    getPaymentConfigurations(this.country, this.server);
+
+    if (
+      this.paymentId === '' ||
+      this.paymentId === undefined ||
+      this.paymentId === null
+    ) {
       this.paymentId = await initPayment(
         this.currency,
         this.country,
@@ -74,10 +80,11 @@ export class BccPay extends LitElement {
         this.server
       );
     }
-    getPaymentConfigurations(this.country, this.server);
 
     if (this.paymentId === '') {
       displayErrorPage();
+    } else {
+      displayFirstScreen();
     }
 
     if (isDevEnv === true) {
