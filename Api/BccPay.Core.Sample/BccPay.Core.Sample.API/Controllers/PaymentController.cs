@@ -14,8 +14,8 @@ namespace BccPay.Core.Sample.API.Controllers
     [Route("[controller]")]
     public class PaymentController : BaseController
     {
-        [HttpGet("problematic")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaymentsResults))]
+        [HttpGet("filters")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetPaymentWithFiltersResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetProblematicPayments([FromQuery] PaymentFilters filters)
         {

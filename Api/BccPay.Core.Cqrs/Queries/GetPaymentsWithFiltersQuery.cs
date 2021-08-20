@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BccPay.Core.Cqrs.Extensions;
@@ -12,7 +13,7 @@ using Raven.Client.Documents.Session;
 
 namespace BccPay.Core.Cqrs.Queries
 {
-    public class GetPaymentsWithFiltersQuery : IRequest<PaymentsResults>
+    public class GetPaymentsWithFiltersQuery : IRequest<List<GetPaymentWithFiltersResponse>>
     {
         public GetPaymentsWithFiltersQuery(
             int page,
@@ -38,9 +39,19 @@ namespace BccPay.Core.Cqrs.Queries
         public bool? IsProblematicPayment { get; set; }
     }
 
-    public record PaymentsResults(List<PaymentsIndex.Result> Payments);
+    public class GetPaymentWithFiltersResponse
+    {
+        public Guid PaymentId { get; set; }
+        public string PayerId { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime? Updated { get; set; }
+        public string Description { get; set; }
+        public string CountryCode { get; set; }
+        public string Amount { get; set; }
+        public string PaymentMethods { get; set; }
+    }
 
-    public class GetPaymentsWithFiltersQueryHandler : IRequestHandler<GetPaymentsWithFiltersQuery, PaymentsResults>
+    public class GetPaymentsWithFiltersQueryHandler : IRequestHandler<GetPaymentsWithFiltersQuery, List<GetPaymentWithFiltersResponse>>
     {
         private readonly IAsyncDocumentSession _documentSession;
 
@@ -49,7 +60,7 @@ namespace BccPay.Core.Cqrs.Queries
             _documentSession = documentSession;
         }
 
-        public async Task<PaymentsResults> Handle(GetPaymentsWithFiltersQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetPaymentWithFiltersResponse>> Handle(GetPaymentsWithFiltersQuery request, CancellationToken cancellationToken)
         {
             var query = _documentSession.Query<PaymentsIndex.Result, PaymentsIndex>();
 
@@ -63,9 +74,20 @@ namespace BccPay.Core.Cqrs.Queries
                 query = query.Where(x => x.Created >= request.From && x.Created <= request.To);
 
             var result = await query.WithPagination(request.Page, request.Size)
+                .Select(x => new GetPaymentWithFiltersResponse
+                {
+                    Amount = x.Amount + x.CurrencyCode,
+                    CountryCode = x.CountryCode,
+                    Created = x.Created,
+                    Description = x.Description,
+                    PayerId = x.PayerId,
+                    PaymentId = x.PaymentId,
+                    Updated = x.Updated,
+                    PaymentMethods = x.Attempts.Select(x => x.PaymentMethod.ToString()).ToString()
+                })
                 .ToListAsync(token: cancellationToken);
 
-            return new PaymentsResults(result);
+            return result;
         }
     }
 }
