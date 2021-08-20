@@ -1,9 +1,10 @@
 name: WebComponent build & deploy
 
 on:
-  push:
+  pull_request:
     branches:
-      - master
+      - main
+    types: [closed]
   workflow_dispatch:
 
 env:
@@ -12,6 +13,8 @@ env:
 
 jobs:
   build:
+    merge_job:
+      if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Set up Cloud SDK
