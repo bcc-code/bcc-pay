@@ -2,7 +2,8 @@
 FROM node:lts-alpine as build-stage
 WORKDIR /app
 COPY package*.json ./
-RUN npm install bcc-pay
+RUN npm cache verify
+RUN npm install bcc-pay@latest
 RUN npm install -f
 COPY . .
 RUN npm run build

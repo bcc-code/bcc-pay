@@ -4,17 +4,21 @@ import { startNetsPayment } from './NetsClient';
 import { getPaymentConfigurations, initPayment } from './BccPayClient';
 import { User } from './User';
 import {
-  displayChangeUserDataPage,
   displayErrorPage,
-  reload,
-  close,
+  displayFirstScreen,
+  closeComponent,
+  reloadPage,
 } from './ScreenChange';
 import { RequestHeader } from './RequestHeader';
 import { startMolliePayment } from './MollieClient';
-import { Spinner, SpinnerShow, SpinnerHide } from './Spinner';
 
 export let isDevEnv: boolean;
 export let requestHeaders: [RequestHeader] | undefined;
+export let country: string;
+export let mollieUrl: string;
+export let primaryColor: string;
+export let secondaryColor: string;
+export let accentColor: string;
 
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
@@ -29,12 +33,17 @@ export class BccPay extends LitElement {
     | [RequestHeader]
     | undefined;
   @property({ type: String }) paymentId: string = '';
-
-  @property({ type: String }) mollieUrl: string = '';
+  @property({ type: String }) primaryColor: string = '#006fc2';
+  @property({ type: String }) secondaryColor: string = 'white';
+  @property({ type: String }) accentColor: string = '#bae1ff';
 
   loadNestScript() {
     isDevEnv = this.isDevEnv;
     requestHeaders = this.requestHeaders;
+    country = this.country;
+    primaryColor = this.primaryColor;
+    secondaryColor = this.secondaryColor;
+    accentColor = this.accentColor;
 
     let nestScript = document.createElement('script');
     if (isDevEnv === true) {
@@ -57,8 +66,6 @@ export class BccPay extends LitElement {
   }
 
   async init() {
-    getPaymentConfigurations(this.country, this.server);
-
     if (this.paymentId === '' || this.paymentId === undefined) {
       this.paymentId = await initPayment(
         this.currency,
@@ -67,6 +74,7 @@ export class BccPay extends LitElement {
         this.server
       );
     }
+    getPaymentConfigurations(this.country, this.server);
 
     if (this.paymentId === '') {
       displayErrorPage();
@@ -78,14 +86,13 @@ export class BccPay extends LitElement {
   }
 
   async initMolliePayment() {
-    this.mollieUrl = await startMolliePayment(
+    mollieUrl = await startMolliePayment(
       this.paymentId,
       this.user,
-      this.server,
-      this.netsCheckoutKey
+      this.server
     );
 
-    if (this.mollieUrl !== '') {
+    if (mollieUrl !== '' || mollieUrl !== null || mollieUrl !== undefined) {
       const mollyButton = document.getElementById(
         'mollie-payment-button'
       ) as HTMLButtonElement;
@@ -99,7 +106,7 @@ export class BccPay extends LitElement {
         ${this.loadNestScript()} ${this.applyCssStyles()} ${this.init()}
       </div>
       <div class="card-square" id="main-div">
-        <div id="first-screen">
+        <div id="first-screen" class="screen">
           <div class="card-subtitle">
             <h5>you are paying for</h5>
           </div>
@@ -138,66 +145,53 @@ export class BccPay extends LitElement {
                 this.netsCheckoutKey
               )}"
           >
-            PAY WITH NETS
+            <span class="payment-button-text">CREDIT CARD</span>
           </button>
           <button
             id="Mollie"
             class="payment-button"
             @click="${() => this.initMolliePayment()}"
           >
-            PAY WITH MOLLIE
+            <span class="payment-button-text">GIROPAY</span>
           </button>
         </div>
 
-        <div id="payment-error-screen" style="display: none">
+        <div id="payment-error-screen" class="screen" style="display: none">
           <div class="card-subtitle">
             <h5>
               There is an issue with starting payment, please try again later.
             </h5>
           </div>
-          <button class="reload-button" @click="${() => reload()}">
+          <button class="payment-button" @click="${() => reloadPage()}">
             RELOAD
           </button>
         </div>
 
-        <div id="payment-completed-screen" style="display: none">
+        <div id="payment-completed-screen" class="screen" style="display: none">
           <div class="card-subtitle">
             <h5>Payment success</h5>
           </div>
-          <button class="reload-button" @click="${() => close()}">Close</button>
+          <button class="payment-button" @click="${() => closeComponent()}">
+            Close
+          </button>
         </div>
 
-        <div id="nets-payment-screen" style="display: none">
+        <div id="nets-payment-screen" class="screen" style="display: none">
           <div class="card-subtitle">
-            <h5 id="payment-issue">
-              Issue with payment?
+            <h5 id="payment-provider-change">
+              Other payment method?
               <button
                 class="link-button"
-                @click="${() => displayChangeUserDataPage()}"
+                @click="${() => displayFirstScreen()}"
               >
-                Edit personal data
+                Change provider
               </button>
             </h5>
           </div>
           <div id="checkout-container-div"></div>
         </div>
 
-        <div id="mollie-payment-screen" style="display: none">
-          <div class="card-subtitle">
-            <h5>Mollie payment</h5>
-          </div>
-
-          <button
-            id="mollie-payment-button"
-            class="payment-button"
-            @click="${() => window.open(this.mollieUrl)}"
-            disabled
-          >
-            Open Mollie payment page
-          </button>
-        </div>
-
-        <div id="change-user-data-screen" style="display: none">
+        <div id="change-user-data-screen" class="screen" style="display: none">
           <div class="card-subtitle">
             <h5>Changing user data:</h5>
           </div>
@@ -275,7 +269,7 @@ export class BccPay extends LitElement {
           </div>
 
           <button
-            class="reload-button"
+            class="payment-button"
             @click="${() =>
               startNetsPayment(
                 this.paymentId,

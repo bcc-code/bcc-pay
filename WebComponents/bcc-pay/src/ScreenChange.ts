@@ -1,49 +1,125 @@
 export function displayErrorPage() {
-  const firstScreenElement = document.getElementById(
-    'first-screen'
-  ) as HTMLElement;
-  firstScreenElement.style.display = 'none';
+  hideFirstScreen();
+  hideNetsPaymentScreen();
+  showErrorPageScreen();
+}
 
+export function displayChangeUserDataPage() {
+  hideNetsPaymentScreen();
+  clearNetsIframe();
+  showChangeUserDataScreen();
+}
+
+export function displayNetsPayment() {
+  hideFirstScreen();
+  showNetsPaymentScreen();
+}
+
+export function displayMolliePayment() {
+  hideFirstScreen();
+  hideNetsPaymentScreen();
+}
+
+export function displayFirstScreen() {
+  hideNetsPaymentScreen();
+  hideErrorPageScreen();
+  showFirstScreen();
+}
+
+export function paymentCompleted() {
+  hidePaymentProviderChangeElement();
+  showPaymentCompletedScreen();
+}
+
+export function reloadPage() {
+  window.location.reload();
+}
+
+export function closeComponent() {
+  const mainElement = document.getElementById('main-div') as HTMLElement;
+  mainElement.style.display = 'none';
+}
+
+function showErrorPageScreen() {
   const errorScreenElement = document.getElementById(
     'payment-error-screen'
   ) as HTMLElement;
   errorScreenElement.style.display = 'block';
 }
 
-export function displayChangeUserDataPage() {
+function hideErrorPageScreen() {
   const errorScreenElement = document.getElementById(
-    'nets-payment-screen'
+    'payment-error-screen'
   ) as HTMLElement;
   errorScreenElement.style.display = 'none';
+}
 
-  const checkoutElement = document.getElementById(
-    'checkout-container-div'
+function showNetsPaymentScreen() {
+  const netsScreenElement = document.getElementById(
+    'nets-payment-screen'
   ) as HTMLElement;
-  checkoutElement.innerHTML = '';
+  netsScreenElement.style.display = 'block';
+}
 
+function hideNetsPaymentScreen() {
+  const netsScreenElement = document.getElementById(
+    'nets-payment-screen'
+  ) as HTMLElement;
+  netsScreenElement.style.display = 'none';
+}
+
+function showFirstScreen() {
+  const firstScreenElement = document.getElementById(
+    'first-screen'
+  ) as HTMLElement;
+  firstScreenElement.style.display = 'block';
+}
+
+function hideFirstScreen() {
+  const firstScreenElement = document.getElementById(
+    'first-screen'
+  ) as HTMLElement;
+  firstScreenElement.style.display = 'none';
+}
+
+function showChangeUserDataScreen() {
   const changeUserDataElement = document.getElementById(
     'change-user-data-screen'
   ) as HTMLElement;
   changeUserDataElement.style.display = 'block';
 }
 
-export function paymentCompleted() {
-  const errorScreenElement = document.getElementById(
-    'payment-issue'
+function hideChangeUserDataScreen() {
+  const changeUserDataElement = document.getElementById(
+    'change-user-data-screen'
   ) as HTMLElement;
-  errorScreenElement.style.display = 'none';
+  changeUserDataElement.style.display = 'none';
+}
 
+function showPaymentCompletedScreen() {
   const paymentCompletedElement = document.getElementById(
     'payment-completed-screen'
   ) as HTMLElement;
   paymentCompletedElement.style.display = 'block';
 }
 
-export function reload() {
-  window.location.reload();
+function hidePaymentCompletedScreen() {
+  const paymentCompletedElement = document.getElementById(
+    'payment-completed-screen'
+  ) as HTMLElement;
+  paymentCompletedElement.style.display = 'none';
 }
 
-export function close() {
-  const mainElement = document.getElementById('main-div') as HTMLElement;
-  mainElement.style.display = 'none';
+function hidePaymentProviderChangeElement() {
+  const paymentProviderChangeElement = document.getElementById(
+    'payment-provider-change'
+  ) as HTMLElement;
+  paymentProviderChangeElement.style.display = 'none';
+}
+
+function clearNetsIframe() {
+  const checkoutElement = document.getElementById(
+    'checkout-container-div'
+  ) as HTMLElement;
+  checkoutElement.innerHTML = '';
 }

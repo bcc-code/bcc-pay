@@ -16,7 +16,6 @@ export async function getPaymentConfigurations(
 
   try {
     disablePayments();
-
     const url = `${server}/payment-configurations?countryCode=${country}`;
     await fetch(url, {
       method: 'GET',
@@ -86,6 +85,7 @@ export async function initPayment(
   }
 
   try {
+    disablePayments();
     await fetch(`${server}/Payment`, {
       method: 'POST',
       body: JSON.stringify(body),
@@ -95,6 +95,7 @@ export async function initPayment(
       .then(json => {
         paymentId = json.paymentId;
       });
+
     return paymentId;
   } catch (e) {
     return '';

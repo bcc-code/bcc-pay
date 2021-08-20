@@ -1,6 +1,10 @@
 import { User } from './User';
-import { isDevEnv, requestHeaders } from './BccPay';
-import { displayErrorPage, paymentCompleted } from './ScreenChange';
+import { country, isDevEnv, requestHeaders } from './BccPay';
+import {
+  displayErrorPage,
+  paymentCompleted,
+  displayNetsPayment,
+} from './ScreenChange';
 
 var checkout: any;
 
@@ -10,27 +14,22 @@ export async function startNetsPayment(
   server: string,
   checkoutKey: string
 ): Promise<boolean> {
-  const firstScreenElement = document.getElementById(
-    'first-screen'
-  ) as HTMLElement;
-  firstScreenElement.style.display = 'none';
-
-  const changeUserDataScreenElement = document.getElementById(
-    'change-user-data-screen'
-  ) as HTMLElement;
-  changeUserDataScreenElement.style.display = 'none';
-
-  const netsScreenElement = document.getElementById(
-    'nets-payment-screen'
-  ) as HTMLElement;
-  netsScreenElement.style.display = 'block';
-
+  const netsButton = document.getElementById('Nets');
+  netsButton!.classList.add('payment-button--loading');
   const netsPaymentId = await initNetsPayment(paymentId, user, server);
+  netsButton!.classList.remove('payment-button--loading');
+
+  displayNetsPayment();
+
   if (isDevEnv === true) {
     console.log('Nets payment id is: ' + netsPaymentId);
   }
 
-  if (netsPaymentId === null || netsPaymentId === undefined) {
+  if (
+    netsPaymentId === null ||
+    netsPaymentId === undefined ||
+    netsPaymentId === ''
+  ) {
     displayErrorPage();
     return false;
   }
@@ -42,6 +41,7 @@ export async function initNetsPayment(
   user: User,
   server: string
 ): Promise<string> {
+  console.log('Nets payment country: ' + country);
   const body = {
     paymentConfigurationId: 'nets-cc-nok',
     email: user.email === null ? undefined : user.email,
@@ -52,6 +52,7 @@ export async function initNetsPayment(
     addressLine2: user.addressLine2 === null ? undefined : user.addressLine2,
     city: user.city === null ? undefined : user.city,
     postalCode: user.postalCode === null ? undefined : user.postalCode,
+    countryCode: country,
   };
 
   const fetchHeaders = new Headers();

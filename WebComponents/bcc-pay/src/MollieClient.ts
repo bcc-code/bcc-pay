@@ -1,39 +1,31 @@
 import { User } from './User';
-import { isDevEnv, requestHeaders } from './BccPay';
-import { displayErrorPage, paymentCompleted } from './ScreenChange';
-
-var checkout: any;
+import { country, isDevEnv, requestHeaders } from './BccPay';
+import { displayErrorPage } from './ScreenChange';
 
 export async function startMolliePayment(
   paymentId: string,
   user: User,
-  server: string,
-  checkoutKey: string
+  server: string
 ): Promise<string> {
-  const firstScreenElement = document.getElementById(
-    'first-screen'
-  ) as HTMLElement;
-  firstScreenElement.style.display = 'none';
-
-  const changeUserDataScreenElement = document.getElementById(
-    'change-user-data-screen'
-  ) as HTMLElement;
-  changeUserDataScreenElement.style.display = 'none';
-
-  const netsScreenElement = document.getElementById(
-    'mollie-payment-screen'
-  ) as HTMLElement;
-  netsScreenElement.style.display = 'block';
+  const mollieButton = document.getElementById('Mollie');
+  mollieButton!.classList.add('payment-button--loading');
 
   const mollieCheckoutUrl = await initMolliePayment(paymentId, user, server);
   if (isDevEnv === true) {
     console.log('Mollie checkoutUrl is: ' + mollieCheckoutUrl);
   }
 
-  if (mollieCheckoutUrl === null || mollieCheckoutUrl === '') {
+  if (
+    mollieCheckoutUrl === null ||
+    mollieCheckoutUrl === '' ||
+    mollieCheckoutUrl === undefined
+  ) {
     displayErrorPage();
     return '';
   }
+
+  mollieButton!.classList.remove('payment-button--loading');
+  window.open(mollieCheckoutUrl, '_system');
 
   return mollieCheckoutUrl;
 }
@@ -53,6 +45,7 @@ export async function initMolliePayment(
     addressLine2: user.addressLine2 === null ? undefined : user.addressLine2,
     city: user.city === null ? undefined : user.city,
     postalCode: user.postalCode === null ? undefined : user.postalCode,
+    countryCode: country,
   };
 
   const fetchHeaders = new Headers();
@@ -77,9 +70,6 @@ export async function initMolliePayment(
   } catch (e) {
     displayErrorPage();
   }
+  if (mollieCheckoutUrl === undefined) displayErrorPage();
   return mollieCheckoutUrl;
-}
-
-export async function cleanupNetsPayment() {
-  checkout.cleanup();
 }
