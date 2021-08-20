@@ -14,7 +14,7 @@ namespace BccPay.Core.Sample.API.Controllers
         [HttpPost("mollie/status/{paymentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateMolliePaymentStatus([FromRoute] string paymentId, [FromBody] MollieWebhook request)
+        public async Task<IActionResult> UpdateMolliePaymentStatus([FromRoute] Guid paymentId, [FromBody] MollieWebhook request)
         {
             var result = await Mediator.Send(new UpdateMolliePaymentStatusCommand(request, paymentId));
 
