@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using BccPay.Core.Sample.Contracts.Requests;
-using BccPay.Core.Sample.Contracts.Responses;
 using BccPay.Core.Cqrs.Commands;
 using BccPay.Core.Cqrs.Queries;
+using BccPay.Core.Sample.Contracts.Requests;
+using BccPay.Core.Sample.Contracts.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -14,6 +14,23 @@ namespace BccPay.Core.Sample.API.Controllers
     [Route("[controller]")]
     public class PaymentController : BaseController
     {
+        [HttpGet("filtered")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetPaymentWithFiltersResponse))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetProblematicPayments([FromQuery] PaymentFilters filters)
+        {
+            var query = new GetPaymentsWithFiltersQuery(filters.Page,
+                filters.Size,
+                filters.From,
+                filters.To,
+                filters.PaymentStatus,
+                filters.IsProblematicPayment);
+
+            var result = await Mediator.Send(query);
+
+            return Ok(result);
+        }
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaymentsResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
