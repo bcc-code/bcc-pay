@@ -166,9 +166,8 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                      {
                          Amount = Convert.ToInt32(payment.Amount * 100)
                      });
-                // ?? throw new InvalidPaymentException();
 
-                //netsStatusDetails.InvoiceId = invoice?.Invoice?.InvoiceNumber;
+                netsStatusDetails.InvoiceId = invoice?.Invoice?.InvoiceNumber;
             }
             catch (ApiException exception)
             { }
