@@ -7,6 +7,7 @@ using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Dtos;
+using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations;
 using BccPay.Core.Infrastructure.RefitClients;
@@ -153,6 +154,26 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
         {
             throw new NotImplementedException();
         }
+
+        public async Task ChargePayment(Payment payment, Attempt attempt)
+        {
+            var netsStatusDetails = (NetsStatusDetails)attempt.StatusDetails;
+            try
+            {
+                var invoice = await _netsClient.ChargePayment(_headers,
+                     netsStatusDetails.PaymentCheckoutId,
+                     new NetsChargeRequest
+                     {
+                         Amount = Convert.ToInt32(payment.Amount * 100)
+                     });
+                // ?? throw new InvalidPaymentException();
+
+                //netsStatusDetails.InvoiceId = invoice?.Invoice?.InvoiceNumber;
+            }
+            catch (ApiException exception)
+            { }
+        }
+
         private INetsPaymentRequestBuilder CreateRequestBuilder(PaymentSettings settings)
         {
             // create a builder depending on the settings
