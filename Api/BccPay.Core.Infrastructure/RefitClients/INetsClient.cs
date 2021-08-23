@@ -13,7 +13,10 @@ namespace BccPay.Core.Infrastructure.RefitClients
         Task<NetsCreatePaymentResponse> CreatePaymentAsync([HeaderCollection] IDictionary<string, string> headers, [Body] NetsPaymentRequest payment);
 
         [Get("/v1/payments/{paymentId}")]
-        Task<NetsRetrievePaymentResponse> RetrievePayment([HeaderCollection] IDictionary<string, string> headers, [Query] string paymentId);
+        Task<NetsRetrievePaymentResponse> RetrievePayment([HeaderCollection] IDictionary<string, string> headers, [AliasAs("paymentId")] string paymentId);
+
+        [Post("/v1/payments/{paymentId}/charges")]
+        Task<NetsChargeResponse> ChargePayment([HeaderCollection] IDictionary<string, string> headers, [AliasAs("paymentId")] string paymentId, [Body] NetsChargeRequest chargeRequest);
 
         [Put("/v1/payments/{paymentId}/terminate")]
         Task<HttpResponseMessage> TerminatePayment([HeaderCollection] IDictionary<string, string> headers, [AliasAs("paymentId")] string paymentId);

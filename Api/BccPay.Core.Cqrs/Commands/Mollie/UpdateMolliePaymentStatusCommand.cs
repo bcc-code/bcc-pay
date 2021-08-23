@@ -15,7 +15,7 @@ using BccPay.Core.Infrastructure.PaymentProviders;
 using MediatR;
 using Raven.Client.Documents.Session;
 
-namespace BccPay.Core.Cqrs.Commands.Webhooks
+namespace BccPay.Core.Cqrs.Commands.Mollie
 {
     public class UpdateMolliePaymentStatusCommand : IRequest<bool>
     {
@@ -58,7 +58,7 @@ namespace BccPay.Core.Cqrs.Commands.Webhooks
 
             var paymentResponse = await provider.GetPayment(request.Webhook.Id);
 
-            var mollieStatusDetails = ReverseAbstraction<MollieStatusDetails, IStatusDetails>.GetImplementationFromAbstraction(actualAttempt.StatusDetails);
+            var mollieStatusDetails = (MollieStatusDetails)actualAttempt.StatusDetails;
 
             if (mollieStatusDetails.MolliePaymentId != request.Webhook.Id)
                 throw new InvalidPaymentException("Invalid mollie payment id");

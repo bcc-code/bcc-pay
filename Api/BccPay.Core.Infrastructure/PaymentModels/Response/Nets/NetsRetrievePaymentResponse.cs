@@ -5,6 +5,11 @@ namespace BccPay.Core.Infrastructure.PaymentModels.Response.Nets
 {
     public class NetsRetrievePaymentResponse
     {
+        public NetsPayment Payment { get; set; }
+    }
+
+    public class NetsPayment
+    {
         public string PaymentId { get; set; }
         public Summary Summary { get; set; }
         public Consumer Consumer { get; set; }

@@ -10,6 +10,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders
     {
         public PaymentProvider PaymentProvider { get; }
 
+        Task ChargePayment(Payment payment, Attempt attempt);
         Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSettings settings);
         Task<IPaymentResponse> GetPayment(string paymentId);
         Task<AttemptCancellationResult> TryCancelPreviousPaymentAttempt(Attempt attempt);
