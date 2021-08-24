@@ -41,11 +41,11 @@ namespace BccPay.Core.Sample
                 options.Nets.CheckoutPageUrl = "/";
                 options.Nets.TermsUrl = "http://localhost:8000";
                 options.Nets.SecretKey = Configuration["NetsSecretKey"];
-                options.Nets.NotificationUrl = "https://localhost:5001/Payment/webhook";
+                options.Nets.NotificationUrl = "https://localhost:5001/Payment/webhook/";
                 options.Mollie.BaseAddress = "https://api.mollie.com";
                 options.Mollie.AuthToken = Configuration["MollieSecretKey"];
                 options.Mollie.RedirectUrl = "https://test.api.samvirk.com/redirect";
-                options.Mollie.WebhookUrl = "https://en46nkjh5kbngpp.m.pipedream.net";
+                options.Mollie.WebhookUrl = "https://en46nkjh5kbngpp.m.pipedream.net/";
                 options.Mollie.RedirectUrlMobileApp = "com.ionic.samvirk://overview";
                 options.Mollie.RateMarkup = 0.015M;
                 options.Fixer.BaseAddress = "https://data.fixer.io";

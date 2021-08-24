@@ -11,7 +11,6 @@ using BccPay.Core.Infrastructure.PaymentModels.Response.Mollie;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations;
 using BccPay.Core.Infrastructure.RefitClients;
-using Raven.Client.Documents.Operations.Backups;
 using Refit;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
@@ -174,6 +173,11 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
                 { PaymentMethod: PaymentMethod.Giropay } => new MollieGiropayRequestBuilder(_options),
                 _ => throw new NotImplementedException()
             };
+        }
+
+        public Task ChargePayment(Payment payment, Attempt attempt)
+        {
+            throw new NotImplementedException();
         }
     }
 }

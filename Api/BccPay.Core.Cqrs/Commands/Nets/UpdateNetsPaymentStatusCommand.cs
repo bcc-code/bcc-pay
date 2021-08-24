@@ -6,21 +6,23 @@ using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Exceptions;
-using BccPay.Core.Infrastructure.Helpers;
 using BccPay.Core.Infrastructure.PaymentModels.Webhooks;
+using BccPay.Core.Infrastructure.PaymentProviders;
 using MediatR;
 using Raven.Client.Documents.Session;
 
-namespace BccPay.Core.Cqrs.Commands.Webhooks
+namespace BccPay.Core.Cqrs.Commands.Nets
 {
     public class UpdateNetsPaymentStatusCommand : IRequest<bool>
     {
-        public UpdateNetsPaymentStatusCommand(string accessToken, NetsWebhook webhook)
+        public UpdateNetsPaymentStatusCommand(Guid paymentId, string accessToken, NetsWebhook webhook)
         {
             AccessToken = accessToken;
             Webhook = webhook;
+            PaymentId = paymentId;
         }
 
+        public Guid PaymentId { get; set; }
         public string AccessToken { get; set; }
         public NetsWebhook Webhook { get; set; }
     }
@@ -28,17 +30,20 @@ namespace BccPay.Core.Cqrs.Commands.Webhooks
     public class UpdateNetsPaymentAttemptCommandHandler : IRequestHandler<UpdateNetsPaymentStatusCommand, bool>
     {
         private readonly IAsyncDocumentSession _documentSession;
+        private readonly IPaymentProviderFactory _paymentProviderFactory;
 
-        public UpdateNetsPaymentAttemptCommandHandler(IAsyncDocumentSession documentSession)
+        public UpdateNetsPaymentAttemptCommandHandler(IAsyncDocumentSession documentSession,
+            IPaymentProviderFactory paymentProviderFactory)
         {
             _documentSession = documentSession;
+            _paymentProviderFactory = paymentProviderFactory;
         }
 
         public async Task<bool> Handle(UpdateNetsPaymentStatusCommand request, CancellationToken cancellationToken)
         {
             var payment = await _documentSession.LoadAsync<Payment>(
-                    Payment.GetDocumentId(Guid.Parse(request.Webhook.Data.PaymentId)), cancellationToken)
-                ?? throw new NotFoundException("Invalid payment ID");
+                    Payment.GetDocumentId(request.PaymentId), cancellationToken)
+                ?? throw new NotFoundException($"Invalid payment ID {request.PaymentId}");
 
             if (!payment.Attempts.Where(x => x.NotificationAccessToken.Contains(request.AccessToken)).Any())
                 throw new UnauthorizedException();
@@ -61,9 +66,15 @@ namespace BccPay.Core.Cqrs.Commands.Webhooks
                 _ => actualAttempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled,
             };
 
-            var statusDetails = ReverseAbstraction<NetsStatusDetails, IStatusDetails>.GetImplementationFromAbstraction(actualAttempt.StatusDetails);
+            var statusDetails = (NetsStatusDetails)actualAttempt.StatusDetails;
             statusDetails.WebhookStatus = webhookStatus;
-            actualAttempt.StatusDetails = statusDetails;
+
+            if (webhookEvent == PaymentProviderConstants.Nets.Webhooks.CheckoutCompleted)
+            {
+                var provider = _paymentProviderFactory.GetPaymentProvider(PaymentProvider.Nets);
+
+                await provider.ChargePayment(payment, actualAttempt);
+            }
 
             payment.UpdateAttempt(actualAttempt);
             await _documentSession.SaveChangesAsync(cancellationToken);

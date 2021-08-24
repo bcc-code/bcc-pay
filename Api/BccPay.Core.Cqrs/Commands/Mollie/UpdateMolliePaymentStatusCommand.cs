@@ -15,17 +15,17 @@ using BccPay.Core.Infrastructure.PaymentProviders;
 using MediatR;
 using Raven.Client.Documents.Session;
 
-namespace BccPay.Core.Cqrs.Commands.Webhooks
+namespace BccPay.Core.Cqrs.Commands.Mollie
 {
     public class UpdateMolliePaymentStatusCommand : IRequest<bool>
     {
-        public UpdateMolliePaymentStatusCommand(MollieWebhook webhook, string paymentId)
+        public UpdateMolliePaymentStatusCommand(MollieWebhook webhook, Guid paymentId)
         {
             PaymentId = paymentId;
             Webhook = webhook;
         }
 
-        public string PaymentId { get; set; }
+        public Guid PaymentId { get; set; }
         public MollieWebhook Webhook { get; set; }
     }
 
@@ -46,8 +46,8 @@ namespace BccPay.Core.Cqrs.Commands.Webhooks
         public async Task<bool> Handle(UpdateMolliePaymentStatusCommand request, CancellationToken cancellationToken)
         {
             var payment = await _documentSession.LoadAsync<Payment>(
-                    Payment.GetDocumentId(Guid.Parse(request.PaymentId)), cancellationToken)
-                ?? throw new NotFoundException("Invalid payment ID");
+                    Payment.GetDocumentId(request.PaymentId), cancellationToken)
+                ?? throw new NotFoundException($"Invalid payment ID {request.PaymentId}");
 
             var actualAttempt = payment.Attempts
                     .OrderByDescending(x => x.Created)
@@ -58,7 +58,7 @@ namespace BccPay.Core.Cqrs.Commands.Webhooks
 
             var paymentResponse = await provider.GetPayment(request.Webhook.Id);
 
-            var mollieStatusDetails = ReverseAbstraction<MollieStatusDetails, IStatusDetails>.GetImplementationFromAbstraction(actualAttempt.StatusDetails);
+            var mollieStatusDetails = (MollieStatusDetails)actualAttempt.StatusDetails;
 
             if (mollieStatusDetails.MolliePaymentId != request.Webhook.Id)
                 throw new InvalidPaymentException("Invalid mollie payment id");
