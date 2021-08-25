@@ -25,7 +25,8 @@ export async function startMolliePayment(
   }
 
   mollieButton!.classList.remove('payment-button--loading');
-  window.open(mollieCheckoutUrl, '_system');
+  // window.location.replace(mollieCheckoutUrl);
+  window.open(mollieCheckoutUrl, '_self');
 
   return mollieCheckoutUrl;
 }
