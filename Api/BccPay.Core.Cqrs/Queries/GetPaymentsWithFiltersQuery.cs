@@ -13,7 +13,7 @@ using Raven.Client.Documents.Session;
 
 namespace BccPay.Core.Cqrs.Queries
 {
-    public class GetPaymentsWithFiltersQuery : IRequest<List<GetPaymentWithFiltersResponse>>
+    public class GetPaymentsWithFiltersQuery : IRequest<GetPaymentWithFiltersResponse>
     {
         public GetPaymentsWithFiltersQuery(
             int page,
@@ -41,6 +41,12 @@ namespace BccPay.Core.Cqrs.Queries
 
     public class GetPaymentWithFiltersResponse
     {
+        public List<PaymentResponse> Payments { get; set; }
+        public int AmountOfObjects { get; set; }
+    }
+
+    public class PaymentResponse
+    {
         public Guid PaymentId { get; set; }
         public string PayerId { get; set; }
         public DateTime Created { get; set; }
@@ -51,7 +57,7 @@ namespace BccPay.Core.Cqrs.Queries
         public string PaymentMethods { get; set; }
     }
 
-    public class GetPaymentsWithFiltersQueryHandler : IRequestHandler<GetPaymentsWithFiltersQuery, List<GetPaymentWithFiltersResponse>>
+    public class GetPaymentsWithFiltersQueryHandler : IRequestHandler<GetPaymentsWithFiltersQuery, GetPaymentWithFiltersResponse>
     {
         private readonly IAsyncDocumentSession _documentSession;
 
@@ -60,7 +66,7 @@ namespace BccPay.Core.Cqrs.Queries
             _documentSession = documentSession;
         }
 
-        public async Task<List<GetPaymentWithFiltersResponse>> Handle(GetPaymentsWithFiltersQuery request, CancellationToken cancellationToken)
+        public async Task<GetPaymentWithFiltersResponse> Handle(GetPaymentsWithFiltersQuery request, CancellationToken cancellationToken)
         {
             var query = _documentSession.Query<PaymentsIndex.Result, PaymentsIndex>();
 
@@ -74,7 +80,7 @@ namespace BccPay.Core.Cqrs.Queries
                 query = query.Where(x => x.Created >= request.From && x.Created <= request.To);
 
             var result = await query.WithPagination(request.Page, request.Size)
-                .Select(x => new GetPaymentWithFiltersResponse
+                .Select(x => new PaymentResponse
                 {
                     Amount = x.Amount + x.CurrencyCode,
                     CountryCode = x.CountryCode,
@@ -84,10 +90,15 @@ namespace BccPay.Core.Cqrs.Queries
                     PaymentId = x.PaymentId,
                     Updated = x.Updated,
                     PaymentMethods = x.Attempts.Select(x => x.PaymentMethod.ToString()).ToString()
-                })
-                .ToListAsync(token: cancellationToken);
+                }).ToListAsync(token: cancellationToken);
 
-            return result;
+            var amountOfObjects = await query.Distinct().CountAsync(cancellationToken);
+
+            return new GetPaymentWithFiltersResponse
+            {
+                Payments = result,
+                AmountOfObjects = amountOfObjects
+            };
         }
     }
 }

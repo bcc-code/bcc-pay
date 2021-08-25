@@ -44,6 +44,14 @@ namespace BccPay.Core.Domain.Entities
             Description = description;
         }
 
+        public void ResolveProblematicPayment()
+        {
+            Updated = DateTime.UtcNow;
+            PaymentStatus = PaymentStatus.Refunded;
+
+            Notifications.Add(new ProblematicPaymentRefundedNotification(PaymentId));
+        }
+
         public void UpdatePaymentStatus(PaymentStatus paymentProgress)
         {
             if (paymentProgress == PaymentStatus.Canceled || paymentProgress == PaymentStatus.Completed)

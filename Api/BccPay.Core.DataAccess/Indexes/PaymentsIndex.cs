@@ -15,6 +15,7 @@ namespace BccPay.Core.DataAccess.Indexes
                                         let isProblematicPayment = payment.Attempts
                                             .Where(x => x.AttemptStatus == AttemptStatus.PaymentIsSuccessful)
                                             .Count() > 1
+                                        where payment.PaymentStatus != PaymentStatus.Refunded
                                         select new Result
                                         {
                                             IsProblematicPayment = isProblematicPayment,

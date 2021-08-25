@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using BccPay.Core.Cqrs.Commands;
 using BccPay.Core.Cqrs.Queries;
@@ -15,7 +16,7 @@ namespace BccPay.Core.Sample.API.Controllers
     public class PaymentController : BaseController
     {
         [HttpGet("filtered")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetPaymentWithFiltersResponse))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PageResult<List<PaymentResponse>>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetProblematicPayments([FromQuery] PaymentFilters filters)
         {
@@ -28,7 +29,12 @@ namespace BccPay.Core.Sample.API.Controllers
 
             var result = await Mediator.Send(query);
 
-            return Ok(result);
+            return Ok(new PageResult<List<PaymentResponse>>
+            {
+                AmountOfObjects = result.AmountOfObjects,
+                AmountOfPages = filters.Size == 0 ? 1 : result.AmountOfObjects / filters.Size,
+                Data = result.Payments
+            });
         }
 
         [HttpGet]
