@@ -46,7 +46,7 @@ namespace BccPay.Core.Domain.Entities
 
         public void ResolveProblematicPayment()
         {
-            PaymentStatus = PaymentStatus.Refunded;
+            PaymentStatus = PaymentStatus.RefundedAndClosed;
 
             foreach (Attempt concreteAttempt in Attempts)
             {

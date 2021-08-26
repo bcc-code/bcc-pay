@@ -5,6 +5,6 @@
         Open,
         Canceled,
         Completed,
-        Refunded
+        RefundedAndClosed
     }
 }
