@@ -87,6 +87,13 @@ namespace BccPay.Core.Cqrs.Commands.Mollie
                 {
                     mollieStatusDetails.Errors = new List<string> { molliePaymentResponse.Error };
                 }
+
+                // NOTE: mollie removed "refund" status and force to check other
+                // properties like "amountRefunded" to know, that Refund is triggered
+                if (IsAmountValueGreaterThanZero(molliePaymentResponse.AmountRefunded?.Value))
+                {
+                    actualAttempt.AttemptStatus = AttemptStatus.RefundedSucceeded;
+                }
             }
 
             actualAttempt.StatusDetails = mollieStatusDetails;
@@ -94,6 +101,15 @@ namespace BccPay.Core.Cqrs.Commands.Mollie
             await _documentSession.SaveChangesAsync(cancellationToken);
 
             return true;
+        }
+
+        private static bool IsAmountValueGreaterThanZero(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return false;
+            if (decimal.TryParse(value, out decimal result))
+                return result > 0;
+            return false;
         }
     }
 }
