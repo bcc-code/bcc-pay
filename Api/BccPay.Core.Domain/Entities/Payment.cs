@@ -82,6 +82,11 @@ namespace BccPay.Core.Domain.Entities
             attemptToUpdate = attempt;
             var paymentStatus = PaymentStatus;
 
+            if (attempt.AttemptStatus == AttemptStatus.Processing)
+            {
+                attemptToUpdate.IsActive = true;
+                paymentStatus = PaymentStatus.Open;
+            }
             if (attempt.AttemptStatus == AttemptStatus.RejectedEitherCancelled)
             {
                 attemptToUpdate.IsActive = false;
@@ -101,9 +106,14 @@ namespace BccPay.Core.Domain.Entities
                 attemptToUpdate.IsActive = false;
                 paymentStatus = PaymentStatus.Completed;
             }
+
             if (Attempts.Where(x => x.AttemptStatus == AttemptStatus.Successful).Count() > 1)
             {
                 IsProblematic = true;
+            }
+            else
+            {
+                IsProblematic = false;
             }
 
             UpdatePaymentStatus(paymentStatus);
