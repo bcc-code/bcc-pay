@@ -50,7 +50,7 @@ namespace BccPay.Core.Domain.Entities
 
             foreach (Attempt concreteAttempt in Attempts)
             {
-                concreteAttempt.AttemptStatus = AttemptStatus.RefundedSucceeded;
+                concreteAttempt.AttemptStatus = AttemptStatus.ManuallyRefunded;
             }
 
             Notifications.Add(new ProblematicPaymentRefundedNotification(PaymentId));
@@ -110,6 +110,7 @@ namespace BccPay.Core.Domain.Entities
             if (attempt.AttemptStatus == AttemptStatus.RefundedSucceeded)
             {
                 ResolveProblematicPayment();
+                attempt.AttemptStatus = AttemptStatus.RefundedSucceeded;
             }
 
             UpdatePaymentStatus(paymentStatus);
