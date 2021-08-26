@@ -13,9 +13,8 @@ namespace BccPay.Core.DataAccess.Indexes
         {
             AddMap<Payment>(payments => from payment in payments
                                         let isProblematicPayment = payment.Attempts
-                                            .Where(x => x.AttemptStatus == AttemptStatus.PaymentIsSuccessful)
+                                            .Where(x => x.AttemptStatus == AttemptStatus.Successful)
                                             .Count() > 1
-                                        where payment.PaymentStatus != PaymentStatus.Refunded
                                         select new Result
                                         {
                                             IsProblematicPayment = isProblematicPayment,

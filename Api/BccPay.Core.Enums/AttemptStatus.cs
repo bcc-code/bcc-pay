@@ -2,10 +2,11 @@
 {
     public enum AttemptStatus
     {
-        ProcessingPayment,
+        Processing,
         WaitingForCharge,
         RejectedEitherCancelled,
-        PaymentIsSuccessful,
-        Expired
+        Successful,
+        Expired,
+        RefundedSucceeded
     }
 }

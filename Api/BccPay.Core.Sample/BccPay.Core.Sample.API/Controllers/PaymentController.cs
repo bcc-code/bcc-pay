@@ -99,5 +99,17 @@ namespace BccPay.Core.Sample.API.Controllers
 
             return Ok(Mapper.Map<GetPaymentResponse>(result));
         }
+
+        [HttpHead("{paymentId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ResolveProblematic([FromRoute] Guid paymentId)
+        {
+            var command = new ResolveProblematicPaymentCommand(paymentId);
+
+            await Mediator.Send(command);
+
+            return Ok();
+        }
     }
 }

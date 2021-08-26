@@ -46,8 +46,12 @@ namespace BccPay.Core.Domain.Entities
 
         public void ResolveProblematicPayment()
         {
-            Updated = DateTime.UtcNow;
             PaymentStatus = PaymentStatus.Refunded;
+
+            foreach (Attempt concreteAttempt in Attempts)
+            {
+                concreteAttempt.AttemptStatus = AttemptStatus.RefundedSucceeded;
+            }
 
             Notifications.Add(new ProblematicPaymentRefundedNotification(PaymentId));
         }
@@ -98,10 +102,14 @@ namespace BccPay.Core.Domain.Entities
             {
                 attemptToUpdate.IsActive = false;
             }
-            if (attempt.AttemptStatus == AttemptStatus.PaymentIsSuccessful)
+            if (attempt.AttemptStatus == AttemptStatus.Successful)
             {
                 attemptToUpdate.IsActive = false;
                 paymentStatus = PaymentStatus.Completed;
+            }
+            if (attempt.AttemptStatus == AttemptStatus.RefundedSucceeded)
+            {
+                ResolveProblematicPayment();
             }
 
             UpdatePaymentStatus(paymentStatus);

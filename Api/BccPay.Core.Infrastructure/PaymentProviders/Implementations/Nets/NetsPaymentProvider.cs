@@ -46,7 +46,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 
             if (details.WebhookStatus == PaymentProviderConstants.Nets.Webhooks.ChargeCreated)
             {
-                attempt.AttemptStatus = AttemptStatus.PaymentIsSuccessful;
+                attempt.AttemptStatus = AttemptStatus.Successful;
                 attempt.IsActive = false;
 
                 return AttemptCancellationResult.AlreadyCompleted;

@@ -41,7 +41,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
 
             if (paymentResult.Status == PaymentProviderConstants.Mollie.Webhook.Paid)
             {
-                attempt.AttemptStatus = AttemptStatus.PaymentIsSuccessful;
+                attempt.AttemptStatus = AttemptStatus.Successful;
                 attempt.IsActive = false;
 
                 return AttemptCancellationResult.AlreadyCompleted;

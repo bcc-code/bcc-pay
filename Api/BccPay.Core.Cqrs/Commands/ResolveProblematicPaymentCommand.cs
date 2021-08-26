@@ -21,6 +21,11 @@ namespace BccPay.Core.Cqrs.Commands
         public Guid PaymentId { get; set; }
     }
 
+    /// <summary>
+    /// NOTE: refund works automaticly through webhooks, 
+    /// but this command added to be able to resolve problematic payment manually; 
+    /// For example if we got catch unexpected error with payment provider
+    /// </summary>
     public class ResolveProblematicPaymentCommandHandler : IRequestHandler<ResolveProblematicPaymentCommand>
     {
         private readonly IAsyncDocumentSession _documentSession;
