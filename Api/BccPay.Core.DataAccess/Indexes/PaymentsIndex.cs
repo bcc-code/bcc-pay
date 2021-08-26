@@ -12,12 +12,8 @@ namespace BccPay.Core.DataAccess.Indexes
         public PaymentsIndex()
         {
             AddMap<Payment>(payments => from payment in payments
-                                        let isProblematicPayment = payment.Attempts
-                                            .Where(x => x.AttemptStatus == AttemptStatus.Successful)
-                                            .Count() > 1
                                         select new Result
                                         {
-                                            IsProblematicPayment = isProblematicPayment,
                                             PaymentId = payment.PaymentId,
                                             PayerId = payment.PayerId,
                                             Created = payment.Created,
@@ -27,6 +23,7 @@ namespace BccPay.Core.DataAccess.Indexes
                                             CurrencyCode = payment.CurrencyCode,
                                             Amount = payment.Amount,
                                             PaymentStatus = payment.PaymentStatus,
+                                            IsProblematic = payment.IsProblematic,
                                             Attempts = payment.Attempts.Select(x => new AttemptResult
                                             {
                                                 AttemptStatus = x.AttemptStatus,
@@ -37,13 +34,12 @@ namespace BccPay.Core.DataAccess.Indexes
                                             }).ToList(),
                                         });
 
-            Store(x => x.IsProblematicPayment, FieldStorage.Yes);
             Store(x => x.Attempts, FieldStorage.Yes);
         }
 
         public class Result
         {
-            public bool IsProblematicPayment { get; set; }
+            public bool IsProblematic { get; set; }
             public PaymentStatus PaymentStatus { get; set; }
             public string CurrencyCode { get; set; }
             public Guid PaymentId { get; set; }

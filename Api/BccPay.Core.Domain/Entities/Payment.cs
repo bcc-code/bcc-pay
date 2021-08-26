@@ -20,6 +20,7 @@ namespace BccPay.Core.Domain.Entities
         public string CountryCode { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; }
+        public bool IsProblematic { get; set; }
 
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
@@ -42,18 +43,6 @@ namespace BccPay.Core.Domain.Entities
             PaymentStatus = PaymentStatus.Open;
             Created = DateTime.UtcNow;
             Description = description;
-        }
-
-        public void ResolveProblematicPayment()
-        {
-            PaymentStatus = PaymentStatus.RefundedAndClosed;
-
-            foreach (Attempt concreteAttempt in Attempts)
-            {
-                concreteAttempt.AttemptStatus = AttemptStatus.ManuallyRefunded;
-            }
-
-            Notifications.Add(new ProblematicPaymentRefundedNotification(PaymentId));
         }
 
         public void UpdatePaymentStatus(PaymentStatus paymentProgress)
@@ -109,8 +98,12 @@ namespace BccPay.Core.Domain.Entities
             }
             if (attempt.AttemptStatus == AttemptStatus.RefundedSucceeded)
             {
-                ResolveProblematicPayment();
-                attempt.AttemptStatus = AttemptStatus.RefundedSucceeded;
+                attemptToUpdate.IsActive = false;
+                paymentStatus = PaymentStatus.Completed;
+            }
+            if (Attempts.Where(x => x.AttemptStatus == AttemptStatus.Successful).Count() > 1)
+            {
+                IsProblematic = true;
             }
 
             UpdatePaymentStatus(paymentStatus);

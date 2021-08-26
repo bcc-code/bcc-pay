@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -104,12 +105,6 @@ namespace BccPay.Core.Cqrs.Commands.Mollie
         }
 
         private static bool IsAmountValueGreaterThanZero(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-                return false;
-            if (decimal.TryParse(value, out decimal result))
-                return result > 0;
-            return false;
-        }
+            => Decimal.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal result) && result > 0;
     }
 }

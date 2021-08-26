@@ -16,7 +16,7 @@ namespace BccPay.Core.Sample.API.Controllers
     public class PaymentController : BaseController
     {
         [HttpGet("filtered")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PageResult<List<PaymentResponse>>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PageResult<List<PaymentResult>>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetProblematicPayments([FromQuery] PaymentFilters filters)
         {
@@ -29,24 +29,12 @@ namespace BccPay.Core.Sample.API.Controllers
 
             var result = await Mediator.Send(query);
 
-            return Ok(new PageResult<List<PaymentResponse>>
+            return Ok(new PageResult<List<PaymentResult>>
             {
                 AmountOfObjects = result.AmountOfObjects,
                 AmountOfPages = filters.Size == 0 ? 1 : result.AmountOfObjects / filters.Size,
                 Data = result.Payments
             });
-        }
-
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaymentsResult))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetPayments()
-        {
-            var query = new GetPaymentsQuery();
-
-            var result = await Mediator.Send(query);
-
-            return Ok(result);
         }
 
         [HttpPost]
@@ -98,18 +86,6 @@ namespace BccPay.Core.Sample.API.Controllers
             var result = await Mediator.Send(query);
 
             return Ok(Mapper.Map<GetPaymentResponse>(result));
-        }
-
-        [HttpHead("{paymentId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> ResolveProblematic([FromRoute] Guid paymentId)
-        {
-            var command = new ResolveProblematicPaymentCommand(paymentId);
-
-            await Mediator.Send(command);
-
-            return Ok();
         }
     }
 }

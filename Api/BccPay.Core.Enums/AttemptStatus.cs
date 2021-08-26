@@ -19,10 +19,6 @@
         /// <summary>
         /// Refunded on the provider side, possible through the dashboard on concrete provider site using admin tools
         /// </summary>
-        RefundedSucceeded,
-        /// <summary>
-        /// Mark inner attempts, that payment was refunded and can be resolved
-        /// </summary>
-        ManuallyRefunded
+        RefundedSucceeded
     }
 }

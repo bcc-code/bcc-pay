@@ -13,7 +13,7 @@ using Raven.Client.Documents.Session;
 
 namespace BccPay.Core.Cqrs.Queries
 {
-    public class GetPaymentsWithFiltersQuery : IRequest<GetPaymentWithFiltersResponse>
+    public class GetPaymentsWithFiltersQuery : IRequest<PaymentWithFiltersResult>
     {
         public GetPaymentsWithFiltersQuery(
             int page,
@@ -39,13 +39,13 @@ namespace BccPay.Core.Cqrs.Queries
         public bool? IsProblematicPayment { get; set; }
     }
 
-    public class GetPaymentWithFiltersResponse
+    public class PaymentWithFiltersResult
     {
-        public List<PaymentResponse> Payments { get; set; }
+        public List<PaymentResult> Payments { get; set; }
         public int AmountOfObjects { get; set; }
     }
 
-    public class PaymentResponse
+    public class PaymentResult
     {
         public Guid PaymentId { get; set; }
         public string PayerId { get; set; }
@@ -57,7 +57,7 @@ namespace BccPay.Core.Cqrs.Queries
         public string PaymentMethods { get; set; }
     }
 
-    public class GetPaymentsWithFiltersQueryHandler : IRequestHandler<GetPaymentsWithFiltersQuery, GetPaymentWithFiltersResponse>
+    public class GetPaymentsWithFiltersQueryHandler : IRequestHandler<GetPaymentsWithFiltersQuery, PaymentWithFiltersResult>
     {
         private readonly IAsyncDocumentSession _documentSession;
 
@@ -66,12 +66,12 @@ namespace BccPay.Core.Cqrs.Queries
             _documentSession = documentSession;
         }
 
-        public async Task<GetPaymentWithFiltersResponse> Handle(GetPaymentsWithFiltersQuery request, CancellationToken cancellationToken)
+        public async Task<PaymentWithFiltersResult> Handle(GetPaymentsWithFiltersQuery request, CancellationToken cancellationToken)
         {
             var query = _documentSession.Query<PaymentsIndex.Result, PaymentsIndex>();
 
             if (request.IsProblematicPayment is not null)
-                query = query.Where(x => x.IsProblematicPayment);
+                query = query.Where(x => x.IsProblematic);
 
             if (request.PaymentStatus is not null)
                 query = query.Where(x => x.PaymentStatus == request.PaymentStatus);
@@ -80,7 +80,7 @@ namespace BccPay.Core.Cqrs.Queries
                 query = query.Where(x => x.Created >= request.From && x.Created <= request.To);
 
             var result = await query.WithPagination(request.Page, request.Size)
-                .Select(x => new PaymentResponse
+                .Select(x => new PaymentResult
                 {
                     Amount = x.Amount + x.CurrencyCode,
                     CountryCode = x.CountryCode,
@@ -94,7 +94,7 @@ namespace BccPay.Core.Cqrs.Queries
 
             var amountOfObjects = await query.Distinct().CountAsync(cancellationToken);
 
-            return new GetPaymentWithFiltersResponse
+            return new PaymentWithFiltersResult
             {
                 Payments = result,
                 AmountOfObjects = amountOfObjects
