@@ -48,27 +48,34 @@ namespace BccPay.Core.Domain.Entities
             Description = description;
         }
 
-        public void RefreshPaymentStatus()
+        private void RefreshPaymentStatus()
         {
             Updated = DateTime.UtcNow;
             IsProblematic = Attempts.Where(x => x.AttemptStatus == AttemptStatus.PaidSucceeded).Count() > 1;
 
-            if (Attempts.Where(x => x.AttemptStatus == AttemptStatus.Processing ||
+            PaymentStatus newStatus;
+            
+            if (Attempts.Any(x => x.AttemptStatus == AttemptStatus.PaidSucceeded))
+                newStatus = PaymentStatus.Paid;
+            else if (Attempts.Any(x => x.AttemptStatus == AttemptStatus.RefundedSucceeded))
+                newStatus = PaymentStatus.Refunded;
+            else if (Attempts.Where(x => x.AttemptStatus == AttemptStatus.Processing ||
                                     x.AttemptStatus == AttemptStatus.WaitingForCharge ||
                                     x.AttemptStatus == AttemptStatus.RefundedInitiated).Any())
-                PaymentStatus = PaymentStatus.Pending;
+                newStatus = PaymentStatus.Pending;
+            else
+                newStatus = PaymentStatus.Pending; // TODO: Set to close when ClosePayment(or etc.) endpoint appears
 
-            if (Attempts.Any(x => x.AttemptStatus == AttemptStatus.PaidSucceeded))
-                PaymentStatus = PaymentStatus.Paid;
+            if (newStatus != PaymentStatus)
+            {
+                PaymentStatus = newStatus;
 
-            if (Attempts.Any(x => x.AttemptStatus == AttemptStatus.RefundedSucceeded))
-                PaymentStatus = PaymentStatus.Refunded;
+                if (PaymentStatus == PaymentStatus.Paid)
+                    Notifications.Add(new PaymentSuccessfullyPaidNotification(PaymentId));
 
-            if (PaymentStatus == PaymentStatus.Paid)
-                Notifications.Add(new PaymentSuccessfullyPaidNotification(PaymentId));
-
-            if(PaymentStatus == PaymentStatus.Refunded)
-                Notifications.Add(new PaymentRefundedNotification(PaymentId));
+                if (PaymentStatus == PaymentStatus.Refunded)
+                    Notifications.Add(new PaymentRefundedNotification(PaymentId));
+            }
         }
 
         public void AddAttempt(

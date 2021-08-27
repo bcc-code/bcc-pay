@@ -97,7 +97,7 @@ namespace BccPay.Core.Cqrs.Commands
                 var paymentProvider = _paymentProviderFactory.GetPaymentProvider(attempt.PaymentProvider);
                 if (await paymentProvider.TryCancelPreviousPaymentAttempt(attempt) == AttemptCancellationResult.AlreadyCompleted)
                 {
-                    payment.RefreshPaymentStatus();
+                    payment.UpdateAttempt(attempt);
                     await _documentSession.SaveChangesAsync(cancellationToken);
                     throw new UpdatePaymentAttemptForbiddenException("Attempt is completed.");
                 }
