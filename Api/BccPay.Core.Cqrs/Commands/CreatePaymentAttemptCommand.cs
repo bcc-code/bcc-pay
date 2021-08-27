@@ -75,7 +75,9 @@ namespace BccPay.Core.Cqrs.Commands
                         Payment.GetDocumentId(request.PaymentId), cancellationToken)
                     ?? throw new NotFoundException("Invalid payment ID");
 
-            if (payment.PaymentStatus == PaymentStatus.Canceled || payment.PaymentStatus == PaymentStatus.Completed)
+            if (payment.PaymentStatus == PaymentStatus.Closed 
+                || payment.PaymentStatus == PaymentStatus.Paid
+                || payment.PaymentStatus == PaymentStatus.Refunded)
                 throw new UpdatePaymentAttemptForbiddenException("Payment is completed.");
 
             var countryCode = request.CountryCode ?? payment.CountryCode;
@@ -95,7 +97,7 @@ namespace BccPay.Core.Cqrs.Commands
                 var paymentProvider = _paymentProviderFactory.GetPaymentProvider(attempt.PaymentProvider);
                 if (await paymentProvider.TryCancelPreviousPaymentAttempt(attempt) == AttemptCancellationResult.AlreadyCompleted)
                 {
-                    payment.UpdatePaymentStatus(PaymentStatus.Completed);
+                    payment.RefreshPaymentStatus();
                     await _documentSession.SaveChangesAsync(cancellationToken);
                     throw new UpdatePaymentAttemptForbiddenException("Attempt is completed.");
                 }
@@ -138,8 +140,7 @@ namespace BccPay.Core.Cqrs.Commands
             {
                 PaymentAttemptId = Guid.NewGuid(),
                 PaymentMethod = paymentConfiguration.Settings.PaymentMethod,
-                AttemptStatus = providerResult.IsSuccess ? AttemptStatus.WaitingForCharge : AttemptStatus.RejectedEitherCancelled,
-                IsActive = providerResult.IsSuccess,
+                AttemptStatus = providerResult.IsSuccess ? AttemptStatus.Processing : AttemptStatus.Failed,
                 Created = DateTime.UtcNow,
                 StatusDetails = providerResult,
                 CountryCode = countryCode,

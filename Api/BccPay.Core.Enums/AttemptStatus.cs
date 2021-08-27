@@ -2,23 +2,14 @@
 {
     public enum AttemptStatus
     {
-        /// <summary>
-        /// Initial status, waiting for action
-        /// </summary>
         Processing,
-        /// <summary>
-        /// Waiting for automatic/manually payment charge
-        /// </summary>
         WaitingForCharge,
-        RejectedEitherCancelled,
-        Successful,
-        /// <summary>
-        /// In case of expiration period given by the provider of checkout/payment
-        /// </summary>
+        RefundedInitiated,
+
+        Failed,
+        Cancelled,
         Expired,
-        /// <summary>
-        /// Refunded on the provider side, possible through the dashboard on concrete provider site using admin tools
-        /// </summary>
+        PaidSucceeded,
         RefundedSucceeded
     }
 }
