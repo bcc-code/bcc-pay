@@ -25,6 +25,7 @@ namespace BccPay.Core.Infrastructure.PaymentModels.Response.Mollie
 
         public MollieLinks Links { get; set; }
         public MollieAmount Amount { get; set; }
+        public MollieAmount AmountRefunded { get; set; }
 
 
         public bool IsSuccess { get; set; }

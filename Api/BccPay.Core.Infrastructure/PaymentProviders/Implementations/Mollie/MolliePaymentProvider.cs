@@ -41,15 +41,13 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
 
             if (paymentResult.Status == PaymentProviderConstants.Mollie.Webhook.Paid)
             {
-                attempt.AttemptStatus = AttemptStatus.PaymentIsSuccessful;
-                attempt.IsActive = false;
+                attempt.AttemptStatus = AttemptStatus.PaidSucceeded;
 
                 return AttemptCancellationResult.AlreadyCompleted;
             }
             else
             {
-                attempt.IsActive = false;
-                attempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled;
+                attempt.AttemptStatus = AttemptStatus.Canceled;
 
                 var mollieCancelDetails = await CancelPayment(details);
 
