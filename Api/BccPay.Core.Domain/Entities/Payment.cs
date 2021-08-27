@@ -20,6 +20,7 @@ namespace BccPay.Core.Domain.Entities
         public string CountryCode { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; }
+        public bool IsProblematic { get; set; }
 
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
@@ -81,6 +82,11 @@ namespace BccPay.Core.Domain.Entities
             attemptToUpdate = attempt;
             var paymentStatus = PaymentStatus;
 
+            if (attempt.AttemptStatus == AttemptStatus.Processing)
+            {
+                attemptToUpdate.IsActive = true;
+                paymentStatus = PaymentStatus.Open;
+            }
             if (attempt.AttemptStatus == AttemptStatus.RejectedEitherCancelled)
             {
                 attemptToUpdate.IsActive = false;
@@ -90,10 +96,24 @@ namespace BccPay.Core.Domain.Entities
             {
                 attemptToUpdate.IsActive = false;
             }
-            if (attempt.AttemptStatus == AttemptStatus.PaymentIsSuccessful)
+            if (attempt.AttemptStatus == AttemptStatus.Successful)
             {
                 attemptToUpdate.IsActive = false;
                 paymentStatus = PaymentStatus.Completed;
+            }
+            if (attempt.AttemptStatus == AttemptStatus.RefundedSucceeded)
+            {
+                attemptToUpdate.IsActive = false;
+                paymentStatus = PaymentStatus.Completed;
+            }
+
+            if (Attempts.Where(x => x.AttemptStatus == AttemptStatus.Successful).Count() > 1)
+            {
+                IsProblematic = true;
+            }
+            else
+            {
+                IsProblematic = false;
             }
 
             UpdatePaymentStatus(paymentStatus);

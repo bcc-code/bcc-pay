@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -69,13 +70,13 @@ namespace BccPay.Core.Cqrs.Commands.Mollie
             {
                 actualAttempt.AttemptStatus = molliePaymentResponse.Status switch
                 {
-                    PaymentProviderConstants.Mollie.Webhook.Paid => AttemptStatus.PaymentIsSuccessful,
+                    PaymentProviderConstants.Mollie.Webhook.Paid => AttemptStatus.Successful,
                     PaymentProviderConstants.Mollie.Webhook.Canceled => AttemptStatus.RejectedEitherCancelled,
                     PaymentProviderConstants.Mollie.Webhook.Pending => AttemptStatus.WaitingForCharge,
-                    PaymentProviderConstants.Mollie.Webhook.Open => AttemptStatus.ProcessingPayment,
+                    PaymentProviderConstants.Mollie.Webhook.Open => AttemptStatus.Processing,
                     PaymentProviderConstants.Mollie.Webhook.Failed => AttemptStatus.RejectedEitherCancelled,
                     PaymentProviderConstants.Mollie.Webhook.Expired => AttemptStatus.Expired,
-                    _ => AttemptStatus.ProcessingPayment
+                    _ => AttemptStatus.Processing
                 };
                 mollieStatusDetails.WebhookStatus = PaymentProviderConstants.Mollie.Webhook.Messages[molliePaymentResponse.Status];
 
@@ -87,6 +88,13 @@ namespace BccPay.Core.Cqrs.Commands.Mollie
                 {
                     mollieStatusDetails.Errors = new List<string> { molliePaymentResponse.Error };
                 }
+
+                // NOTE: mollie removed "refund" status and force to check other
+                // properties like "amountRefunded" to know, that Refund is triggered
+                if (IsAmountValueGreaterThanZero(molliePaymentResponse.AmountRefunded?.Value))
+                {
+                    actualAttempt.AttemptStatus = AttemptStatus.RefundedSucceeded;
+                }
             }
 
             actualAttempt.StatusDetails = mollieStatusDetails;
@@ -95,5 +103,8 @@ namespace BccPay.Core.Cqrs.Commands.Mollie
 
             return true;
         }
+
+        private static bool IsAmountValueGreaterThanZero(string value)
+            => Decimal.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal result) && result > 0;
     }
 }

@@ -19,6 +19,11 @@ namespace BccPay.Core.Infrastructure.Constants
                 public const string CheckoutCompleted = "payment.checkout.completed";
                 public const string ChargeCreated = "payment.charge.created.v2";
                 public const string ChargeFailed = "payment.charge.failed";
+                public const string RefundInitiated = "payment.refund.initiated.v2";
+                public const string RefundFailed = "payment.refund.failed";
+                public const string RefundCompleted = "payment.refund.completed";
+                public const string CancelCreated = "payment.cancel.created";
+                public const string CancelFailed = "payment.cancel.failed";
 
                 public static readonly IReadOnlyDictionary<string, string> Messages
                     = new Dictionary<string, string>()
@@ -26,7 +31,12 @@ namespace BccPay.Core.Infrastructure.Constants
                         { PaymentCreated,    "A payment has been created." },
                         { CheckoutCompleted, "The customer has completed the checkout." },
                         { ChargeCreated,     "The customer has successfully been charged, partially or fully." },
-                        { ChargeFailed,      "A charge attempt has failed." }
+                        { ChargeFailed,      "A charge attempt has failed." },
+                        { RefundInitiated,   "A refund has been initiated." },
+                        { RefundFailed,      "A refund attempt has failed." },
+                        { RefundCompleted,   "A refund has successfully been completed." },
+                        { CancelCreated,     "A reservation has been canceled." },
+                        { CancelFailed,      "A cancellation has failed." }
                     };
             }
         }
