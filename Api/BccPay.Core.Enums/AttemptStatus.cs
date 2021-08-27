@@ -7,7 +7,7 @@
         RefundedInitiated,
 
         Failed,
-        Cancelled,
+        Canceled,
         Expired,
         PaidSucceeded,
         RefundedSucceeded

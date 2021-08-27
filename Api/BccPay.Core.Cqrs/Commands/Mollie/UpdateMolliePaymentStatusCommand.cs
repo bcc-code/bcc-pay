@@ -71,7 +71,7 @@ namespace BccPay.Core.Cqrs.Commands.Mollie
                 actualAttempt.AttemptStatus = molliePaymentResponse.Status switch
                 {
                     PaymentProviderConstants.Mollie.Webhook.Paid => AttemptStatus.PaidSucceeded,
-                    PaymentProviderConstants.Mollie.Webhook.Canceled => AttemptStatus.Cancelled,
+                    PaymentProviderConstants.Mollie.Webhook.Canceled => AttemptStatus.Canceled,
                     PaymentProviderConstants.Mollie.Webhook.Pending => AttemptStatus.Processing,
                     PaymentProviderConstants.Mollie.Webhook.Open => AttemptStatus.WaitingForCharge,
                     PaymentProviderConstants.Mollie.Webhook.Failed => AttemptStatus.Failed,

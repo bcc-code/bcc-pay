@@ -52,7 +52,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
             }
             else
             {
-                attempt.AttemptStatus = AttemptStatus.Cancelled;
+                attempt.AttemptStatus = AttemptStatus.Canceled;
 
                 var netsCancelDetails = await CancelPayment(details);
 

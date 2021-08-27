@@ -47,7 +47,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
             }
             else
             {
-                attempt.AttemptStatus = AttemptStatus.Cancelled;
+                attempt.AttemptStatus = AttemptStatus.Canceled;
 
                 var mollieCancelDetails = await CancelPayment(details);
 
