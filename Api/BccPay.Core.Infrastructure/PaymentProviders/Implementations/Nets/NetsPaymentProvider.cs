@@ -167,7 +167,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 
                 netsStatusDetails.InvoiceId = invoice?.Invoice?.InvoiceNumber;
             }
-            catch (ApiException exception)
+            catch (ApiException)
             { }
         }
 

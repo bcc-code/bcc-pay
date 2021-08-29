@@ -5,6 +5,7 @@ using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Raven.Client.Documents.Session;
+using static BccPay.Core.Domain.Entities.Country;
 
 namespace BccPay.Core.Infrastructure.Configuration
 {
@@ -71,21 +72,21 @@ namespace BccPay.Core.Infrastructure.Configuration
             var existingCountries = _documentSession.Query<Country>().ToList();
 
             // do not remove country if it isn't specified, just remove payment configurations
-            existingCountries.ForEach(c => c.PaymentConfigurations = Array.Empty<string>());
+            existingCountries.ForEach(c => c.PaymentConfigurations = Array.Empty<ConditionalPaymentConfiguration>());
 
             foreach (var config in countryPaymentConfigurations)
             {
                 var existingConfig = existingCountries.FirstOrDefault(x => x.CountryCode == config.CountryCode);
                 if (existingConfig != null)
                 {
-                    existingConfig.PaymentConfigurations = config.PaymentConfigurationIds;
+                    existingConfig.PaymentConfigurations = config.PaymentConfigurations;
                 }
                 else
                 {
                     _documentSession.Store(new Country
                     {
                         CountryCode = config.CountryCode,
-                        PaymentConfigurations = config.PaymentConfigurationIds
+                        PaymentConfigurations = config.PaymentConfigurations
                     });
                 }
             }

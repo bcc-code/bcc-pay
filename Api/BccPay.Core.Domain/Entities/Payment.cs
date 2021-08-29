@@ -23,6 +23,12 @@ namespace BccPay.Core.Domain.Entities
         public string Description { get; set; }
         public bool IsProblematic { get; set; }
 
+        /// <summary>
+        /// Optional property. 
+        /// Could indicate if it is a membership deposit of saving payment
+        /// </summary>
+        public string Type { get; set; }
+
         public PaymentStatus PaymentStatus { get; set; }
         public List<Attempt> Attempts { get; set; }
 
@@ -54,7 +60,7 @@ namespace BccPay.Core.Domain.Entities
             IsProblematic = Attempts.Where(x => x.AttemptStatus == AttemptStatus.PaidSucceeded).Count() > 1;
 
             PaymentStatus newStatus;
-            
+
             if (Attempts.Any(x => x.AttemptStatus == AttemptStatus.PaidSucceeded))
                 newStatus = PaymentStatus.Paid;
             else if (Attempts.Any(x => x.AttemptStatus == AttemptStatus.RefundedSucceeded))

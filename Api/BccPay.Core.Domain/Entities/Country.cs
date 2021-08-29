@@ -10,6 +10,13 @@
 
         public string CountryCode { get; set; }
 
-        public string[] PaymentConfigurations { get; set; }
+        public ConditionalPaymentConfiguration[] PaymentConfigurations { get; set; }
+
+        public class ConditionalPaymentConfiguration
+        {
+            public string Condition { get; set; }
+
+            public string[] PaymentConfigurationIds { get; set; }
+        }
     }
 }

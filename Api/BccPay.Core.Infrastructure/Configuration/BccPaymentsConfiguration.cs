@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using BccPay.Core.Domain;
 using BccPay.Core.Enums;
+using static BccPay.Core.Domain.Entities.Country;
 
 namespace BccPay.Core.Infrastructure.Configuration
 {
@@ -24,6 +25,8 @@ namespace BccPay.Core.Infrastructure.Configuration
     {
         public string CountryCode { get; init; }
 
-        public string[] PaymentConfigurationIds { get; set; }
+        public string Condition { get; set; }
+
+        public ConditionalPaymentConfiguration[] PaymentConfigurations { get; set; }
     }
 }
