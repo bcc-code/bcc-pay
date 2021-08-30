@@ -15,6 +15,6 @@ export class SampleComponent {
   constructor() {
     this.server = environment.bccPayUrl;
     this.netsCheckoutKey = environment.netsCheckoutKey;
-    this.requestHeaders = [{ key: 'is-mobile-app', value: 'true' }];
+    this.requestHeaders = [{ key: 'is-mobile-app', value: 'false' }];
   }
 }

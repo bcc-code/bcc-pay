@@ -46,15 +46,13 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
 
             if (details.WebhookStatus == PaymentProviderConstants.Nets.Webhooks.ChargeCreated)
             {
-                attempt.AttemptStatus = AttemptStatus.Successful;
-                attempt.IsActive = false;
+                attempt.AttemptStatus = AttemptStatus.PaidSucceeded;
 
                 return AttemptCancellationResult.AlreadyCompleted;
             }
             else
             {
-                attempt.IsActive = false;
-                attempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled;
+                attempt.AttemptStatus = AttemptStatus.Canceled;
 
                 var netsCancelDetails = await CancelPayment(details);
 
@@ -178,7 +176,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
             // create a builder depending on the settings
             return settings switch
             {
-                { PaymentMethod: PaymentMethod.CreditCardOrVipps } => new NetsRequestBuilder(_options),
+                { PaymentMethod: PaymentMethod.CreditCard } => new NetsCreditCardRequestBuilder(_options),
                 _ => throw new NotImplementedException()
             };
         }

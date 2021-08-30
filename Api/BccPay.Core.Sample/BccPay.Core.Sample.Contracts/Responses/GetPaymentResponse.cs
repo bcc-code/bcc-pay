@@ -21,7 +21,6 @@ namespace BccPay.Core.Sample.Contracts.Responses
     public class AttemptResponseModel
     {
         public Guid PaymentAttemptId { get; set; }
-        public bool IsActive { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
         public DateTime Created { get; set; }
         public AttemptStatus PaymentStatus { get; set; }

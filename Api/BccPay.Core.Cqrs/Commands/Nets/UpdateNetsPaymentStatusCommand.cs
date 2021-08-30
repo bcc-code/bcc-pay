@@ -60,12 +60,12 @@ namespace BccPay.Core.Cqrs.Commands.Nets
             actualAttempt.AttemptStatus = webhookEvent switch
             {
                 PaymentProviderConstants.Nets.Webhooks.PaymentCreated => actualAttempt.AttemptStatus = AttemptStatus.Processing,
-                PaymentProviderConstants.Nets.Webhooks.RefundInitiated => actualAttempt.AttemptStatus = AttemptStatus.Processing,
+                PaymentProviderConstants.Nets.Webhooks.RefundInitiated => actualAttempt.AttemptStatus = AttemptStatus.RefundedInitiated,
                 PaymentProviderConstants.Nets.Webhooks.CheckoutCompleted => actualAttempt.AttemptStatus = AttemptStatus.WaitingForCharge,
-                PaymentProviderConstants.Nets.Webhooks.ChargeCreated => actualAttempt.AttemptStatus = AttemptStatus.Successful,
-                PaymentProviderConstants.Nets.Webhooks.ChargeFailed => actualAttempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled,
+                PaymentProviderConstants.Nets.Webhooks.ChargeCreated => actualAttempt.AttemptStatus = AttemptStatus.PaidSucceeded,
+                PaymentProviderConstants.Nets.Webhooks.ChargeFailed => actualAttempt.AttemptStatus = AttemptStatus.Failed,
                 PaymentProviderConstants.Nets.Webhooks.RefundCompleted => actualAttempt.AttemptStatus = AttemptStatus.RefundedSucceeded,
-                _ => actualAttempt.AttemptStatus = AttemptStatus.RejectedEitherCancelled,
+                _ => AttemptStatus.Processing,
             };
 
             var statusDetails = (NetsStatusDetails)actualAttempt.StatusDetails;
