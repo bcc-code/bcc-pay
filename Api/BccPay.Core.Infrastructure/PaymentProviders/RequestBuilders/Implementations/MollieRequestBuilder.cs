@@ -6,15 +6,15 @@ using BccPay.Core.Infrastructure.PaymentModels.Request.Mollie;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations
 {
-    internal class MollieGiropayRequestBuilder : IMollieRequestBuilder
+    internal class MollieRequestBuilder : IMollieRequestBuilder
     {
         private readonly MollieProviderOptions _options;
-        public MollieGiropayRequestBuilder(MollieProviderOptions options)
+        public MollieRequestBuilder(MollieProviderOptions options)
         {
             _options = options;
         }
 
-        public MolliePaymentRequest BuildMolliePaymentRequest(PaymentRequestDto paymentRequest)
+        public MolliePaymentRequest BuildMolliePaymentRequest(PaymentRequestDto paymentRequest, PaymentMethod paymentMethod)
         {
             return new MolliePaymentRequest
             {
@@ -24,7 +24,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
                     Value = String.Format("{0:0.00}", paymentRequest.Amount)
                 },
                 Locale = GetLocale(paymentRequest.AcceptLanguage),
-                Method = new string[] { PaymentMethod.Giropay.ToString().ToLower() },
+                Method = new string[] { paymentMethod.ToString().ToLower() },
                 Description = paymentRequest.Description,
                 RedirectUrl = GetRedirectUrl(paymentRequest.IsMobile),
                 WebhookUrl = _options.WebhookUrl + $"/{ paymentRequest.PaymentId }",

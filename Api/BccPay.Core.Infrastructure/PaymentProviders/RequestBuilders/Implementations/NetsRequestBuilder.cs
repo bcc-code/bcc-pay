@@ -7,11 +7,11 @@ using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations
 {
-    internal class NetsCreditCardRequestBuilder : INetsPaymentRequestBuilder
+    internal class NetsRequestBuilder : INetsPaymentRequestBuilder
     {
         private readonly NetsProviderOptions _options;
 
-        public NetsCreditCardRequestBuilder(NetsProviderOptions options)
+        public NetsRequestBuilder(NetsProviderOptions options)
         {
             _options = options;
         }
