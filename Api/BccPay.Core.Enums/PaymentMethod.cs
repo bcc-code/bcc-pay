@@ -4,8 +4,11 @@ namespace BccPay.Core.Enums
 {
     public enum PaymentMethod
     {
-        [Description("Credit Card")]
-        CreditCard,
-        Giropay
+        [Description("Credit Card Or Vipps (mobile)")]
+        CreditCardOrVipps,
+        [Description("Giropay")]
+        Giropay,
+        [Description("iDeal")]
+        iDeal
     }
 }

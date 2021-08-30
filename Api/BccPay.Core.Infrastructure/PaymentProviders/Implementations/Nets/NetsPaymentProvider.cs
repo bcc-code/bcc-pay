@@ -176,7 +176,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
             // create a builder depending on the settings
             return settings switch
             {
-                { PaymentMethod: PaymentMethod.CreditCard } => new NetsCreditCardRequestBuilder(_options),
+                { PaymentMethod: PaymentMethod.CreditCardOrVipps } => new NetsRequestBuilder(_options),
                 _ => throw new NotImplementedException()
             };
         }
