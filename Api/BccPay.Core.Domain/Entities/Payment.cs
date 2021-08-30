@@ -16,16 +16,19 @@ namespace BccPay.Core.Domain.Entities
 
         public Guid PaymentId { get; set; }
         public string PayerId { get; set; }
+
         public string CurrencyCode { get; set; }
         public string CountryCode { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; }
         public bool IsProblematic { get; set; }
 
-        public DateTime Created { get; set; }
-        public DateTime? Updated { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
         public List<Attempt> Attempts { get; set; }
+
+        public DateTime Created { get; set; }
+        public DateTime? Updated { get; set; }
+
         public List<IBccPayNotification> Notifications { get; } = new List<IBccPayNotification>();
 
         public void Create(
@@ -40,25 +43,38 @@ namespace BccPay.Core.Domain.Entities
             CurrencyCode = currencyCode;
             CountryCode = countryCode;
             Amount = amount;
-            PaymentStatus = PaymentStatus.Open;
+            PaymentStatus = PaymentStatus.Pending;
             Created = DateTime.UtcNow;
             Description = description;
         }
 
-        public void UpdatePaymentStatus(PaymentStatus paymentProgress)
+        private void RefreshPaymentStatus()
         {
-            if (paymentProgress == PaymentStatus.Canceled || paymentProgress == PaymentStatus.Completed)
-            {
-                CancelLastAttempt();
-            }
-
-            PaymentStatus = paymentProgress;
-
             Updated = DateTime.UtcNow;
+            IsProblematic = Attempts.Where(x => x.AttemptStatus == AttemptStatus.PaidSucceeded).Count() > 1;
 
-            if (PaymentStatus == PaymentStatus.Completed)
+            PaymentStatus newStatus;
+            
+            if (Attempts.Any(x => x.AttemptStatus == AttemptStatus.PaidSucceeded))
+                newStatus = PaymentStatus.Paid;
+            else if (Attempts.Any(x => x.AttemptStatus == AttemptStatus.RefundedSucceeded))
+                newStatus = PaymentStatus.Refunded;
+            else if (Attempts.Where(x => x.AttemptStatus == AttemptStatus.Processing ||
+                                    x.AttemptStatus == AttemptStatus.WaitingForCharge ||
+                                    x.AttemptStatus == AttemptStatus.RefundedInitiated).Any())
+                newStatus = PaymentStatus.Pending;
+            else
+                newStatus = PaymentStatus.Pending; // TODO: Set to close when ClosePayment(or etc.) endpoint appears
+
+            if (newStatus != PaymentStatus)
             {
-                Notifications.Add(new PaymentCompletedNotification(PaymentId));
+                PaymentStatus = newStatus;
+
+                if (PaymentStatus == PaymentStatus.Paid)
+                    Notifications.Add(new PaymentSuccessfullyPaidNotification(PaymentId));
+
+                if (PaymentStatus == PaymentStatus.Refunded)
+                    Notifications.Add(new PaymentRefundedNotification(PaymentId));
             }
         }
 
@@ -80,49 +96,8 @@ namespace BccPay.Core.Domain.Entities
         {
             var attemptToUpdate = Attempts.Find(x => x.PaymentAttemptId == attempt.PaymentAttemptId);
             attemptToUpdate = attempt;
-            var paymentStatus = PaymentStatus;
 
-            if (attempt.AttemptStatus == AttemptStatus.Processing)
-            {
-                attemptToUpdate.IsActive = true;
-                paymentStatus = PaymentStatus.Open;
-            }
-            if (attempt.AttemptStatus == AttemptStatus.RejectedEitherCancelled)
-            {
-                attemptToUpdate.IsActive = false;
-                paymentStatus = PaymentStatus.Canceled;
-            }
-            if (attempt.AttemptStatus == AttemptStatus.Expired)
-            {
-                attemptToUpdate.IsActive = false;
-            }
-            if (attempt.AttemptStatus == AttemptStatus.Successful)
-            {
-                attemptToUpdate.IsActive = false;
-                paymentStatus = PaymentStatus.Completed;
-            }
-            if (attempt.AttemptStatus == AttemptStatus.RefundedSucceeded)
-            {
-                attemptToUpdate.IsActive = false;
-                paymentStatus = PaymentStatus.Completed;
-            }
-
-            if (Attempts.Where(x => x.AttemptStatus == AttemptStatus.Successful).Count() > 1)
-            {
-                IsProblematic = true;
-            }
-            else
-            {
-                IsProblematic = false;
-            }
-
-            UpdatePaymentStatus(paymentStatus);
-        }
-
-        public void CancelLastAttempt()
-        {
-            var lastAttempt = Attempts?.LastOrDefault();
-            if (lastAttempt != null) lastAttempt.IsActive = false;
+            RefreshPaymentStatus();
         }
     }
 }
