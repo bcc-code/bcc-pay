@@ -29,6 +29,7 @@ namespace BccPay.Core.DataAccess.Indexes
             Store(x => x.Currency, FieldStorage.Yes);
             Store(x => x.PaymentMethod, FieldStorage.Yes);
             Store(x => x.PaymentProvider, FieldStorage.Yes);
+            Store(x => x.Condition, FieldStorage.Yes);
         }
 
         public class Result
