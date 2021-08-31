@@ -92,11 +92,13 @@ export class BccPay extends LitElement {
     }
   }
 
-  async initMolliePayment() {
+  async initMolliePayment(paymentConfigurationId: string, buttonId: string) {
     mollieUrl = await startMolliePayment(
       this.paymentId,
       this.user,
-      this.server
+      this.server,
+      paymentConfigurationId,
+      buttonId
     );
 
     if (mollieUrl !== '' || mollieUrl !== null || mollieUrl !== undefined) {
@@ -156,11 +158,20 @@ export class BccPay extends LitElement {
             <span class="payment-button-text">CREDIT CARD</span>
           </button>
           <button
-            id="Mollie"
+            id="mollie-giropay"
             class="payment-button"
-            @click="${() => this.initMolliePayment()}"
+            @click="${() =>
+              this.initMolliePayment('mollie-giropay-eur', 'mollie-giropay')}"
           >
             <span class="payment-button-text">GIROPAY</span>
+          </button>
+          <button
+            id="mollie-ideal"
+            class="payment-button"
+            @click="${() =>
+              this.initMolliePayment('mollie-ideal-eur', 'mollie-ideal')}"
+          >
+            <span class="payment-button-text">iDeal</span>
           </button>
         </div>
 

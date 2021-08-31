@@ -5,12 +5,19 @@ import { displayErrorPage } from './ScreenChange';
 export async function startMolliePayment(
   paymentId: string,
   user: User,
-  server: string
+  server: string,
+  paymentConfigurationId: string,
+  buttonId: string
 ): Promise<string> {
-  const mollieButton = document.getElementById('Mollie');
+  const mollieButton = document.getElementById(buttonId);
   mollieButton!.classList.add('payment-button--loading');
 
-  const mollieCheckoutUrl = await initMolliePayment(paymentId, user, server);
+  const mollieCheckoutUrl = await initMolliePayment(
+    paymentId,
+    user,
+    server,
+    paymentConfigurationId
+  );
   if (isDevEnv === true) {
     console.log('Mollie checkoutUrl is: ' + mollieCheckoutUrl);
   }
@@ -26,7 +33,8 @@ export async function startMolliePayment(
 
   mollieButton!.classList.remove('payment-button--loading');
   // window.location.replace(mollieCheckoutUrl);
-  window.open(mollieCheckoutUrl, '_self');
+  // window.open(mollieCheckoutUrl, '_self');
+  window.open(mollieCheckoutUrl, '_system');
 
   return mollieCheckoutUrl;
 }
@@ -34,10 +42,11 @@ export async function startMolliePayment(
 export async function initMolliePayment(
   paymentId: string,
   user: User,
-  server: string
+  server: string,
+  paymentConfigurationId: string
 ): Promise<string> {
   const body = {
-    paymentConfigurationId: 'mollie-giropay-eur',
+    paymentConfigurationId: paymentConfigurationId,
     email: user.email === null ? undefined : user.email,
     phoneNumber: user.phoneNumber === null ? undefined : user.phoneNumber,
     firstName: user.firstName === null ? undefined : user.firstName,
