@@ -107,7 +107,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
         {
             IMollieRequestBuilder requestBuilder = CreateRequestBuilder(settings);
 
-            var request = requestBuilder.BuildMolliePaymentRequest(paymentRequest);
+            var request = requestBuilder.BuildMolliePaymentRequest(paymentRequest, settings.PaymentMethod);
 
             CurrencyConversionRecord currencyConversion = null;
             if (settings.PaymentMethod == PaymentMethod.Giropay)
@@ -166,9 +166,11 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
 
         private IMollieRequestBuilder CreateRequestBuilder(PaymentSettings settings)
         {
+            /// NOTE: probably this part is useless and need to remove (giropay and ideal have the same request build options)
             return settings switch
             {
-                { PaymentMethod: PaymentMethod.Giropay } => new MollieGiropayRequestBuilder(_options),
+                { PaymentMethod: PaymentMethod.Giropay } => new MollieRequestBuilder(_options),
+                { PaymentMethod: PaymentMethod.iDeal } => new MollieRequestBuilder(_options),
                 _ => throw new NotImplementedException()
             };
         }
