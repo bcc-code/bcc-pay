@@ -74,10 +74,10 @@ export class TransactionsListComponent implements AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   async ngAfterViewInit() {
-    const apiPayments = await axios.get(`${environment.bccPayUrl}/Payment`);
-    this.dataSource = new MatTableDataSource<Payment>(
-      apiPayments.data.payments
+    const apiPayments = await axios.get(
+      `${environment.bccPayUrl}/Payment/filtered`
     );
+    this.dataSource = new MatTableDataSource<Payment>(apiPayments.data.data);
 
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;

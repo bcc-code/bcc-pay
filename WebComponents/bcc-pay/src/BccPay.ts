@@ -114,32 +114,33 @@ export class BccPay extends LitElement {
       </div>
       <div class="card-square" id="main-div">
         <div id="first-screen" class="screen">
-          <div class="card-subtitle">
-            <h5>you are paying for</h5>
-          </div>
-          <div class="card-title">
-            <h3>${this.item}</h3>
-          </div>
           <div class="card-price">
-            <span class="card-tag">Price</span>
-            <span class="card-cost">${this.amount} ${this.currency} </span>
+            <div>
+              <div class="card-subtitle">
+                <h5>you are paying for</h5>
+              </div>
+              <div class="card-title">
+                <h3>${this.item}</h3>
+              </div>
+            </div>
+            <div class="card-row">
+              <span class="card-tag">Amount</span>
+              <span class="card-cost">${this.amount} ${this.currency} </span>
+            </div>
           </div>
 
           <div class="country-container">
-            Current country: ${this.country}
-            <div>
-              <select
-                class="country-select"
-                value="${this.country}"
-                @change="${(e: any) => (this.country = e.target.value)}"
-              >
-                <option value="">Change country</option>
-                <option value="NOR">Norway</option>
-                <option value="DE">Germany</option>
-                <option value="UA">Ukraine</option>
-                <option value="PL">Poland</option>
-              </select>
-            </div>
+            Choose your country:
+            <select
+              class="country-select"
+              @change="${(e: any) => (this.country = e.target.value)}"
+            >
+              <option value="" selected disabled hidden>Change country</option>
+              <option selected="${this.country}" value="NOR">Norway</option>
+              <option selected="${this.country}" value="DE">Germany</option>
+              <option selected="${this.country}" value="UA">Ukraine</option>
+              <option selected="${this.country}" value="PL">Poland</option>
+            </select>
           </div>
           <button
             id="Nets"
