@@ -9,16 +9,15 @@ using BccPay.Core.Enums;
 using MediatR;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
-using Raven.Client.Documents.Queries;
 using Raven.Client.Documents.Session;
 
 namespace BccPay.Core.Cqrs.Queries
 {
     public record GetPaymentProviderDefinitionByConfigurationQuery(
         string CountryCode,
-        string[] PaymentType = null) : IRequest<AvailableConfigurationResult>;
+        string[] PaymentTypes = null) : IRequest<AvailableConfigurationResult>;
 
-    public record AvailableConfigurationResult(string[] Types, List<PaymentConfigurationResult> PaymentConfigurations);
+    public record AvailableConfigurationResult(List<string> SupportedTypes, List<PaymentConfigurationResult> PaymentConfigurations);
 
     public class PaymentConfigurationResult
     {
@@ -40,20 +39,20 @@ namespace BccPay.Core.Cqrs.Queries
 
         public async Task<AvailableConfigurationResult> Handle(GetPaymentProviderDefinitionByConfigurationQuery request, CancellationToken cancellationToken)
         {
-            var configurations = await _documentSession.Query<PaymentConfiguration>()
-                                    .Where(paymentConfiguration
-                                        => request.CountryCode == paymentConfiguration.Conditions.CountryCode
-                                        && paymentConfiguration.Conditions.PaymentTypes.ContainsAny(request.PaymentType)
-                                        || paymentConfiguration.Conditions.CountryCode == Country.DefaultCountryCode)
-                                    .ToListAsync(cancellationToken);
+            var query = _documentSession.Query<PaymentConfiguration>();
 
-            // if result have 0 configurations => return default
-            // or 
-            // if (configurations.Count == 0)
-            //     throw new InvalidConfigurationException($"Unable to find payment implementation for {request.CountryCode} with type {string.Join(", ", request.PaymentType)}");
+            if (request.PaymentTypes is not null)
+                query.Where(paymentConfiguration => paymentConfiguration.Conditions.PaymentTypes.ContainsAny(request.PaymentTypes));
+
+            var paymentConfigurations = await query.Where(paymentConfiguration
+                                                => request.CountryCode == paymentConfiguration.Conditions.CountryCode
+                                                || paymentConfiguration.Conditions.CountryCode == Country.DefaultCountryCode)
+                                            .ToListAsync(cancellationToken);
+
+            var idsToCompare = paymentConfigurations.SelectMany(x => x.PaymentProviderDefinitionIds).ToArray();
 
             var paymentProviderDefinition = await _documentSession.Query<PaymentProviderDefinition>()
-                     .Search(definition => definition.PaymentDefinitionCode, configurations.SelectMany(configuration => configuration.PaymentProviderDefinitionIds), @operator: SearchOperator.And)
+                     .Where(x => x.PaymentDefinitionCode.In(idsToCompare))
                      .Select(definition => new PaymentConfigurationResult
                      {
                          PaymentConfigurationId = definition.PaymentDefinitionCode,
@@ -63,9 +62,33 @@ namespace BccPay.Core.Cqrs.Queries
                      })
                      .ToListAsync(cancellationToken);
 
-            var availableTypes = configurations.SelectMany(configuration => configuration.Conditions.PaymentTypes.Intersect(request.PaymentType));
+            // NOTE: not relevant, always takes default values as result
+            // if (paymentProviderDefinition is null)
+            //    throw new InvalidConfigurationException($"Unable to find configuration for {request.CountryCode} with type {string.Join(", ", request.PaymentTypes)}");
 
-            return new AvailableConfigurationResult(availableTypes.ToArray(), paymentProviderDefinition);
+
+            List<string> paymentTypes = new();
+
+            if (request.PaymentTypes is not null && paymentConfigurations.Count > 0)
+            {
+                paymentTypes = paymentConfigurations.SelectMany(configuration
+                            => configuration.Conditions.PaymentTypes.Intersect(request.PaymentTypes))
+                        .Distinct()
+                        .ToList();
+            }
+
+            if (request.PaymentTypes is null)
+            {
+                foreach (var paymentConfiguration in paymentConfigurations)
+                {
+                    foreach (var paymentTypesArray in paymentConfiguration.Conditions.PaymentTypes)
+                    {
+                        paymentTypes.Add(paymentTypesArray);
+                    }
+                }
+            }
+
+            return new AvailableConfigurationResult(paymentTypes.Distinct().ToList(), paymentProviderDefinition);
         }
     }
 }
