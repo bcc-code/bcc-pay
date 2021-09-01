@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Web;
 using BccPay.Core.Cqrs.Queries;
+using BccPay.Core.Sample.Contracts.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +14,7 @@ namespace BccPay.Core.Sample.API.Controllers
     {
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<PaymentConfigurationResult>))]
-        public async Task<IActionResult> GetPaymentConfigurations([FromQuery] string countryCode)
+        public async Task<IActionResult> GetPaymentConfigurations([FromQuery] PaymentConfigurationRequest paymentConfiguration)
         {
             var queryParams = HttpUtility.ParseQueryString(Request.QueryString.ToString());
 
@@ -26,7 +27,7 @@ namespace BccPay.Core.Sample.API.Controllers
                 }
             }
 
-            var query = new GetCountryPaymentConfigurationsQuery(countryCode, conditions);
+            var query = new GetCountryPaymentConfigurationsQuery(paymentConfiguration.CountryCodes, paymentConfiguration.PaymentTypes);
 
             var result = await Mediator.Send(query);
 

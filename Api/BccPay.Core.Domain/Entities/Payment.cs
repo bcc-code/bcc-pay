@@ -20,14 +20,13 @@ namespace BccPay.Core.Domain.Entities
         public string CurrencyCode { get; set; }
         public string CountryCode { get; set; }
         public decimal Amount { get; set; }
-        public string Description { get; set; }
-        public bool IsProblematic { get; set; }
-
         /// <summary>
         /// Optional property. 
         /// Could indicate if it is a membership deposit of saving payment
         /// </summary>
         public string Type { get; set; }
+        public string Description { get; set; }
+        public bool IsProblematic { get; set; }
 
         public PaymentStatus PaymentStatus { get; set; }
         public List<Attempt> Attempts { get; set; }

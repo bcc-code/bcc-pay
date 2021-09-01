@@ -75,18 +75,18 @@ namespace BccPay.Core.Cqrs.Commands
                         Payment.GetDocumentId(request.PaymentId), cancellationToken)
                     ?? throw new NotFoundException("Invalid payment ID");
 
-            if (payment.PaymentStatus == PaymentStatus.Closed 
+            if (payment.PaymentStatus == PaymentStatus.Closed
                 || payment.PaymentStatus == PaymentStatus.Paid
                 || payment.PaymentStatus == PaymentStatus.Refunded)
                 throw new UpdatePaymentAttemptForbiddenException("Payment is completed.");
 
             var countryCode = request.CountryCode ?? payment.CountryCode;
 
-            var paymentConfiguration = await _documentSession.LoadAsync<PaymentConfiguration>(
-                    PaymentConfiguration.GetDocumentId(request.PaymentConfigurationId), cancellationToken)
+            var paymentConfiguration = await _documentSession.LoadAsync<PaymentProviderDefinition>(
+                    PaymentProviderDefinition.GetDocumentId(request.PaymentConfigurationId), cancellationToken)
                     ?? throw new Exception("Invalid payment configuration ID");
 
-            var countryAvailableConfigurations = await _mediator.Send(new GetCountryPaymentConfigurationsQuery(countryCode), cancellationToken);
+            var countryAvailableConfigurations = await _mediator.Send(new GetCountryPaymentConfigurationsQuery(new string[] { countryCode }), cancellationToken);
 
             var provider = _paymentProviderFactory.GetPaymentProvider(paymentConfiguration.Provider);
 
@@ -103,8 +103,8 @@ namespace BccPay.Core.Cqrs.Commands
                 }
             }
 
-            if (!countryAvailableConfigurations.Any(x => x.Id == request.PaymentConfigurationId))
-                throw new InvalidPaymentException($"The payment configuration {request.PaymentConfigurationId} is not available for the country '{countryCode}'");
+            //if (!countryAvailableConfigurations.Any(x => x.Id == request.PaymentConfigurationId))
+            //    throw new InvalidPaymentException($"The payment configuration {request.PaymentConfigurationId} is not available for the country '{countryCode}'");
 
             var (phonePrefix, phoneBody) = PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);
 
