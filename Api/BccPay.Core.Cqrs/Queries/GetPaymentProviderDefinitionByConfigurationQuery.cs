@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
-using BccPay.Core.Infrastructure.Exceptions;
 using MediatR;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
@@ -24,11 +23,9 @@ namespace BccPay.Core.Cqrs.Queries
     public class PaymentConfigurationResult
     {
         public string PaymentConfigurationId { get; set; }
-        public string[] Types { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
         public PaymentProvider Provider { get; set; }
         public Currencies Currency { get; set; }
-
     }
 
     public class GetCountryPaymentConfigurationsQueryHandler : IRequestHandler<GetPaymentProviderDefinitionByConfigurationQuery, AvailableConfigurationResult>
@@ -46,11 +43,14 @@ namespace BccPay.Core.Cqrs.Queries
             var configurations = await _documentSession.Query<PaymentConfiguration>()
                                     .Where(paymentConfiguration
                                         => request.CountryCode == paymentConfiguration.Conditions.CountryCode
-                                        && paymentConfiguration.Conditions.PaymentTypes.ContainsAny(request.PaymentType))
+                                        && paymentConfiguration.Conditions.PaymentTypes.ContainsAny(request.PaymentType)
+                                        || paymentConfiguration.Conditions.CountryCode == Country.DefaultCountryCode)
                                     .ToListAsync(cancellationToken);
 
-            if (configurations.Count == 0)
-                throw new InvalidConfigurationException($"Unable to find payment implementation for {request.CountryCode} with type {string.Join(", ", request.PaymentType)}");
+            // if result have 0 configurations => return default
+            // or 
+            // if (configurations.Count == 0)
+            //     throw new InvalidConfigurationException($"Unable to find payment implementation for {request.CountryCode} with type {string.Join(", ", request.PaymentType)}");
 
             var paymentProviderDefinition = await _documentSession.Query<PaymentProviderDefinition>()
                      .Search(definition => definition.PaymentDefinitionCode, configurations.SelectMany(configuration => configuration.PaymentProviderDefinitionIds), @operator: SearchOperator.And)
