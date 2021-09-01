@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BccPay.Core.Domain;
+using BccPay.Core.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Raven.Client.Documents.Session;
 
@@ -41,7 +42,7 @@ namespace BccPay.Core.Infrastructure.Configuration
             // add/update payment provider definition
             foreach (var definition in paymentDefinitions)
             {
-                var oldDefinition = oldPaymentDefinitions.FirstOrDefault(x => x.PaymentConfigurationCode == definition.Id);
+                var oldDefinition = oldPaymentDefinitions.FirstOrDefault(x => x.PaymentDefinitionCode == definition.Id);
                 if (oldDefinition != null)
                 {
                     oldDefinition.Provider = definition.Provider;
@@ -51,7 +52,7 @@ namespace BccPay.Core.Infrastructure.Configuration
                 {
                     _documentSession.Store(new PaymentProviderDefinition
                     {
-                        PaymentConfigurationCode = definition.Id,
+                        PaymentDefinitionCode = definition.Id,
                         Provider = definition.Provider,
                         Settings = definition.Settings
                     });
@@ -60,28 +61,32 @@ namespace BccPay.Core.Infrastructure.Configuration
 
             // remove old configurations
             oldPaymentDefinitions
-                .Where(x => !paymentDefinitions.Any(c => c.Id == x.PaymentConfigurationCode))
+                .Where(x => !paymentDefinitions.Any(c => c.Id == x.PaymentDefinitionCode))
                 .ToList()
                 .ForEach(_documentSession.Delete);
         }
 
-        private void UpdatePaymentConditionConfigurations(List<PaymentConfigurations> paymentConfigurations)
+        private void UpdatePaymentConditionConfigurations(List<PaymentConditionConfigurations> paymentConfigurations)
         {
-            var existingConfigurations = _documentSession.Query<PaymentConfigurations>().ToList();
+            var existingConfigurations = _documentSession.Query<PaymentConditionConfigurations>().ToList();
 
             foreach (var paymentConfiguration in paymentConfigurations)
             {
-                // NOTE: Probably we need to check the whole object instead of supported types
-                var existingPaymentConfiguration = existingConfigurations.FirstOrDefault(x => x.PaymentProviderDefinitionIds == paymentConfiguration.PaymentProviderDefinitionIds);
+                var existingPaymentConfiguration = existingConfigurations.FirstOrDefault(x => x.Conditions.CountryCode == paymentConfiguration.Conditions.CountryCode);
                 if (existingPaymentConfiguration != null)
                 {
                     existingPaymentConfiguration = paymentConfiguration;
                 }
                 else
                 {
-                    _documentSession.Store(new PaymentConfigurations
+                    _documentSession.Store(new PaymentConfiguration
                     {
-                        Conditions = paymentConfiguration.Conditions,
+                        Conditions = new PaymentConditions
+                        {
+                            CountryCode = paymentConfiguration.Conditions.CountryCode,
+                            CurrencyCodes = paymentConfiguration.Conditions.CurrencyCodes,
+                            PaymentTypes = paymentConfiguration.Conditions.PaymentTypes
+                        },
                         PaymentProviderDefinitionIds = paymentConfiguration.PaymentProviderDefinitionIds
                     });
                 }

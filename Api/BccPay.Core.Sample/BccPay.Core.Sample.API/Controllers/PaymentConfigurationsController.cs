@@ -27,7 +27,7 @@ namespace BccPay.Core.Sample.API.Controllers
                 }
             }
 
-            var query = new GetCountryPaymentConfigurationsQuery(paymentConfiguration.CountryCodes, paymentConfiguration.PaymentTypes);
+            var query = new GetPaymentProviderDefinitionByConfigurationQuery(paymentConfiguration.CountryCode, paymentConfiguration.PaymentType);
 
             var result = await Mediator.Send(query);
 

@@ -4,11 +4,11 @@ namespace BccPay.Core.Domain
 {
     public class PaymentProviderDefinition
     {
-        public static string GetDocumentId(string code) => $"payment-provider-definition/{code}";
+        public static string GetDocumentId(string code) => $"payment-provider-definitions/{code}";
 
-        public string Id => GetDocumentId(PaymentConfigurationCode);
+        public string Id => GetDocumentId(PaymentDefinitionCode);
 
-        public string PaymentConfigurationCode { get; init; }
+        public string PaymentDefinitionCode { get; set; }
 
         public PaymentProvider Provider { get; set; }
 
@@ -19,6 +19,6 @@ namespace BccPay.Core.Domain
     {
         public PaymentMethod PaymentMethod { get; init; }
 
-        public Currency Currency { get; init; }
+        public Currencies Currency { get; init; }
     }
 }
