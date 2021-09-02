@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BccPay.Core.DataAccess.Indexes;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
@@ -15,9 +16,10 @@ namespace BccPay.Core.Cqrs.Queries
 {
     public record GetPaymentProviderDefinitionByConfigurationQuery(
         string CountryCode,
-        string[] PaymentTypes = null) : IRequest<AvailableConfigurationResult>;
+        string PaymentType = null,
+        string CurrencyCode = null) : IRequest<AvailableConfigurationResult>;
 
-    public record AvailableConfigurationResult(List<string> SupportedTypes, List<PaymentConfigurationResult> PaymentConfigurations);
+    public record AvailableConfigurationResult(List<string> SupportedTypes, List<string> SupportedCurrencies, List<PaymentConfigurationResult> PaymentConfigurations);
 
     public class PaymentConfigurationResult
     {
@@ -39,15 +41,25 @@ namespace BccPay.Core.Cqrs.Queries
 
         public async Task<AvailableConfigurationResult> Handle(GetPaymentProviderDefinitionByConfigurationQuery request, CancellationToken cancellationToken)
         {
-            var query = _documentSession.Query<PaymentConfiguration>();
+            var query = _documentSession.Query<PaymentConfigurationIndex.Result, PaymentConfigurationIndex>()
+                        .Where(paymentConfiguration => paymentConfiguration.CountryCode == request.CountryCode);
 
-            if (request.PaymentTypes is not null)
-                query.Where(paymentConfiguration => paymentConfiguration.Conditions.PaymentTypes.ContainsAny(request.PaymentTypes));
+            if (!string.IsNullOrWhiteSpace(request.CurrencyCode))
+                query = query.Search(paymentConfiguration => paymentConfiguration.SearchContent, request.CurrencyCode, options: SearchOptions.And);
+            if (!string.IsNullOrWhiteSpace(request.PaymentType))
+                query = query.Search(paymentConfiguration => paymentConfiguration.SearchContent, request.PaymentType, options: SearchOptions.And);
 
-            var paymentConfigurations = await query.Where(paymentConfiguration
-                                                => request.CountryCode == paymentConfiguration.Conditions.CountryCode
-                                                || paymentConfiguration.Conditions.CountryCode == Country.DefaultCountryCode)
-                                            .ToListAsync(cancellationToken);
+            List<PaymentConfigurationIndex.Result> paymentConfigurations = new();
+
+            paymentConfigurations = await query.ToListAsync(cancellationToken);
+
+            if (paymentConfigurations.Count == 0)
+            {
+                paymentConfigurations = await _documentSession
+                    .Query<PaymentConfigurationIndex.Result, PaymentConfigurationIndex>()
+                    .Where(paymentConfiguration => paymentConfiguration.CountryCode == Country.DefaultCountryCode)
+                    .ToListAsync(cancellationToken);
+            }
 
             var idsToCompare = paymentConfigurations.SelectMany(x => x.PaymentProviderDefinitionIds).ToArray();
 
@@ -62,33 +74,50 @@ namespace BccPay.Core.Cqrs.Queries
                      })
                      .ToListAsync(cancellationToken);
 
-            // NOTE: not relevant, always takes default values as result
-            // if (paymentProviderDefinition is null)
-            //    throw new InvalidConfigurationException($"Unable to find configuration for {request.CountryCode} with type {string.Join(", ", request.PaymentTypes)}");
+            List<string> supportedPaymentTypes = new();
+            List<string> supportedCurrencies = new();
 
-
-            List<string> paymentTypes = new();
-
-            if (request.PaymentTypes is not null && paymentConfigurations.Count > 0)
+            if (request.PaymentType is not null && paymentConfigurations.Count > 0)
             {
-                paymentTypes = paymentConfigurations.SelectMany(configuration
-                            => configuration.Conditions.PaymentTypes.Intersect(request.PaymentTypes))
+                supportedPaymentTypes = paymentConfigurations.Where(configuration
+                            => request.PaymentType.In(configuration.Conditions.PaymentTypes))
+                        .SelectMany(configuration => configuration.Conditions.PaymentTypes)
                         .Distinct()
                         .ToList();
             }
 
-            if (request.PaymentTypes is null)
+            if (supportedPaymentTypes.Count == 0)
             {
                 foreach (var paymentConfiguration in paymentConfigurations)
                 {
                     foreach (var paymentTypesArray in paymentConfiguration.Conditions.PaymentTypes)
                     {
-                        paymentTypes.Add(paymentTypesArray);
+                        supportedPaymentTypes.Add(paymentTypesArray);
                     }
                 }
             }
 
-            return new AvailableConfigurationResult(paymentTypes.Distinct().ToList(), paymentProviderDefinition);
+            if (request.CurrencyCode is not null && paymentConfigurations.Count > 0)
+            {
+                supportedCurrencies = paymentConfigurations.Where(configuration
+                            => request.CurrencyCode.In(configuration.Conditions.CurrencyCodes))
+                        .SelectMany(configuration => configuration.Conditions.CurrencyCodes)
+                        .Distinct()
+                        .ToList();
+            }
+
+            if (supportedCurrencies.Count == 0)
+            {
+                foreach (var paymentConfiguration in paymentConfigurations)
+                {
+                    foreach (var paymentCurrency in paymentConfiguration.Conditions.CurrencyCodes)
+                    {
+                        supportedCurrencies.Add(paymentCurrency);
+                    }
+                }
+            }
+
+            return new AvailableConfigurationResult(supportedPaymentTypes.Distinct().ToList(), supportedCurrencies.Distinct().ToList(), paymentProviderDefinition);
         }
     }
 }

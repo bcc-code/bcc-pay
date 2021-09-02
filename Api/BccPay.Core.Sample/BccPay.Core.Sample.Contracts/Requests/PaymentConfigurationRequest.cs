@@ -3,6 +3,7 @@
     public class PaymentConfigurationRequest
     {
         public string CountryCode { get; set; }
-        public string[] PaymentTypes { get; set; }
+        public string PaymentType { get; set; }
+        public string CurrencyCode { get; set; }
     }
 }

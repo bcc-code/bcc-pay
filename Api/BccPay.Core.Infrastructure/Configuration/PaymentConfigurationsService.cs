@@ -72,7 +72,7 @@ namespace BccPay.Core.Infrastructure.Configuration
 
             foreach (var paymentConfiguration in paymentConfigurations)
             {
-                var existingPaymentConfiguration = existingConfigurations.FirstOrDefault(x => x.Conditions.CountryCode == paymentConfiguration.Conditions.CountryCode);
+                var existingPaymentConfiguration = existingConfigurations.FirstOrDefault(x => x.CountryCode == paymentConfiguration.CountryCode);
                 if (existingPaymentConfiguration != null)
                 {
                     existingPaymentConfiguration = paymentConfiguration;
@@ -81,9 +81,9 @@ namespace BccPay.Core.Infrastructure.Configuration
                 {
                     _documentSession.Store(new PaymentConfiguration
                     {
+                        CountryCode = paymentConfiguration.CountryCode,
                         Conditions = new PaymentConditions
                         {
-                            CountryCode = paymentConfiguration.Conditions.CountryCode,
                             CurrencyCodes = paymentConfiguration.Conditions.CurrencyCodes,
                             PaymentTypes = paymentConfiguration.Conditions.PaymentTypes
                         },

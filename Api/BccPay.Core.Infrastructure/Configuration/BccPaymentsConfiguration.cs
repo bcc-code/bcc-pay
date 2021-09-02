@@ -22,14 +22,13 @@ namespace BccPay.Core.Infrastructure.Configuration
 
     public class PaymentConditionConfigurations
     {
-        public string PaymentConfigurationCode { get; set; }
+        public string CountryCode { get; set; }
         public Conditions Conditions { get; set; }
         public string[] PaymentProviderDefinitionIds { get; set; }
     }
 
     public class Conditions
     {
-        public string CountryCode { get; set; }
         public string[] PaymentTypes { get; set; }
         public string[] CurrencyCodes { get; set; }
     }
