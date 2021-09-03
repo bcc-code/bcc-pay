@@ -24,19 +24,16 @@ export async function getPaymentConfigurations(
       .then(response => response.json())
       .then(json => {
         possibleConfigurations = json;
-        console.log(
-          'Possible configurations for country ' +
-            country +
-            ' : ' +
-            JSON.stringify(possibleConfigurations)
-        );
       });
 
     const possibleConfigurationsObject = JSON.parse(
       JSON.stringify(possibleConfigurations)
     );
-    possibleConfigurationsObject.forEach(element => {
-      enablePossiblePayments(element.provider);
+
+    console.log('Possible configurations :');
+    console.log(possibleConfigurationsObject);
+    possibleConfigurationsObject.paymentConfigurations.forEach(element => {
+      enablePossiblePayments(element.paymentMethod);
     });
     return possibleConfigurations;
   } catch (e) {
@@ -54,14 +51,21 @@ export function enablePossiblePayments(provider: string) {
 }
 
 export function disablePayments() {
-  const netsButton = document.getElementById('Nets') as HTMLButtonElement;
-  if (netsButton) {
-    netsButton.disabled = true;
+  const creditCardButton = document.getElementById(
+    'CreditCardOrVipps'
+  ) as HTMLButtonElement;
+  if (creditCardButton) {
+    creditCardButton.disabled = true;
   }
 
-  const mollyButton = document.getElementById('Mollie') as HTMLButtonElement;
-  if (netsButton) {
-    mollyButton.disabled = true;
+  const giropayButton = document.getElementById('Giropay') as HTMLButtonElement;
+  if (giropayButton) {
+    giropayButton.disabled = true;
+  }
+
+  const idealButton = document.getElementById('iDeal') as HTMLButtonElement;
+  if (idealButton) {
+    idealButton.disabled = true;
   }
 }
 
