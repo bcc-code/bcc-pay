@@ -6,9 +6,9 @@ namespace BccPay.Core.Infrastructure.Configuration
 {
     public class BccPaymentsConfiguration
     {
-        public List<BccPaymentConfiguration> PaymentConfigurations { get; set; } = new List<BccPaymentConfiguration>();
+        public List<BccPaymentConfiguration> PaymentProviderDefinitions { get; set; } = new List<BccPaymentConfiguration>();
 
-        public List<CountryBccPaymentConfigurations> CountryPaymentConfigurations { get; set; } = new List<CountryBccPaymentConfigurations>();
+        public List<PaymentConditionConfigurations> PaymentConfigurations { get; set; } = new List<PaymentConditionConfigurations>();
     }
 
     public class BccPaymentConfiguration
@@ -20,10 +20,16 @@ namespace BccPay.Core.Infrastructure.Configuration
         public PaymentSettings Settings { get; set; }
     }
 
-    public class CountryBccPaymentConfigurations
+    public class PaymentConditionConfigurations
     {
-        public string CountryCode { get; init; }
+        public string CountryCode { get; set; }
+        public Conditions Conditions { get; set; }
+        public string[] PaymentProviderDefinitionIds { get; set; }
+    }
 
-        public string[] PaymentConfigurationIds { get; set; }
+    public class Conditions
+    {
+        public string[] PaymentTypes { get; set; }
+        public string[] CurrencyCodes { get; set; }
     }
 }

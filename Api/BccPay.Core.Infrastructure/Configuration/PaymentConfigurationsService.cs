@@ -28,64 +28,66 @@ namespace BccPay.Core.Infrastructure.Configuration
 
         public void InitPaymentsConfiguration()
         {
-            UpdatePaymentConfigurations(_bccPaymentsConfiguration.Value.PaymentConfigurations);
+            UpdatePaymentProviderDefinitions(_bccPaymentsConfiguration.Value.PaymentProviderDefinitions);
 
-            UpdateCountries(_bccPaymentsConfiguration.Value.CountryPaymentConfigurations);
+            UpdatePaymentConditionConfigurations(_bccPaymentsConfiguration.Value.PaymentConfigurations);
 
             _documentSession.SaveChanges();
         }
 
-        private void UpdatePaymentConfigurations(List<BccPaymentConfiguration> paymentConfigs)
+        private void UpdatePaymentProviderDefinitions(List<BccPaymentConfiguration> paymentDefinitions)
         {
-            var oldPaymentConfigs = _documentSession.Query<PaymentConfiguration>().ToList();
+            var oldPaymentDefinitions = _documentSession.Query<PaymentProviderDefinition>().ToList();
 
-            // add/update payment configurations
-            foreach (var config in paymentConfigs)
+            // add/update payment provider definition
+            foreach (var definition in paymentDefinitions)
             {
-                var oldConfig = oldPaymentConfigs.FirstOrDefault(x => x.PaymentConfigurationCode == config.Id);
-                if (oldConfig != null)
+                var oldDefinition = oldPaymentDefinitions.FirstOrDefault(x => x.PaymentDefinitionCode == definition.Id);
+                if (oldDefinition != null)
                 {
-                    oldConfig.Provider = config.Provider;
-                    oldConfig.Settings = config.Settings;
+                    oldDefinition.Provider = definition.Provider;
+                    oldDefinition.Settings = definition.Settings;
                 }
                 else
                 {
-                    _documentSession.Store(new PaymentConfiguration
+                    _documentSession.Store(new PaymentProviderDefinition
                     {
-                        PaymentConfigurationCode = config.Id,
-                        Provider = config.Provider,
-                        Settings = config.Settings
+                        PaymentDefinitionCode = definition.Id,
+                        Provider = definition.Provider,
+                        Settings = definition.Settings
                     });
                 }
             }
 
             // remove old configurations
-            oldPaymentConfigs
-                .Where(x => !paymentConfigs.Any(c => c.Id == x.PaymentConfigurationCode))
+            oldPaymentDefinitions
+                .Where(x => !paymentDefinitions.Any(c => c.Id == x.PaymentDefinitionCode))
                 .ToList()
                 .ForEach(_documentSession.Delete);
         }
 
-        private void UpdateCountries(List<CountryBccPaymentConfigurations> countryPaymentConfigurations)
+        private void UpdatePaymentConditionConfigurations(List<PaymentConditionConfigurations> paymentConfigurations)
         {
-            var existingCountries = _documentSession.Query<Country>().ToList();
+            var existingConfigurations = _documentSession.Query<PaymentConditionConfigurations>().ToList();
 
-            // do not remove country if it isn't specified, just remove payment configurations
-            existingCountries.ForEach(c => c.PaymentConfigurations = Array.Empty<string>());
-
-            foreach (var config in countryPaymentConfigurations)
+            foreach (var paymentConfiguration in paymentConfigurations)
             {
-                var existingConfig = existingCountries.FirstOrDefault(x => x.CountryCode == config.CountryCode);
-                if (existingConfig != null)
+                var existingPaymentConfiguration = existingConfigurations.FirstOrDefault(x => x.CountryCode == paymentConfiguration.CountryCode);
+                if (existingPaymentConfiguration != null)
                 {
-                    existingConfig.PaymentConfigurations = config.PaymentConfigurationIds;
+                    existingPaymentConfiguration = paymentConfiguration;
                 }
                 else
                 {
-                    _documentSession.Store(new Country
+                    _documentSession.Store(new PaymentConfiguration
                     {
-                        CountryCode = config.CountryCode,
-                        PaymentConfigurations = config.PaymentConfigurationIds
+                        CountryCode = paymentConfiguration.CountryCode,
+                        Conditions = new PaymentConditions
+                        {
+                            CurrencyCodes = paymentConfiguration.Conditions.CurrencyCodes,
+                            PaymentTypes = paymentConfiguration.Conditions.PaymentTypes
+                        },
+                        PaymentProviderDefinitionIds = paymentConfiguration.PaymentProviderDefinitionIds
                     });
                 }
             }
