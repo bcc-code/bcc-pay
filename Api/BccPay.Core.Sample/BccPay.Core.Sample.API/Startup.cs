@@ -44,7 +44,7 @@ namespace BccPay.Core.Sample
                 options.Nets.NotificationUrl = "https://localhost:5001/Payment/webhook/";
                 options.Mollie.BaseAddress = "https://api.mollie.com";
                 options.Mollie.AuthToken = Configuration["MollieSecretKey"];
-                options.Mollie.RedirectUrl = "https://test.api.samvirk.com/redirect";
+                options.Mollie.RedirectUrl = "https://bcc-pay-front-dev-gshbhxouha-ew.a.run.app/status";
                 options.Mollie.WebhookUrl = "https://en46nkjh5kbngpp.m.pipedream.net/";
                 options.Mollie.RedirectUrlMobileApp = "com.ionic.samvirk://overview";
                 options.Mollie.RateMarkup = 0.015M;
