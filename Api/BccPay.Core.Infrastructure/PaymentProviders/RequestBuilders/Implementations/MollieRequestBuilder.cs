@@ -1,5 +1,6 @@
 ﻿using System;
 using BccPay.Core.Enums;
+using BccPay.Core.Infrastructure.BccPaymentSettings;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentModels.MollieNodes;
 using BccPay.Core.Infrastructure.PaymentModels.Request.Mollie;

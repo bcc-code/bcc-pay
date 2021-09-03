@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
+using BccPay.Core.Infrastructure.BccPaymentSettings;
 using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
@@ -156,19 +157,14 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
         public async Task ChargePayment(Payment payment, Attempt attempt)
         {
             var netsStatusDetails = (NetsStatusDetails)attempt.StatusDetails;
-            try
-            {
-                var invoice = await _netsClient.ChargePayment(_headers,
-                     netsStatusDetails.PaymentCheckoutId,
-                     new NetsChargeRequest
-                     {
-                         Amount = Convert.ToInt32(payment.Amount * 100)
-                     });
+            var invoice = await _netsClient.ChargePayment(_headers,
+                 netsStatusDetails.PaymentCheckoutId,
+                 new NetsChargeRequest
+                 {
+                     Amount = Convert.ToInt32(payment.Amount * 100)
+                 });
 
-                netsStatusDetails.InvoiceId = invoice?.Invoice?.InvoiceNumber;
-            }
-            catch (ApiException exception)
-            { }
+            netsStatusDetails.InvoiceId = invoice?.Invoice?.InvoiceNumber;
         }
 
         private INetsPaymentRequestBuilder CreateRequestBuilder(PaymentSettings settings)
