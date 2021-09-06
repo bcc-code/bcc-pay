@@ -83,7 +83,7 @@ namespace BccPay.Core.Cqrs.Queries
                 .Select(x => new PaymentResult
                 {
                     Amount = x.Amount + x.CurrencyCode,
-                    CountryCode = x.CountryCode,
+                    CountryCode = string.IsNullOrWhiteSpace(x.CountryCode) ? x.Attempts.First().CountryCode : x.CountryCode,
                     Created = x.Created,
                     Description = x.Description,
                     PayerId = x.PayerId,
