@@ -1,24 +1,26 @@
-﻿using BccPay.Core.Enums;
-
-namespace BccPay.Core.Domain
+﻿namespace BccPay.Core.Domain.Entities
 {
     public class PaymentConfiguration
     {
         public static string GetDocumentId(string code) => $"payment-configurations/{code}";
 
-        public string Id => GetDocumentId(PaymentConfigurationCode);
+        public string Id => GetDocumentId(CountryCode);
 
-        public string PaymentConfigurationCode { get; init; }
+        public string CountryCode { get; init; }
 
-        public PaymentProvider Provider { get; set; }
+        public PaymentConditions Conditions { get; set; }
 
-        public PaymentSettings Settings { get; set; }
+        public string[] PaymentProviderDefinitionIds { get; set; }
+
+        public PaymentConfiguration()
+        {
+
+        }
     }
 
-    public class PaymentSettings
+    public class PaymentConditions
     {
-        public PaymentMethod PaymentMethod { get; init; }
-
-        public Currency Currency { get; init; }
+        public string[] PaymentTypes { get; set; }
+        public string[] CurrencyCodes { get; set; }
     }
 }

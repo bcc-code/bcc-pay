@@ -9,7 +9,5 @@
         public string Id => GetDocumentId(CountryCode);
 
         public string CountryCode { get; set; }
-
-        public string[] PaymentConfigurations { get; set; }
     }
 }
