@@ -1,12 +1,14 @@
 ﻿using System;
-using BccPay.Core.Infrastructure;
+using BccPay.Core.Infrastructure.BccPaymentSettings;
 using BccPay.Core.Infrastructure.Configuration;
+using BccPay.Core.Infrastructure.Exceptions;
 using BccPay.Core.Infrastructure.Helpers;
 using BccPay.Core.Infrastructure.Helpers.Implementation;
 using BccPay.Core.Infrastructure.PaymentProviders;
 using BccPay.Core.Infrastructure.PaymentProviders.Implementations;
 using BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie;
 using BccPay.Core.Infrastructure.RefitClients;
+using BccPay.Core.Shared.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
@@ -18,10 +20,11 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection ConfigureBccPayInfrastructureServices(
             this IServiceCollection services,
-            Action<BccPaymentsSettings> configuration)
+            Action<InfrastructureConfigurations> configuration)
         {
-            var defaultOptions = new BccPaymentsSettings();
+            var defaultOptions = new InfrastructureConfigurations();
             configuration(defaultOptions);
+            CheckSettings(defaultOptions);
 
             services.AddScoped<IPaymentProvider, NetsPaymentProvider>(implementationFactory =>
             {
@@ -62,6 +65,19 @@ namespace Microsoft.Extensions.DependencyInjection
             var paymentConfigurationsService = serviceScope.ServiceProvider.GetRequiredService<IPaymentConfigurationsService>();
 
             paymentConfigurationsService.InitPaymentsConfiguration();
+        }
+
+        private static void CheckSettings(InfrastructureConfigurations infrastructureConfigurations)
+        {
+            // NOTE: we have a lot of dependencies and validation is required for all of the payment providers
+            if (infrastructureConfigurations.Mollie.IsAnyFieldNullOrEmpty(out string mollieFields))
+                throw new NullConfigurationException(nameof(infrastructureConfigurations.Mollie), mollieFields);
+
+            if (infrastructureConfigurations.Nets.IsAnyFieldNullOrEmpty(out string netsFields))
+                throw new NullConfigurationException(nameof(infrastructureConfigurations.Nets), netsFields);
+
+            if (infrastructureConfigurations.Fixer.IsAnyFieldNullOrEmpty(out string fixerFields))
+                throw new NullConfigurationException(nameof(infrastructureConfigurations.Fixer), fixerFields);
         }
     }
 }

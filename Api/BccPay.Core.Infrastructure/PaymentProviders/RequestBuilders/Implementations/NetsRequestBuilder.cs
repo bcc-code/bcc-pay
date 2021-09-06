@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BccPay.Core.Infrastructure.BccPaymentSettings;
 using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
