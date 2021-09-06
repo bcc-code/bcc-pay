@@ -92,11 +92,13 @@ export class BccPay extends LitElement {
     }
   }
 
-  async initMolliePayment() {
+  async initMolliePayment(paymentConfigurationId: string, buttonId: string) {
     mollieUrl = await startMolliePayment(
       this.paymentId,
       this.user,
-      this.server
+      this.server,
+      paymentConfigurationId,
+      buttonId
     );
 
     if (mollieUrl !== '' || mollieUrl !== null || mollieUrl !== undefined) {
@@ -114,32 +116,33 @@ export class BccPay extends LitElement {
       </div>
       <div class="card-square" id="main-div">
         <div id="first-screen" class="screen">
-          <div class="card-subtitle">
-            <h5>you are paying for</h5>
-          </div>
-          <div class="card-title">
-            <h3>${this.item}</h3>
-          </div>
           <div class="card-price">
-            <span class="card-tag">Price</span>
-            <span class="card-cost">${this.amount} ${this.currency} </span>
+            <div>
+              <div class="card-subtitle">
+                <h5>you are paying for</h5>
+              </div>
+              <div class="card-title">
+                <h3>${this.item}</h3>
+              </div>
+            </div>
+            <div class="card-row">
+              <span class="card-tag">Amount</span>
+              <span class="card-cost">${this.amount} ${this.currency} </span>
+            </div>
           </div>
 
           <div class="country-container">
-            Current country: ${this.country}
-            <div>
-              <select
-                class="country-select"
-                value="${this.country}"
-                @change="${(e: any) => (this.country = e.target.value)}"
-              >
-                <option value="">Change country</option>
-                <option value="NOR">Norway</option>
-                <option value="DE">Germany</option>
-                <option value="UA">Ukraine</option>
-                <option value="PL">Poland</option>
-              </select>
-            </div>
+            Choose your country:
+            <select
+              class="country-select"
+              @change="${(e: any) => (this.country = e.target.value)}"
+            >
+              <option value="" selected disabled hidden>Change country</option>
+              <option selected="${this.country}" value="NOR">Norway</option>
+              <option selected="${this.country}" value="DE">Germany</option>
+              <option selected="${this.country}" value="UA">Ukraine</option>
+              <option selected="${this.country}" value="PL">Poland</option>
+            </select>
           </div>
           <button
             id="Nets"
@@ -155,11 +158,20 @@ export class BccPay extends LitElement {
             <span class="payment-button-text">CREDIT CARD</span>
           </button>
           <button
-            id="Mollie"
+            id="mollie-giropay"
             class="payment-button"
-            @click="${() => this.initMolliePayment()}"
+            @click="${() =>
+              this.initMolliePayment('mollie-giropay-eur', 'mollie-giropay')}"
           >
             <span class="payment-button-text">GIROPAY</span>
+          </button>
+          <button
+            id="mollie-ideal"
+            class="payment-button"
+            @click="${() =>
+              this.initMolliePayment('mollie-ideal-eur', 'mollie-ideal')}"
+          >
+            <span class="payment-button-text">iDeal</span>
           </button>
         </div>
 

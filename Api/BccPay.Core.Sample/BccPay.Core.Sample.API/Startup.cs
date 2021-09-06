@@ -35,20 +35,28 @@ namespace BccPay.Core.Sample
 
             services.AddRavenDatabaseDocumentStore();
 
-            services.ConfigureBccPayInfrastructureServices(options =>
+            services.ConfigureBccPayInfrastructureServices(bccPay =>
             {
-                options.Nets.BaseAddress = "https://test.api.dibspayment.eu";
-                options.Nets.CheckoutPageUrl = "/";
-                options.Nets.TermsUrl = "http://localhost:8000";
-                options.Nets.SecretKey = Configuration["NetsSecretKey"];
-                options.Nets.NotificationUrl = "https://localhost:5001/Payment/webhook/";
-                options.Mollie.BaseAddress = "https://api.mollie.com";
-                options.Mollie.AuthToken = Configuration["MollieSecretKey"];
-                options.Mollie.RedirectUrl = "https://test.api.samvirk.com/redirect";
-                options.Mollie.WebhookUrl = "https://en46nkjh5kbngpp.m.pipedream.net/";
-                options.Mollie.RedirectUrlMobileApp = "com.ionic.samvirk://overview";
-                options.Mollie.RateMarkup = 0.015M;
-                options.Fixer.BaseAddress = "https://data.fixer.io";
+                bccPay.AddFixer(options => options.BaseAddress = "https://data.fixer.io");
+
+                bccPay.AddMollie(options =>
+                {
+                    options.BaseAddress = "https://api.mollie.com";
+                    options.AuthToken = Configuration["MollieSecretKey"];
+                    options.RedirectUrl = "https://test.api.samvirk.com/redirect";
+                    options.WebhookUrl = "https://en46nkjh5kbngpp.m.pipedream.net/";
+                    options.RedirectUrlMobileApp = "com.ionic.samvirk://overview";
+                    options.RateMarkup = 0.015M;
+                });
+
+                bccPay.AddNets(options =>
+                {
+                    options.BaseAddress = "https://test.api.dibspayment.eu";
+                    options.CheckoutPageUrl = "/";
+                    options.TermsUrl = "http://localhost:8000";
+                    options.SecretKey = Configuration["NetsSecretKey"];
+                    options.NotificationUrl = "https://localhost:5001/Payment/webhook/";
+                });
             });
 
             services.ConfigureBccCoreCqrs();

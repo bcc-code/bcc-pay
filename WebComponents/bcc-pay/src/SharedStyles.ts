@@ -15,7 +15,7 @@ function createComponentStyle(): string {
       grid-template-columns: 1fr;
       grid-auto-rows: max-content;
       grid-row-gap: 1rem;
-      max-width: 478px;
+      max-width: 400px;
       background: #ffffff;
       box-shadow: 0px 24px 25px -10px rgba(182, 194, 240, 0.54);
       border-radius: 15px;
@@ -34,9 +34,10 @@ function createComponentStyle(): string {
 
     .card-price {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: baseline;
       justify-content: space-between;
-      padding: 27px 30px;
+      padding: 10px 10px;
       background-color: hsl(238, 90%, 99%);
       border: 1px solid hsl(227, 65%, 95%);
       border-radius: 10px;
@@ -56,6 +57,13 @@ function createComponentStyle(): string {
     .card-cost {
       font-size: 1.125rem;
       font-weight: 900;
+    }
+
+    .card-row {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      padding-bottom: 6px;
     }
 
     input[type='text'] {
@@ -86,6 +94,7 @@ function createComponentStyle(): string {
       margin-top: 1rem;
       position: relative;
       cursor: pointer;
+      width: 100%;
     }
     .payment-button:disabled {
       background-color: gray;
@@ -158,14 +167,18 @@ function createComponentStyle(): string {
 
     .country-container {
       display: flex;
-      align-items: center;
-      margin-top: 12px;
+      flex-direction: column;
+      align-items: left;
+      margin-top: 32px;
+      margin-bottom: 24px;
       justify-content: space-between;
     }
     .country-select {
+      margin-top: 8px;
     }
 
     select {
+      width: 100%;
       font: 400 12px/1.3 sans-serif;
       -webkit-appearance: none;
       appearance: none;
@@ -192,6 +205,11 @@ function createComponentStyle(): string {
 
     .is-hidden {
       display: none !important;
+    }
+
+    h5 {
+      margin-top: 8px;
+      margin-bottom: 8px;
     }
   `.toString();
 }

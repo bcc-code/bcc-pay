@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
+using BccPay.Core.Infrastructure.BccPaymentSettings;
 using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.Helpers;
