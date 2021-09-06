@@ -25,8 +25,8 @@ namespace BccPay.Core.DataAccess.Indexes
             Store(x => x.PaymentProviderDefinitionIds, FieldStorage.Yes);
             Store(x => x.Conditions, FieldStorage.Yes);
 
-            Index(x => x.CountryCode, FieldIndexing.Search);
-            Index(x => x.SearchContent, FieldIndexing.Search);
+            Index(x => x.CountryCode, FieldIndexing.Exact);
+            Index(x => x.SearchContent, FieldIndexing.Exact);
         }
 
         public class Result

@@ -19,7 +19,7 @@ namespace BccPay.Core.Cqrs.Queries
         string PaymentType = null,
         string CurrencyCode = null) : IRequest<AvailableConfigurationResult>;
 
-    public record AvailableConfigurationResult(List<string> SupportedTypes, List<string> SupportedCurrencies, List<PaymentConfigurationResult> PaymentConfigurations);
+    public record AvailableConfigurationResult(List<string> SupportedTypes, List<PaymentConfigurationResult> PaymentConfigurations);
 
     public class PaymentConfigurationResult
     {
@@ -75,7 +75,6 @@ namespace BccPay.Core.Cqrs.Queries
                      .ToListAsync(cancellationToken);
 
             List<string> supportedPaymentTypes = new();
-            List<string> supportedCurrencies = new();
 
             if (request.PaymentType is not null && paymentConfigurations.Count > 0)
             {
@@ -97,27 +96,7 @@ namespace BccPay.Core.Cqrs.Queries
                 }
             }
 
-            if (request.CurrencyCode is not null && paymentConfigurations.Count > 0)
-            {
-                supportedCurrencies = paymentConfigurations.Where(configuration
-                            => request.CurrencyCode.In(configuration.Conditions.CurrencyCodes))
-                        .SelectMany(configuration => configuration.Conditions.CurrencyCodes)
-                        .Distinct()
-                        .ToList();
-            }
-
-            if (supportedCurrencies.Count == 0)
-            {
-                foreach (var paymentConfiguration in paymentConfigurations)
-                {
-                    foreach (var paymentCurrency in paymentConfiguration.Conditions.CurrencyCodes)
-                    {
-                        supportedCurrencies.Add(paymentCurrency);
-                    }
-                }
-            }
-
-            return new AvailableConfigurationResult(supportedPaymentTypes.Distinct().ToList(), supportedCurrencies.Distinct().ToList(), paymentProviderDefinition);
+            return new AvailableConfigurationResult(supportedPaymentTypes.Distinct().ToList(), paymentProviderDefinition);
         }
     }
 }
