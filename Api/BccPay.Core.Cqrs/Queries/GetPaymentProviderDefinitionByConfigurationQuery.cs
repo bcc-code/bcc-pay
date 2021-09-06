@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using BccPay.Core.DataAccess.Indexes;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
@@ -41,22 +40,22 @@ namespace BccPay.Core.Cqrs.Queries
 
         public async Task<AvailableConfigurationResult> Handle(GetPaymentProviderDefinitionByConfigurationQuery request, CancellationToken cancellationToken)
         {
-            var query = _documentSession.Query<PaymentConfigurationIndex.Result, PaymentConfigurationIndex>()
+            var query = _documentSession.Query<PaymentConfiguration>()
                         .Where(paymentConfiguration => paymentConfiguration.CountryCode == request.CountryCode);
 
-            if (!string.IsNullOrWhiteSpace(request.CurrencyCode))
-                query = query.Search(paymentConfiguration => paymentConfiguration.SearchContent, request.CurrencyCode, options: SearchOptions.And);
             if (!string.IsNullOrWhiteSpace(request.PaymentType))
-                query = query.Search(paymentConfiguration => paymentConfiguration.SearchContent, request.PaymentType, options: SearchOptions.And);
+                query = query.Where(paymentConfiguration => paymentConfiguration.Conditions.PaymentTypes.Contains(request.PaymentType));
+            if (!string.IsNullOrWhiteSpace(request.CurrencyCode))
+                query = query.Where(paymentConfiguration => paymentConfiguration.Conditions.CurrencyCodes.Contains(request.CurrencyCode));
 
-            List<PaymentConfigurationIndex.Result> paymentConfigurations = new();
+            List<PaymentConfiguration> paymentConfigurations = new();
 
             paymentConfigurations = await query.ToListAsync(cancellationToken);
 
             if (paymentConfigurations.Count == 0)
             {
                 paymentConfigurations = await _documentSession
-                    .Query<PaymentConfigurationIndex.Result, PaymentConfigurationIndex>()
+                    .Query<PaymentConfiguration>()
                     .Where(paymentConfiguration => paymentConfiguration.CountryCode == Country.DefaultCountryCode)
                     .ToListAsync(cancellationToken);
             }
