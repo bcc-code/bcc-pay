@@ -1,4 +1,4 @@
-﻿namespace BccPay.Core.Infrastructure.PaymentProviders
+﻿namespace BccPay.Core.Infrastructure.BccPaymentSettings
 {
     public class MollieProviderOptions
     {
