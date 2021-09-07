@@ -103,7 +103,7 @@ namespace BccPay.Core.Cqrs.Commands
                 }
             }
 
-            if (!countryAvailableConfigurations.PaymentConfigurations.Any(x => x.CountryCode.Contains(request.PaymentConfigurationId)))
+            if (!countryAvailableConfigurations.PaymentConfigurations.Any(x => x.PaymentProviderDefinitionIds.Contains(request.PaymentConfigurationId)))
                 throw new InvalidPaymentException($"The payment configuration {request.PaymentConfigurationId} is not available for the country '{countryCode}'");
 
             var (phonePrefix, phoneBody) = PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);
