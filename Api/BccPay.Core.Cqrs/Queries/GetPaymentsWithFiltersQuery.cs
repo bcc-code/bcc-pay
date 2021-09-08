@@ -71,7 +71,7 @@ namespace BccPay.Core.Cqrs.Queries
             var query = _documentSession.Query<PaymentsIndex.Result, PaymentsIndex>();
 
             if (request.IsProblematicPayment is not null)
-                query = query.Where(x => x.IsProblematic);
+                query = query.Where(x => x.IsProblematic == request.IsProblematicPayment);
 
             if (request.PaymentStatus is not null)
                 query = query.Where(x => x.PaymentStatus == request.PaymentStatus);
