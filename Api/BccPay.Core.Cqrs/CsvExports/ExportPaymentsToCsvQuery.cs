@@ -16,21 +16,21 @@ namespace BccPay.Core.Cqrs.CsvExports
             var csvModels = payments.Select(payment =>
                 new PaymentInCsvModel(
                     PaymentId: payment.PaymentId,
-                    MembershipId: payment.MembershipId,
-                    PaymentType: payment.PaymentType,
+                    PayerId: payment.PayerId,
+                    PaymentDetails: payment.PaymentDetails,
                     CurrencyCode: payment.CurrencyCode,
                     Amount: payment.Amount,
                     Created: payment.Created,
                     Updated: payment.Updated,
-                    PaymentStatus: Enum.GetName(payment.PaymentStatus),
+                    PaymentStatus: payment.PaymentStatus,
                     IsProblematicPayment: payment.IsProblematicPayment,
                     Attempt: payment.Attempt is null
                         ? null
                         : new AttemptInCsvModel(
                             AttemptId: payment.Attempt.AttemptId,
                             IsSuccessfulAttempt: payment.Attempt.IsSuccessfulAttempt,
-                            AttemptStatus: Enum.GetName(payment.Attempt.AttemptStatus),
-                            PaymentMethod: Enum.GetName(payment.Attempt.PaymentMethod),
+                            AttemptStatus: payment.Attempt.AttemptStatus,
+                            PaymentMethod: payment.Attempt.PaymentMethod,
                             DetailsJson: payment.Attempt.DetailsJson))).ToList();
 
             using MemoryStream fileStream = new();
@@ -59,8 +59,8 @@ namespace BccPay.Core.Cqrs.CsvExports
 
     internal record PaymentInCsvModel(
         Guid PaymentId,
-        string MembershipId,
-        string PaymentType,
+        string PayerId,
+        string PaymentDetails,
         string CurrencyCode,
         decimal Amount,
         DateTime Created,
@@ -69,8 +69,9 @@ namespace BccPay.Core.Cqrs.CsvExports
         bool IsProblematicPayment,
         AttemptInCsvModel Attempt);
 
-    internal record AttemptInCsvModel(Guid AttemptId,
+    internal record AttemptInCsvModel(
         bool IsSuccessfulAttempt,
+        Guid AttemptId,
         string AttemptStatus,
         string PaymentMethod,
         string DetailsJson);
@@ -79,16 +80,15 @@ namespace BccPay.Core.Cqrs.CsvExports
     {
         public PaymentCsvMapper()
         {
-            Map(paymentModel => paymentModel.PaymentId);
-            Map(paymentModel => paymentModel.MembershipId);
-            Map(paymentModel => paymentModel.PaymentType);
-            Map(paymentModel => paymentModel.CurrencyCode);
-            Map(paymentModel => paymentModel.Amount);
-            Map(paymentModel => paymentModel.Created);
-            Map(paymentModel => paymentModel.Updated);
-            Map(paymentModel => paymentModel.PaymentStatus);
-            Map(paymentModel => paymentModel.IsProblematicPayment);
-
+            Map(paymentModel => paymentModel.PaymentId).Name("Payment ID");
+            Map(paymentModel => paymentModel.PayerId).Name("Payer ID");
+            Map(paymentModel => paymentModel.PaymentDetails).Name("Payment details in JSON");
+            Map(paymentModel => paymentModel.CurrencyCode).Name("Currency Code");
+            Map(paymentModel => paymentModel.Amount).Name("Amount value");
+            Map(paymentModel => paymentModel.Created).Name("Payment creation date");
+            Map(paymentModel => paymentModel.Updated).Name("Payment last update");
+            Map(paymentModel => paymentModel.PaymentStatus).Name("Payment status");
+            Map(paymentModel => paymentModel.IsProblematicPayment).Name("Is payment problematic");
             References<AttemptCsvMapper>(attempt => attempt.Attempt);
         }
     }
@@ -97,10 +97,11 @@ namespace BccPay.Core.Cqrs.CsvExports
     {
         public AttemptCsvMapper()
         {
-            Map(attemptModel => attemptModel.IsSuccessfulAttempt);
-            Map(attemptModel => attemptModel.AttemptStatus);
-            Map(attemptModel => attemptModel.PaymentMethod);
-            Map(attemptModel => attemptModel.DetailsJson);
+            Map(attemptModel => attemptModel.IsSuccessfulAttempt).Name("Is attempt successful");
+            Map(attemptModel => attemptModel.AttemptId).Name("Attempt ID");
+            Map(attemptModel => attemptModel.AttemptStatus).Name("Attempt Status");
+            Map(attemptModel => attemptModel.PaymentMethod).Name("Attempt Method");
+            Map(attemptModel => attemptModel.DetailsJson).Name("Attempt details in JSON");
         }
     }
 }

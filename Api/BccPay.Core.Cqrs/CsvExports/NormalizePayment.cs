@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Text.Json;
 using BccPay.Core.Domain.Entities;
-using BccPay.Core.Enums;
 
 namespace BccPay.Core.Cqrs.CsvExports
 {
     internal class NormalizePayment
     {
         public Guid PaymentId { get; set; }
-        public string MembershipId { get; set; }
-        public string PaymentType { get; set; }
+        public string PayerId { get; set; }
+        public string PaymentDetails { get; set; }
         public string CurrencyCode { get; set; }
         public decimal Amount { get; set; }
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
-        public PaymentStatus PaymentStatus { get; set; }
+        public string PaymentStatus { get; set; }
         public bool IsProblematicPayment { get; set; }
         public NormalizeAttempt Attempt { get; set; }
 
@@ -31,13 +30,13 @@ namespace BccPay.Core.Cqrs.CsvExports
         private void Normalize(Payment payment, Attempt attempt = null)
         {
             Amount = payment.Amount;
+            PayerId = payment.PayerId;
             Created = payment.Created;
             CurrencyCode = payment.CurrencyCode;
             IsProblematicPayment = payment.IsProblematic;
-            MembershipId = "";
-            PaymentStatus = payment.PaymentStatus;
+            PaymentStatus = Enum.GetName(payment.PaymentStatus);
             PaymentId = payment.PaymentId;
-            PaymentType = payment.Type;
+            PaymentDetails = payment.PaymentDetails is not null ? JsonSerializer.Serialize((object)payment.PaymentDetails) : null;
             Updated = payment.Updated;
             Attempt = attempt is not null
                 ? new NormalizeAttempt(attempt)
@@ -49,8 +48,8 @@ namespace BccPay.Core.Cqrs.CsvExports
     {
         public Guid AttemptId { get; set; }
         public bool IsSuccessfulAttempt { get; set; }
-        public AttemptStatus AttemptStatus { get; set; }
-        public PaymentMethod PaymentMethod { get; set; }
+        public string AttemptStatus { get; set; }
+        public string PaymentMethod { get; set; }
         public string DetailsJson { get; set; }
 
         internal NormalizeAttempt(Attempt attempt)
@@ -61,9 +60,9 @@ namespace BccPay.Core.Cqrs.CsvExports
         private void Normalize(Attempt attempt)
         {
             AttemptId = attempt.PaymentAttemptId;
-            AttemptStatus = attempt.AttemptStatus;
-            IsSuccessfulAttempt = attempt.AttemptStatus == AttemptStatus.PaidSucceeded;
-            PaymentMethod = attempt.PaymentMethod;
+            AttemptStatus = Enum.GetName(attempt.AttemptStatus);
+            IsSuccessfulAttempt = attempt.AttemptStatus == Enums.AttemptStatus.PaidSucceeded;
+            PaymentMethod = Enum.GetName(attempt.PaymentMethod);
             DetailsJson = attempt.StatusDetails is not null ? JsonSerializer.Serialize((object)attempt.StatusDetails) : null;
         }
     }

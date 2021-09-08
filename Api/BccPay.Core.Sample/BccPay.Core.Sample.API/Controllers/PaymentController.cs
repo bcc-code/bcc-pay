@@ -46,7 +46,7 @@ namespace BccPay.Core.Sample.API.Controllers
 
             var result = await Mediator.Send(query);
 
-            return Ok(new { bytes = result });
+            return Ok(new { csv = result });
         }
 
         [HttpPost]
@@ -55,7 +55,6 @@ namespace BccPay.Core.Sample.API.Controllers
         public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentRequest request)
         {
             CreatePaymentCommand command = Mapper.Map<CreatePaymentCommand>(request);
-
             var result = await Mediator.Send(command);
 
             return Ok(new CreatePaymentResponse { PaymentId = result });

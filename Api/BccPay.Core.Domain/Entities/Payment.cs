@@ -24,7 +24,7 @@ namespace BccPay.Core.Domain.Entities
         /// Optional property. 
         /// Could indicate if it is a membership deposit of saving payment
         /// </summary>
-        public string Type { get; set; }
+        public IPaymentDetails PaymentDetails { get; set; }
         public string Description { get; set; }
         public bool IsProblematic { get; set; }
 
@@ -41,7 +41,8 @@ namespace BccPay.Core.Domain.Entities
             string currencyCode,
             string countryCode,
             decimal amount,
-            string description)
+            string description,
+            IPaymentDetails paymentDetails)
         {
             PaymentId = Guid.NewGuid();
             PayerId = payerId;
@@ -51,6 +52,7 @@ namespace BccPay.Core.Domain.Entities
             PaymentStatus = PaymentStatus.Pending;
             Created = DateTime.UtcNow;
             Description = description;
+            PaymentDetails = paymentDetails;
         }
 
         private void RefreshPaymentStatus()

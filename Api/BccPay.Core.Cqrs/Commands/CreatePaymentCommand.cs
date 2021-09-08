@@ -19,13 +19,15 @@ namespace BccPay.Core.Cqrs.Commands
             string currencyCode,
             decimal amount,
             string countryCode,
-            string description)
+            string description,
+            IPaymentDetails paymentDetails)
         {
             PayerId = payerId;
             Amount = amount;
             CurrencyCode = currencyCode;
             CountryCode = countryCode;
             Description = description;
+            PaymentDetails = paymentDetails;
         }
 
         public string Description { get; set; }
@@ -33,6 +35,7 @@ namespace BccPay.Core.Cqrs.Commands
         public string CurrencyCode { get; set; }
         public string CountryCode { get; set; }
         public decimal Amount { get; set; }
+        public IPaymentDetails PaymentDetails { get; set; }
     }
 
     public class CreatePaymentCommandValidator : AbstractValidator<CreatePaymentCommand>
@@ -69,7 +72,7 @@ namespace BccPay.Core.Cqrs.Commands
         {
             var payment = new Payment();
 
-            payment.Create(request.PayerId, request.CurrencyCode, request.CountryCode, request.Amount, request.Description);
+            payment.Create(request.PayerId, request.CurrencyCode, request.CountryCode, request.Amount, request.Description, request.PaymentDetails);
 
             await _documentSession.StoreAsync(payment, cancellationToken);
             await _documentSession.SaveChangesAsync(cancellationToken);

@@ -43,7 +43,7 @@ namespace BccPay.Core.Cqrs.Queries
 
         private static List<NormalizePayment> NormalizePayments(List<Payment> payments)
         {
-            var result = new List<NormalizePayment>();
+            var normalized = new List<NormalizePayment>();
 
             foreach (Payment payment in payments)
             {
@@ -51,16 +51,16 @@ namespace BccPay.Core.Cqrs.Queries
                 {
                     foreach (Attempt attempt in payment.Attempts)
                     {
-                        result.Add(new NormalizePayment(payment, attempt));
+                        normalized.Add(new NormalizePayment(payment, attempt));
                     }
                 }
                 else
                 {
-                    result.Add(new NormalizePayment(payment));
+                    normalized.Add(new NormalizePayment(payment));
                 }
             }
 
-            return result;
+            return normalized;
         }
     }
 }
