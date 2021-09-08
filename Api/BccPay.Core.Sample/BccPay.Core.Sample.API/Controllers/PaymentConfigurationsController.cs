@@ -15,7 +15,7 @@ namespace BccPay.Core.Sample.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<PaymentConfigurationResult>))]
         public async Task<IActionResult> GetPaymentConfigurations([FromQuery] PaymentConfigurationRequest paymentConfiguration)
         {
-            var query = new GetPaymentProviderDefinitionByConfigurationQuery(paymentConfiguration.CountryCode, paymentConfiguration.PaymentType, paymentConfiguration.CurrencyCode);
+            var query = new GetPaymentConfigurationsByQuery(paymentConfiguration.CountryCode, paymentConfiguration.PaymentType, paymentConfiguration.CurrencyCode);
 
             var result = await Mediator.Send(query);
 

@@ -86,7 +86,7 @@ namespace BccPay.Core.Cqrs.Commands
                     PaymentProviderDefinition.GetDocumentId(request.PaymentConfigurationId), cancellationToken)
                     ?? throw new Exception("Invalid payment configuration ID");
 
-            var countryAvailableConfigurations = await _mediator.Send(new GetPaymentProviderDefinitionByConfigurationQuery(countryCode), cancellationToken);
+            var countryAvailableConfigurations = await _mediator.Send(new GetPaymentConfigurationsByQuery(countryCode), cancellationToken);
 
             var provider = _paymentProviderFactory.GetPaymentProvider(paymentConfiguration.Provider);
 
@@ -103,7 +103,7 @@ namespace BccPay.Core.Cqrs.Commands
                 }
             }
 
-            if (!countryAvailableConfigurations.PaymentConfigurations.Any(x => x.PaymentConfigurationId.Contains(request.PaymentConfigurationId)))
+            if (!countryAvailableConfigurations.PaymentConfigurations.Any(x => x.PaymentProviderDefinitionIds.Contains(request.PaymentConfigurationId)))
                 throw new InvalidPaymentException($"The payment configuration {request.PaymentConfigurationId} is not available for the country '{countryCode}'");
 
             var (phonePrefix, phoneBody) = PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);

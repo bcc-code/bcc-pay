@@ -71,7 +71,7 @@ namespace BccPay.Core.Cqrs.Queries
             var query = _documentSession.Query<PaymentsIndex.Result, PaymentsIndex>();
 
             if (request.IsProblematicPayment is not null)
-                query = query.Where(x => x.IsProblematic);
+                query = query.Where(x => x.IsProblematic == request.IsProblematicPayment);
 
             if (request.PaymentStatus is not null)
                 query = query.Where(x => x.PaymentStatus == request.PaymentStatus);
@@ -83,7 +83,7 @@ namespace BccPay.Core.Cqrs.Queries
                 .Select(x => new PaymentResult
                 {
                     Amount = x.Amount + x.CurrencyCode,
-                    CountryCode = x.CountryCode,
+                    CountryCode = string.IsNullOrWhiteSpace(x.CountryCode) ? x.Attempts.First().CountryCode : x.CountryCode,
                     Created = x.Created,
                     Description = x.Description,
                     PayerId = x.PayerId,
