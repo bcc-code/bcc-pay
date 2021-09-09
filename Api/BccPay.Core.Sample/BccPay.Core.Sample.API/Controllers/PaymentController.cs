@@ -37,13 +37,24 @@ namespace BccPay.Core.Sample.API.Controllers
             });
         }
 
+        [HttpGet("csv")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetPaymentsCsv()
+        {
+            var query = new GetPaymentsBase64CsvQuery();
+
+            var result = await Mediator.Send(query);
+
+            return Ok(new { csv = result });
+        }
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreatePaymentResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentRequest request)
         {
             CreatePaymentCommand command = Mapper.Map<CreatePaymentCommand>(request);
-
             var result = await Mediator.Send(command);
 
             return Ok(new CreatePaymentResponse { PaymentId = result });
