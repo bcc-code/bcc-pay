@@ -33,6 +33,7 @@ namespace BccPay.Core.Cqrs.Queries
     {
         public string Id { get; set; }
         public PaymentProvider PaymentProvider { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
     }
 
     public class GetPaymentConfigurationsByQueryHandler : IRequestHandler<GetPaymentConfigurationsByQuery, AvailableConfigurationsResult>
@@ -77,7 +78,8 @@ namespace BccPay.Core.Cqrs.Queries
                      => new PaymentProviderDefinitionResult
                      {
                          Id = x.PaymentDefinitionCode,
-                         PaymentProvider = x.Provider
+                         PaymentProvider = x.Provider,
+                         PaymentMethod = x.Settings.PaymentMethod
                      })
                      .ToListAsync(cancellationToken);
 
