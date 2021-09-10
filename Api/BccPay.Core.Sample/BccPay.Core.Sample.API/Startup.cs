@@ -34,6 +34,7 @@ namespace BccPay.Core.Sample
             services.Configure<BccPaymentsConfiguration>(bccPaymentsConfiguration);
 
             services.AddRavenDatabaseDocumentStore();
+            services.AddDocumentStoreListener();
 
             services.ConfigureBccPayInfrastructureServices(bccPay =>
             {

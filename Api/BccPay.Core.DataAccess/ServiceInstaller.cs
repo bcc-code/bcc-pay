@@ -22,10 +22,12 @@ namespace Microsoft.Extensions.DependencyInjection
             });
             services.AddRavenDbAsyncSession();
             services.AddRavenDbSession();
-            services.AddTransient<IDocumentStoreListener, DocumentStoreListener>();
 
             return services;
         }
+
+        public static IServiceCollection AddDocumentStoreListener(this IServiceCollection services)
+            => services.AddTransient<IDocumentStoreListener, DocumentStoreListener>();
 
         public static IApplicationBuilder InitRavenDatabase(
             this IApplicationBuilder app, params Assembly[] assembliesWithIndexes)
