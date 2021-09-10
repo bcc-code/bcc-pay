@@ -15,7 +15,12 @@ namespace BccPay.Core.Sample.Mappers
 
             CreateMap<CreatePaymentAttemptRequest, CreatePaymentAttemptCommand>();
 
-            CreateMap<Payment, GetPaymentResponse>();
+            CreateMap<Payment, GetPaymentResponse>()
+                .ForMember(destination
+                => destination.PaymentDetails, options
+                    => options.MapFrom(source
+                        => source.PaymentDetails));
+
             CreateMap<Attempt, AttemptResponseModel>()
                 .ForMember(destination
                 => destination.StatusDetails, options

@@ -1,11 +1,11 @@
-﻿using BccPay.Core.Domain.Entities;
-using FluentValidation;
-using MediatR;
-using Raven.Client.Documents.Session;
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using BccPay.Core.Domain.Entities;
+using FluentValidation;
+using MediatR;
+using Raven.Client.Documents.Session;
 
 namespace BccPay.Core.Cqrs.Commands
 {
@@ -20,7 +20,7 @@ namespace BccPay.Core.Cqrs.Commands
             decimal amount,
             string countryCode,
             string description,
-            IPaymentDetails paymentDetails)
+            object paymentDetails)
         {
             PayerId = payerId;
             Amount = amount;
@@ -35,7 +35,7 @@ namespace BccPay.Core.Cqrs.Commands
         public string CurrencyCode { get; set; }
         public string CountryCode { get; set; }
         public decimal Amount { get; set; }
-        public IPaymentDetails PaymentDetails { get; set; }
+        public object PaymentDetails { get; set; }
     }
 
     public class CreatePaymentCommandValidator : AbstractValidator<CreatePaymentCommand>
@@ -72,7 +72,7 @@ namespace BccPay.Core.Cqrs.Commands
         {
             var payment = new Payment();
 
-            payment.Create(request.PayerId, request.CurrencyCode, request.CountryCode, request.Amount, request.Description, request.PaymentDetails);
+            payment.Create(request.PayerId, request.CurrencyCode, request.CountryCode, request.Amount, request.Description, (IPaymentDetails)request.PaymentDetails);
 
             await _documentSession.StoreAsync(payment, cancellationToken);
             await _documentSession.SaveChangesAsync(cancellationToken);
