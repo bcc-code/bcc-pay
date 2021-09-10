@@ -26,14 +26,15 @@ export async function getPaymentConfigurations(
         possibleConfigurations = json;
       });
 
-    const possibleConfigurationsObject = JSON.parse(
+    const paymentConfigurationsObject = JSON.parse(
       JSON.stringify(possibleConfigurations)
     );
 
     console.log('Possible configurations :');
-    console.log(possibleConfigurationsObject);
-    possibleConfigurationsObject.paymentConfigurations.forEach(element => {
-      enablePossiblePayments(element.paymentMethod);
+    paymentConfigurationsObject.paymentConfigurations.forEach(element => {
+      element.providerDefinitionDetails.forEach(element => {
+        enablePossiblePayments(element.paymentMethod);
+      });
     });
     return possibleConfigurations;
   } catch (e) {

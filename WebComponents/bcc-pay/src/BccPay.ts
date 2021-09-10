@@ -152,7 +152,8 @@ export class BccPay extends LitElement {
                 this.paymentId,
                 this.user,
                 this.server,
-                this.netsCheckoutKey
+                this.netsCheckoutKey,
+                'nets-cc-vipps-nok'
               )}"
           >
             <span class="payment-button-text">CREDIT CARD</span>
@@ -294,7 +295,8 @@ export class BccPay extends LitElement {
                 this.paymentId,
                 this.user,
                 this.server,
-                this.netsCheckoutKey
+                this.netsCheckoutKey,
+                'nets-cc-vipps-nok'
               )}"
           >
             CHANGE

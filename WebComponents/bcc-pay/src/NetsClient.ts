@@ -12,13 +12,19 @@ export async function startNetsPayment(
   paymentId: string,
   user: User,
   server: string,
-  checkoutKey: string
+  checkoutKey: string,
+  paymentConfigurationId: string
 ): Promise<boolean> {
   const netsButton = document.getElementById('Nets');
   if (netsButton) {
     netsButton!.classList.add('payment-button--loading');
   }
-  const netsPaymentId = await initNetsPayment(paymentId, user, server);
+  const netsPaymentId = await initNetsPayment(
+    paymentId,
+    user,
+    server,
+    paymentConfigurationId
+  );
   if (netsButton) {
     netsButton!.classList.remove('payment-button--loading');
   }
@@ -42,11 +48,12 @@ export async function startNetsPayment(
 export async function initNetsPayment(
   paymentId: string,
   user: User,
-  server: string
+  server: string,
+  paymentConfigurationId: string
 ): Promise<string> {
   console.log('Nets payment country: ' + country);
   const body = {
-    paymentConfigurationId: 'nets-cc-vipps-nok',
+    paymentConfigurationId: paymentConfigurationId,
     email: user.email === null ? undefined : user.email,
     phoneNumber: user.phoneNumber === null ? undefined : user.phoneNumber,
     firstName: user.firstName === null ? undefined : user.firstName,
