@@ -102,10 +102,10 @@ export class BccPay extends LitElement {
     );
 
     if (mollieUrl !== '' || mollieUrl !== null || mollieUrl !== undefined) {
-      const mollyButton = document.getElementById(
-        'mollie-payment-button'
+      const paymentButton = document.getElementById(
+        buttonId
       ) as HTMLButtonElement;
-      mollyButton.disabled = false;
+      paymentButton.disabled = false;
     }
   }
 
@@ -145,31 +145,32 @@ export class BccPay extends LitElement {
             </select>
           </div>
           <button
-            id="Nets"
+            id="CreditCardOrVipps"
             class="payment-button"
             @click="${() =>
               startNetsPayment(
                 this.paymentId,
                 this.user,
                 this.server,
-                this.netsCheckoutKey
+                this.netsCheckoutKey,
+                'nets-cc-vipps-nok'
               )}"
           >
             <span class="payment-button-text">CREDIT CARD</span>
           </button>
           <button
-            id="mollie-giropay"
+            id="Giropay"
             class="payment-button"
             @click="${() =>
-              this.initMolliePayment('mollie-giropay-eur', 'mollie-giropay')}"
+              this.initMolliePayment('mollie-giropay-eur', 'Giropay')}"
           >
             <span class="payment-button-text">GIROPAY</span>
           </button>
           <button
-            id="mollie-ideal"
+            id="iDeal"
             class="payment-button"
             @click="${() =>
-              this.initMolliePayment('mollie-ideal-eur', 'mollie-ideal')}"
+              this.initMolliePayment('mollie-ideal-eur', 'iDeal')}"
           >
             <span class="payment-button-text">iDeal</span>
           </button>
@@ -294,7 +295,8 @@ export class BccPay extends LitElement {
                 this.paymentId,
                 this.user,
                 this.server,
-                this.netsCheckoutKey
+                this.netsCheckoutKey,
+                'nets-cc-vipps-nok'
               )}"
           >
             CHANGE
