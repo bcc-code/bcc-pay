@@ -1,4 +1,6 @@
-﻿namespace BccPay.Core.Sample.Contracts.Requests
+﻿using BccPay.Core.Domain.Entities;
+
+namespace BccPay.Core.Sample.Contracts.Requests
 {
     public class CreatePaymentRequest
     {
@@ -7,5 +9,6 @@
         public string CountryCode { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; }
+        public IPaymentDetails PaymentDetails { get; set; }
     }
 }
