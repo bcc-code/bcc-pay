@@ -1,6 +1,6 @@
-﻿using BccPay.Core.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using BccPay.Core.Enums;
 
 namespace BccPay.Core.Sample.Contracts.Responses
 {
@@ -15,6 +15,7 @@ namespace BccPay.Core.Sample.Contracts.Responses
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
+        public object PaymentDetails { get; set; }
         public List<AttemptResponseModel> Attempts { get; set; }
     }
 
