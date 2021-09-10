@@ -55,6 +55,7 @@ namespace BccPay.Core.Cqrs.Queries
         public string CountryCode { get; set; }
         public string Amount { get; set; }
         public string PaymentMethods { get; set; }
+        public object PaymentDetails { get; set; }
     }
 
     public class GetPaymentsWithFiltersQueryHandler : IRequestHandler<GetPaymentsWithFiltersQuery, PaymentWithFiltersResult>
@@ -71,25 +72,26 @@ namespace BccPay.Core.Cqrs.Queries
             var query = _documentSession.Query<PaymentsIndex.Result, PaymentsIndex>();
 
             if (request.IsProblematicPayment is not null)
-                query = query.Where(x => x.IsProblematic == request.IsProblematicPayment);
+                query = query.Where(paymentIndex => paymentIndex.IsProblematic == request.IsProblematicPayment);
 
             if (request.PaymentStatus is not null)
-                query = query.Where(x => x.PaymentStatus == request.PaymentStatus);
+                query = query.Where(paymentIndex => paymentIndex.PaymentStatus == request.PaymentStatus);
 
             if (request.From is not null && request.To is not null)
-                query = query.Where(x => x.Created >= request.From && x.Created <= request.To);
+                query = query.Where(paymentIndex => paymentIndex.Created >= request.From && paymentIndex.Created <= request.To);
 
             var result = await query.WithPagination(request.Page, request.Size)
-                .Select(x => new PaymentResult
+                .Select(paymentIndex => new PaymentResult
                 {
-                    Amount = x.Amount + x.CurrencyCode,
-                    CountryCode = string.IsNullOrWhiteSpace(x.CountryCode) ? x.Attempts.First().CountryCode : x.CountryCode,
-                    Created = x.Created,
-                    Description = x.Description,
-                    PayerId = x.PayerId,
-                    PaymentId = x.PaymentId,
-                    Updated = x.Updated,
-                    PaymentMethods = x.Attempts.Select(x => x.PaymentMethod.ToString()).ToString()
+                    Amount = paymentIndex.Amount + paymentIndex.CurrencyCode,
+                    CountryCode = string.IsNullOrWhiteSpace(paymentIndex.CountryCode) ? paymentIndex.Attempts.First().CountryCode : paymentIndex.CountryCode,
+                    Created = paymentIndex.Created,
+                    Description = paymentIndex.Description,
+                    PayerId = paymentIndex.PayerId,
+                    PaymentId = paymentIndex.PaymentId,
+                    Updated = paymentIndex.Updated,
+                    PaymentMethods = paymentIndex.Attempts.Select(x => x.PaymentMethod.ToString()).ToString(),
+                    PaymentDetails = (object)paymentIndex.PaymentDetails
                 }).ToListAsync(token: cancellationToken);
 
             var amountOfObjects = await query.Distinct().CountAsync(cancellationToken);
