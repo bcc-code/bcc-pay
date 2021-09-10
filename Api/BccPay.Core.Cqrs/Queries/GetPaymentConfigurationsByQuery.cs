@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
+using BccPay.Core.Enums;
 using MediatR;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
@@ -21,9 +23,17 @@ namespace BccPay.Core.Cqrs.Queries
     public class PaymentConfigurationResult
     {
         public string CountryCode { get; set; }
-        public string[] PaymentProviderDefinitionIds { get; set; }
+        internal string[] PaymentProviderDefinitionIds { get; set; }
+        public List<PaymentProviderDefinitionResult> ProviderDefinitionDetails { get; set; }
         public string[] PaymentTypes { get; set; }
         public string[] CurrencyCodes { get; set; }
+    }
+
+    public class PaymentProviderDefinitionResult
+    {
+        public string Id { get; set; }
+        public PaymentProvider PaymentProvider { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
     }
 
     public class GetPaymentConfigurationsByQueryHandler : IRequestHandler<GetPaymentConfigurationsByQuery, AvailableConfigurationsResult>
@@ -57,6 +67,26 @@ namespace BccPay.Core.Cqrs.Queries
                         PaymentTypes = paymentConfiguration.Conditions.PaymentTypes,
                         PaymentProviderDefinitionIds = paymentConfiguration.PaymentProviderDefinitionIds
                     }).ToListAsync(cancellationToken);
+
+            var idsToCompare = paymentConfigurations
+                .SelectMany(x => x.PaymentProviderDefinitionIds)
+                .ToArray();
+
+            var paymentProviderDefinition = await _documentSession.Query<PaymentProviderDefinition>()
+                     .Where(x => x.PaymentDefinitionCode.In(idsToCompare))
+                     .Select(x
+                     => new PaymentProviderDefinitionResult
+                     {
+                         Id = x.PaymentDefinitionCode,
+                         PaymentProvider = x.Provider,
+                         PaymentMethod = x.Settings.PaymentMethod
+                     })
+                     .ToListAsync(cancellationToken);
+
+            foreach (var paymentConfiguration in paymentConfigurations)
+            {
+                paymentConfiguration.ProviderDefinitionDetails = paymentProviderDefinition.Where(x => paymentConfiguration.PaymentProviderDefinitionIds.Contains(x.Id)).ToList();
+            }
 
             return new AvailableConfigurationsResult(paymentConfigurations);
         }
