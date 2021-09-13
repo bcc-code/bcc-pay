@@ -52,7 +52,7 @@ jobs:
           npm run build   
           npm publish --access public
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_GITHUB_TOKEN_OSKAR }}
 
       # - name: Webcomponent build & publish
       #   run: |
