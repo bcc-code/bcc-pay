@@ -9,6 +9,8 @@ on:
 env:
   BUILD_CONFIGURATION: "Release"
   DOTNET_VERSION: "5.0.x"
+  NPM_REGISTRY: "registry.npmjs.org"
+  NPM_GITHUB_REGISTRY: "https://npm.pkg.github.com"
 
 jobs:
   build:
@@ -31,6 +33,7 @@ jobs:
           files: '["./WebComponents/bcc-pay/.npmrc"]'
         env:
           npmAuthToken: ${{ secrets.NPM_AUTH_TOKEN_OSKAR }}
+          npmRegistry: ${{ env.NPM_REGISTRY }}
 
       - name: Webcomponent build & publish
         run: |
@@ -42,28 +45,26 @@ jobs:
           npm run build
           npm publish
 
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v2
+
+      - name: Replace NPM Auth Token
+        uses: cschleiden/replace-tokens@v1
         with:
-          node-version: "12.x"
-          registry-url: "https://npm.pkg.github.com"
-      - run: |
-          cd ./WebComponents/bcc-pay/  
+          tokenPrefix: "#{"
+          tokenSuffix: "}#"
+          files: '["./WebComponents/bcc-pay/.npmrc"]'
+        env:
+          npmAuthToken: ${{ secrets.NPM_AUTH_TOKEN_GITHUB_OSKAR }}
+          npmRegistry: ${{ env.NPM_GITHUB_REGISTRY }}
+
+      - name: Webcomponent build & publish
+        run: |
+          cd ./WebComponents/bcc-pay/
+          cat .npmrc
           npm install
           npm run versionCheck
-          npm run build   
-          npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_GITHUB_TOKEN_OSKAR }}
-
-      # - name: Webcomponent build & publish
-      #   run: |
-      #     cd ./WebComponents/bcc-pay/
-      #     cat .npmrc
-      #     npm install
-      #     npm run versionCheck
-      #     npm version patch
-      #     npm run build
-      #     npm publish
+          npm run build
+          npm publish
 
       - name: Replace Ai Token & API Url
         uses: cschleiden/replace-tokens@v1
