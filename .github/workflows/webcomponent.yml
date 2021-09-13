@@ -10,7 +10,7 @@ env:
   BUILD_CONFIGURATION: "Release"
   DOTNET_VERSION: "5.0.x"
   NPM_REGISTRY: "registry.npmjs.org"
-  NPM_GITHUB_REGISTRY: "https://npm.pkg.github.com"
+  NPM_GITHUB_REGISTRY: "npm.pkg.github.com"
 
 jobs:
   build:
@@ -54,7 +54,7 @@ jobs:
           tokenSuffix: "}#"
           files: '["./WebComponents/bcc-pay/.npmrc"]'
         env:
-          npmAuthToken: ${{ secrets.NPM_AUTH_TOKEN_GITHUB_OSKAR }}
+          npmAuthToken: ${{ secrets.NPM_AUTH_GITHUB_TOKEN_OSKAR }}
           npmRegistry: ${{ env.NPM_GITHUB_REGISTRY }}
 
       - name: Webcomponent build & publish
