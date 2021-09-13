@@ -15,10 +15,10 @@ namespace BccPay.Core.Sample.API.Controllers
     [Route("[controller]")]
     public class PaymentController : BaseController
     {
-        [HttpGet("filtered")]
+        [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PageResult<List<PaymentResult>>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetProblematicPayments([FromQuery] PaymentFilters filters)
+        public async Task<IActionResult> GetPayments([FromQuery] PaymentFilters filters)
         {
             var query = new GetPaymentsWithFiltersQuery(filters.Page,
                 filters.Size,
@@ -35,6 +35,18 @@ namespace BccPay.Core.Sample.API.Controllers
                 AmountOfPages = filters.Size == 0 ? 1 : result.AmountOfObjects / filters.Size,
                 Data = result.Payments
             });
+        }
+
+        [HttpGet("problematic-count")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProblematicPaymentsCountResult))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetProblematicPaymentsCount()
+        {
+            var query = new GetProblematicPaymentsCountQuery();
+
+            var result = await Mediator.Send(query);
+
+            return Ok(result);
         }
 
         [HttpGet("csv")]
