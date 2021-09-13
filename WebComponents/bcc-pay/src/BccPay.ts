@@ -1,7 +1,11 @@
 import { html, LitElement, property } from 'lit-element';
 import { applyStyles } from './SharedStyles';
 import { startNetsPayment } from './NetsClient';
-import { getPaymentConfigurations, initPayment } from './BccPayClient';
+import {
+  disablePayments,
+  getPaymentConfigurations,
+  initPayment,
+} from './BccPayClient';
 import { User } from './User';
 import {
   displayErrorPage,
@@ -66,6 +70,7 @@ export class BccPay extends LitElement {
   }
 
   async init() {
+    disablePayments();
     getPaymentConfigurations(this.country, this.server);
 
     if (

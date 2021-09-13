@@ -43,7 +43,6 @@ jobs:
           cat .npmrc
           npm install
           npm run versionCheck
-          npm version minor
           npm version patch
           npm run build
           npm publish
