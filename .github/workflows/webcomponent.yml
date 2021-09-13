@@ -21,13 +21,6 @@ jobs:
           service_account_key: ${{ secrets.GCP_GITHUB_KEY_DEV }}
           export_default_credentials: true
 
-      - uses: actions/checkout@v2
-
-      - name: Cat npm rc
-        run: |
-          cd ./WebComponents/bcc-pay/
-          cat .npmrc
-
       - name: Replace NPM Auth Token
         uses: cschleiden/replace-tokens@v1
         with:
@@ -35,12 +28,21 @@ jobs:
           tokenSuffix: "}#"
           files: '["./WebComponents/bcc-pay/.npmrc"]'
         env:
-          npmAuthToken: ${{ secrets.NPM_AUTH_GITHUB_TOKEN_OSKAR }}
+          npmAuthToken: ${{ secrets.NPM_AUTH_TOKEN_OSKAR }}
 
-      - name: Cat npm rc
-        run: |
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+          registry-url: "https://registry.npmjs.org"
+      - run: |
           cd ./WebComponents/bcc-pay/
-          cat .npmrc
+          npm install
+          npm run versionCheck
+          npm version patch
+          npm run build
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN_OSKAR }}
 
       - uses: actions/setup-node@v1
         with:
@@ -49,6 +51,7 @@ jobs:
       - run: |
           cd ./WebComponents/bcc-pay/  
           npm install
+          npm run versionCheck
           npm run build   
           npm publish --access public
         env:

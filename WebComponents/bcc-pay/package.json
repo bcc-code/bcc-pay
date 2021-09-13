@@ -1,5 +1,5 @@
 {
-  "name": "@bcc-code/bcc-pay",
+  "name": "bcc-pay",
   "version": "0.1.0",
   "description": "bcc-pay webcomponent",
   "author": "bcc-pay-devteam",
@@ -10,7 +10,10 @@
   "files": [
     "dist"
   ],
-  "repository": "https://github.com/bcc-code/bcc-pay",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bcc-code/bcc-pay.git"
+  },
   "scripts": {
     "start": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds\"",
     "build": "tsc",
@@ -22,7 +25,7 @@
     "test:watch": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wtr --watch\"",
     "storybook": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds -c .storybook/server.mjs\"",
     "storybook:build": "tsc && build-storybook",
-    "versionCheck": "VERSION=$(npm show bcc-pay version) && npm version $VERSION --allow-same-version"
+    "versionCheck": "VERSION=$(npm show @bcc-code/bcc-pay version) && npm version $VERSION --allow-same-version"
   },
   "dependencies": {
     "axios": "^0.21.1",
