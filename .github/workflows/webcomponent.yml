@@ -42,15 +42,26 @@ jobs:
           cd ./WebComponents/bcc-pay/
           cat .npmrc
 
-      - name: Webcomponent build & publish
-        run: |
-          cd ./WebComponents/bcc-pay/
-          cat .npmrc
-          npm install
-          npm run versionCheck
-          npm version patch
-          npm run build
-          npm publish
+      - uses: actions/setup-node@v1
+            with:
+              node-version: '12.x'
+              registry-url: 'https://npm.pkg.github.com'  
+          - run: cd ./WebComponents/bcc-pay/  
+          - run: npm install
+          - run: npm run build   
+          - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      # - name: Webcomponent build & publish
+      #   run: |
+      #     cd ./WebComponents/bcc-pay/
+      #     cat .npmrc
+      #     npm install
+      #     npm run versionCheck
+      #     npm version patch
+      #     npm run build
+      #     npm publish
 
       - name: Replace Ai Token & API Url
         uses: cschleiden/replace-tokens@v1
