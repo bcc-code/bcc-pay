@@ -25,7 +25,7 @@
     "test:watch": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wtr --watch\"",
     "storybook": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds -c .storybook/server.mjs\"",
     "storybook:build": "tsc && build-storybook",
-    "versionCheck": "VERSION=$(npm show @bcc-code/bcc-pay version) && npm version $VERSION --allow-same-version"
+    "versionCheck": "VERSION=$(npm show bcc-pay version) && npm version $VERSION --allow-same-version"
   },
   "dependencies": {
     "axios": "^0.21.1",

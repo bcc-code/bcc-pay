@@ -65,16 +65,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_GITHUB_TOKEN_OSKAR }}
 
-      # - name: Webcomponent build & publish
-      #   run: |
-      #     cd ./WebComponents/bcc-pay/
-      #     cat .npmrc
-      #     npm install
-      #     npm run versionCheck
-      #     npm version patch
-      #     npm run build
-      #     npm publish
-
       - name: Replace Ai Token & API Url
         uses: cschleiden/replace-tokens@v1
         with:
@@ -88,7 +78,7 @@ jobs:
       - name: Update version of bcc-pay package
         run: |
           cd ./UI/dashboard/
-          npm install @bcc-code/bcc-pay@latest
+          npm install bcc-pay@latest
           npm install
 
       - name: Dashboard deploy
