@@ -35,7 +35,7 @@ jobs:
           tokenSuffix: "}#"
           files: '["./WebComponents/bcc-pay/.npmrc"]'
         env:
-          npmAuthToken: ${{ secrets.NPM_AUTH_TOKEN_OSKAR }}
+          npmAuthToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Webcomponent build & publish
         run: |
@@ -60,7 +60,7 @@ jobs:
       - name: Update version of bcc-pay package
         run: |
           cd ./UI/dashboard/
-          npm install bcc-pay@latest
+          npm install @bcc-code/bcc-pay@latest
           npm install
 
       - name: Dashboard deploy
