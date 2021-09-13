@@ -9,8 +9,8 @@ on:
 env:
   BUILD_CONFIGURATION: "Release"
   DOTNET_VERSION: "5.0.x"
-  NPM_REGISTRY: "registry.npmjs.org"
-  NPM_GITHUB_REGISTRY: "npm.pkg.github.com"
+  NPM_REGISTRY: "https://registry.npmjs.org"
+  NPM_GITHUB_REGISTRY: "https://npm.pkg.github.com"
 
 jobs:
   build:
