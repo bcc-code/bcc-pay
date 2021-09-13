@@ -32,20 +32,15 @@ jobs:
         env:
           npmAuthToken: ${{ secrets.NPM_AUTH_TOKEN_OSKAR }}
 
-      - uses: actions/setup-node@v1
-        with:
-          node-version: "12.x"
-          registry-url: "https://registry.npmjs.org"
-      - run: |
-          pwd
+      - name: Webcomponent build & publish
+        run: |
           cd ./WebComponents/bcc-pay/
+          cat .npmrc
           npm install
           npm run versionCheck
           npm version patch
           npm run build
           npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN_OSKAR }}
 
       - uses: actions/setup-node@v1
         with:
