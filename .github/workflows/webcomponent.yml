@@ -35,7 +35,12 @@ jobs:
           tokenSuffix: "}#"
           files: '["./WebComponents/bcc-pay/.npmrc"]'
         env:
-          npmAuthToken: ${{ secrets.GITHUB_TOKEN }}
+          npmAuthToken: ${{ secrets.NPM_AUTH_GITHUB_TOKEN_OSKAR }}
+
+      - name: Cat npm rc
+        run: |
+          cd ./WebComponents/bcc-pay/
+          cat .npmrc
 
       - name: Webcomponent build & publish
         run: |
