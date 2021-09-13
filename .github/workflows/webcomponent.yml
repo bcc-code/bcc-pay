@@ -29,12 +29,20 @@ jobs:
           files: '["./WebComponents/bcc-pay/.npmrc"]'
         env:
           npmAuthToken: ${{ secrets.NPM_AUTH_TOKEN_OSKAR }}
+      - uses: actions/checkout@v2
+
+      - name: Cat npm rc
+        run: |
+          cd ./WebComponents/bcc-pay/
+          cat .npmrc
+          pwd
 
       - uses: actions/setup-node@v1
         with:
           node-version: "12.x"
           registry-url: "https://registry.npmjs.org"
       - run: |
+          pwd
           cd ./WebComponents/bcc-pay/
           npm install
           npm run versionCheck
