@@ -64,6 +64,7 @@ jobs:
           npm install
           npm run versionCheck
           npm run build
+          npm config set registry ${{ env.NPM_GITHUB_REGISTRY }}
           npm publish
 
       - name: Replace Ai Token & API Url
