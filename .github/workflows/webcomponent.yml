@@ -42,12 +42,11 @@ jobs:
           cd ./WebComponents/bcc-pay/
           cat .npmrc
 
-      - name: Github npm publish
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v1
         with:
           node-version: "12.x"
           registry-url: "https://npm.pkg.github.com"
-        run: |
+      - run: |
           cd ./WebComponents/bcc-pay/  
           npm install
           npm run build   
