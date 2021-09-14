@@ -8,7 +8,12 @@ To run webComponent in dev mode go to /webComponent/bcc-pay/
 `npm install`
 `npm run storybook`
 
-Currently we are pushing (after .npmrc update):
+We are pushing new version from CI/CD to NPM and Github repositories:
+
+- registry.npmjs.org (public)
+- npm.pkg.github.com (scoped as @bcc-it)
+
+Pushing webComponent manually:
 `npm run versionCheck`
 `npm version patch`
 

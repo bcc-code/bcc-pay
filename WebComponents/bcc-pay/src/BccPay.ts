@@ -95,6 +95,9 @@ export class BccPay extends LitElement {
     if (isDevEnv === true) {
       console.log('Bcc pay payment id: ' + this.paymentId);
     }
+
+    (document.getElementById('country-select') as HTMLSelectElement).value =
+      this.country;
   }
 
   async initMolliePayment(paymentConfigurationId: string, buttonId: string) {
@@ -139,19 +142,25 @@ export class BccPay extends LitElement {
           <div class="country-container">
             Choose your country:
             <select
+              id="country-select"
               class="country-select"
               @change="${(e: any) => (this.country = e.target.value)}"
+              value="${this.country}"
             >
               <option value="" selected disabled hidden>Change country</option>
               <option selected="${this.country}" value="NOR">Norway</option>
-              <option selected="${this.country}" value="DE">Germany</option>
+              <option selected="${this.country}" value="DEU">Germany</option>
               <option selected="${this.country}" value="UA">Ukraine</option>
               <option selected="${this.country}" value="PL">Poland</option>
+              <option selected="${this.country}" value="NLD">
+                Netherlands
+              </option>
             </select>
           </div>
           <button
             id="CreditCardOrVipps"
             class="payment-button"
+            disabled="true"
             @click="${() =>
               startNetsPayment(
                 this.paymentId,
@@ -166,6 +175,7 @@ export class BccPay extends LitElement {
           <button
             id="Giropay"
             class="payment-button"
+            disabled="true"
             @click="${() =>
               this.initMolliePayment('mollie-giropay-eur', 'Giropay')}"
           >
@@ -174,6 +184,7 @@ export class BccPay extends LitElement {
           <button
             id="iDeal"
             class="payment-button"
+            disabled="true"
             @click="${() =>
               this.initMolliePayment('mollie-ideal-eur', 'iDeal')}"
           >
