@@ -75,10 +75,11 @@ namespace BccPay.Core.Domain.Entities
 
             if (newStatus != PaymentStatus)
             {
+                var lastNotification = (PaymentStateChangedNotification)Notifications.LastOrDefault();
+
                 Notifications.Add(new PaymentStateChangedNotification
                 {
-                    Version = Notifications.Select(x => x.Version)
-                        .LastOrDefault() + 1,
+                    Version = lastNotification.Version++,
                     PaymentId = PaymentId,
                     FromPaymentStatus = PaymentStatus,
                     ToPaymentStatus = newStatus,
