@@ -17,6 +17,8 @@ namespace BccPay.Core.Domain
 
     public class PaymentSettings
     {
+        public decimal Markup { get; set; }
+
         public PaymentMethod PaymentMethod { get; init; }
 
         public Currencies Currency { get; init; }

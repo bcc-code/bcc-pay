@@ -117,7 +117,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
                                     paymentRequest.Currency,
                                     Currencies.EUR.ToString(),
                                     paymentRequest.Amount,
-                                    _options.RateMarkup);
+                                    settings.Markup);
 
                 request.Amount.Value = currencyConversion.ToAmount.ToString();
             }

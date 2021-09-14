@@ -39,43 +39,30 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
             throw new CurrencyExchangeOperationException("Unable to convert values.");
         }
 
-        public async Task<CurrencyConversionRecord> Exchange(Currencies fromCurrency, Currencies toCurrency, decimal amount, decimal exchangeRateMarkup = 0)
+        public async Task<CurrencyConversionRecord> Exchange(Currencies fromCurrency, Currencies toCurrency, decimal amount, decimal exchangeMarkup = 0)
         {
             if (amount <= 0)
                 throw new CurrencyExchangeOperationException("Unable to convert values.");
 
             var (currencyRate, fromOpposite, updateTime) = await GetExhangeRateByCurrency(fromCurrency, toCurrency);
 
-            decimal exchangeResultNetto = 0;
+            decimal exchangeResult = 0;
+
             if (fromOpposite)
-                exchangeResultNetto = Decimal.Divide(amount, currencyRate);
+                exchangeResult = Decimal.Divide(amount, currencyRate);
             if (!fromOpposite)
-                exchangeResultNetto = Decimal.Multiply(amount, currencyRate);
+                exchangeResult = Decimal.Multiply(amount, currencyRate);
 
-
-            if (exchangeRateMarkup is not 0)
-            {
-                decimal markup = Decimal.Multiply(exchangeResultNetto, exchangeRateMarkup);
-                decimal exchangeResultGross = exchangeResultNetto + markup;
-
-                return new CurrencyConversionRecord(
-                    updateTime,
-                    fromCurrency,
-                    toCurrency,
-                    currencyRate,
-                    currencyRate + exchangeRateMarkup,
-                    amount,
-                    exchangeResultGross.TwoDigitsAfterPoint());
-            }
+            if (exchangeMarkup is not 0)
+                exchangeResult += exchangeResult * exchangeMarkup;
 
             return new CurrencyConversionRecord(
                 updateTime,
                 fromCurrency,
                 toCurrency,
                 currencyRate,
-                currencyRate + exchangeRateMarkup,
                 amount,
-                exchangeResultNetto.TwoDigitsAfterPoint());
+                exchangeResult.TwoDigitsAfterPoint());
         }
 
         public async Task UpsertByBaseCurrencyRate(Currencies currency = Currencies.NOK, CancellationToken cancellationToken = default)
