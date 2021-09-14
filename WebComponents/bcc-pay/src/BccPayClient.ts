@@ -30,7 +30,8 @@ export async function getPaymentConfigurations(
       JSON.stringify(possibleConfigurations)
     );
 
-    console.log('Possible configurations :');
+    console.log('PossibleConfigurations country: ' + country);
+    console.log(paymentConfigurationsObject);
     paymentConfigurationsObject.paymentConfigurations.forEach(element => {
       element.providerDefinitionDetails.forEach(element => {
         enablePossiblePayments(element.paymentMethod);
