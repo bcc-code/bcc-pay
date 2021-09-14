@@ -50,11 +50,18 @@ namespace BccPay.Core.Cqrs.Queries
 
         public async Task<AvailableConfigurationsResult> Handle(GetPaymentConfigurationsByQuery request, CancellationToken cancellationToken)
         {
-            var countryCodeAlpha3 = AddressConverter.ConvertCountry(request.CountryCode, CountryCodeFormat.Alpha3);
+            var query = _documentSession.Query<PaymentConfiguration>();
 
-            var query = _documentSession.Query<PaymentConfiguration>()
-                        .Where(paymentConfiguration
-                            => paymentConfiguration.CountryCode.In(new string[] { countryCodeAlpha3, Domain.Entities.Country.DefaultCountryCode }));
+            if (!string.IsNullOrWhiteSpace(request.CountryCode))
+            {
+                string countryCodeIso3 = AddressConverter.ConvertCountry(request.CountryCode, CountryCodeFormat.Alpha3);
+
+                query = query.Where(paymentConfiguration
+                             => paymentConfiguration.CountryCode.In(new string[]
+                             {
+                                 countryCodeIso3, Country.DefaultCountryCode
+                             }));
+            }
 
             if (!string.IsNullOrWhiteSpace(request.PaymentType))
                 query = query.Where(paymentConfiguration => paymentConfiguration.Conditions.PaymentTypes.Contains(request.PaymentType));

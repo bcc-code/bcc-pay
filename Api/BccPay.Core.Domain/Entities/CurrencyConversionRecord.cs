@@ -7,8 +7,7 @@ namespace BccPay.Core.Domain.Entities
        DateTime? RateUpdated,
        Currencies FromCurrency,
        Currencies ToCurrency,
-       decimal Rate,
-       decimal MidMarketRate,
+       decimal ExchangeRate,
        decimal FromAmount,
        decimal ToAmount);
 }

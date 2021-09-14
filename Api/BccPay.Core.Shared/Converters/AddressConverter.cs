@@ -16,7 +16,7 @@ namespace BccPay.Core.Shared.Converters
         {
             try
             {
-                Country countryInformation;
+                Country countryInformation = null;
 
                 if (inputValue.Length == 2)
                 {
@@ -32,9 +32,9 @@ namespace BccPay.Core.Shared.Converters
 
                 if (int.TryParse(inputValue, out int countryCodeNumeric))
                     countryInformation = Countries.GetCountryByNumeric(countryCodeNumeric);
-                else
-                    countryInformation = Countries.GetCountryByShortName(inputValue);
 
+                if (inputValue.Length >= 4)
+                    countryInformation = Countries.GetCountryByShortName(inputValue);
 
                 return countryCodeFormat switch
                 {
