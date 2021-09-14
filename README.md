@@ -5,16 +5,17 @@ Core components for a multi-provider payment gateway for BCC.
 # Api
 
 To run Api go to sample app /Api/BccPay.Core.Sample/ and type
-`dotnet run`
+`dotnet restore dotnet run`
 
 # WebComponent
 
 For more info about webcomponent go to /WebComponents/README.md file.
 
 To use webComponent in application type:
-`npm install bcc-pay`
 
-You have to always pass your netsCheckoutKey from nets admin panel. Sample uses of component:
+`npm install bcc-pay@latest`
+
+You have to always pass netsCheckoutKey and amount:
 
 ```html
 <bcc-pay netsCheckoutKey="#netsCheckoutKey#" amount="12"></bcc-pay>
@@ -30,27 +31,34 @@ You have to always pass your netsCheckoutKey from nets admin panel. Sample uses 
 ></bcc-pay>
 ```
 
-You can also pass user object to component:
+Full list of properties you can pass to WebComponent with default values:
 
 ```JavaScript
-const sampleUser = {
-    email: 'doe@test.no',
-    phoneNumber: '+47661626839',
-    firstName: 'John',
-    lastName: 'Doe',
-    addressLine1: 'TestAddressLine1',
-    addressLine2: 'TestAddressLine2',
-    city: 'Oslo',
-    postalCode: '0001',
-  };
+  @property({ type: String }) item = 'Subscription';
+  @property({ type: Number }) amount = 5;
+  @property({ type: String }) currency = 'EUR';
+  @property({ type: String }) country = 'NOR';
+  @property({ type: User }) user: User = {};
+  @property({ type: String }) server = 'https://localhost:5001';
+  @property({ type: String }) netsCheckoutKey = '#checkout_key#';
+  @property({ type: Boolean }) isDevEnv: boolean = false;
+  @property({ type: [RequestHeader] }) requestHeaders:
+    | [RequestHeader]
+    | undefined;
+  @property({ type: String }) paymentId: string = '';
+  @property({ type: String }) primaryColor: string = '#006fc2';
+  @property({ type: String }) secondaryColor: string = 'white';
+  @property({ type: String }) accentColor: string = '#bae1ff';
 ```
-
-<bcc-pay item="Subscpription" currency="NOK" country="NOR" amount="12" server="https://localhost:5001" user=${this.sampleUser} netsCheckoutKey="#netsCheckoutKey#"></bcc-pay>
 
 # Admin panel
 
 To run admin panel application go to /UI/dashboard/
-`ng serve`
+
+```
+npm install
+ng serve
+```
 
 - [ ] Core API
 - [ ] Tenant configuration framework

@@ -1,7 +1,7 @@
 {
   "name": "bcc-pay",
-  "version": "0.0.35",
-  "description": "Webcomponent bcc-pay following open-wc recommendations",
+  "version": "0.1.0",
+  "description": "bcc-pay webcomponent",
   "author": "bcc-pay-devteam",
   "license": "MIT",
   "main": "dist/index.js",
@@ -10,6 +10,10 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bcc-code/bcc-pay.git"
+  },
   "scripts": {
     "start": "tsc && concurrently -k -r \"tsc --watch --preserveWatchOutput\" \"wds\"",
     "build": "tsc",
