@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
+using BccPay.Core.Shared.Converters;
+using BccPay.Core.Shared.Helpers;
 using MediatR;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
@@ -48,9 +50,11 @@ namespace BccPay.Core.Cqrs.Queries
 
         public async Task<AvailableConfigurationsResult> Handle(GetPaymentConfigurationsByQuery request, CancellationToken cancellationToken)
         {
+            var countryCodeAlpha3 = AddressConverter.ConvertCountry(request.CountryCode, CountryCodeFormat.Alpha3);
+
             var query = _documentSession.Query<PaymentConfiguration>()
                         .Where(paymentConfiguration
-                            => paymentConfiguration.CountryCode.In(new string[] { request.CountryCode, Country.DefaultCountryCode }));
+                            => paymentConfiguration.CountryCode.In(new string[] { countryCodeAlpha3, Domain.Entities.Country.DefaultCountryCode }));
 
             if (!string.IsNullOrWhiteSpace(request.PaymentType))
                 query = query.Where(paymentConfiguration => paymentConfiguration.Conditions.PaymentTypes.Contains(request.PaymentType));
