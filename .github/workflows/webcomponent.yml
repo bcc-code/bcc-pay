@@ -57,6 +57,12 @@ jobs:
           npmAuthToken: ${{ secrets.NPM_AUTH_GITHUB_TOKEN_OSKAR }}
           npmRegistry: ${{ env.NPM_GITHUB_REGISTRY }}
 
+      - uses: microsoft/variable-substitution@v1
+        with:
+          files: "WebComponents/bcc-pay/package.json"
+        env:
+          name: "@bcc-code/bcc-pay"
+
       - name: Webcomponent build & publish
         run: |
           cd ./WebComponents/bcc-pay/
