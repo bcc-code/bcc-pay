@@ -80,7 +80,7 @@ namespace BccPay.Core.Cqrs.Commands
                 || payment.PaymentStatus == PaymentStatus.Refunded)
                 throw new UpdatePaymentAttemptForbiddenException("Payment is completed.");
 
-            var countryCode = request.CountryCode ?? payment.CountryCode;
+            var countryCode = AddressConverter.ConvertCountry(request.CountryCode ?? payment.CountryCode);
 
             var paymentConfiguration = await _documentSession.LoadAsync<PaymentProviderDefinition>(
                     PaymentProviderDefinition.GetDocumentId(request.ProviderDefinitionId), cancellationToken)
