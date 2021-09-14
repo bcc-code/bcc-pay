@@ -1,9 +1,8 @@
 ﻿using BccPay.Core.Cqrs.Commands;
 using BccPay.Core.Domain.Entities;
 using MediatR;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace BccPay.Core.Cqrs
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceInstaller
     {
