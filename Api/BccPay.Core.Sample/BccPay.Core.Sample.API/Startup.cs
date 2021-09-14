@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using BccPay.Core.Cqrs;
 using BccPay.Core.Cqrs.Commands;
 using BccPay.Core.Infrastructure.Configuration;
 using BccPay.Core.Sample.Mappers;

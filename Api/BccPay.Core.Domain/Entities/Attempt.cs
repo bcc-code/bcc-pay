@@ -13,5 +13,6 @@ namespace BccPay.Core.Domain.Entities
         public AttemptStatus AttemptStatus { get; set; }
         public IStatusDetails StatusDetails { get; set; }
         public string NotificationAccessToken { get; set; }
+        public string ProviderDefinitionId { get; set; }
     }
 }

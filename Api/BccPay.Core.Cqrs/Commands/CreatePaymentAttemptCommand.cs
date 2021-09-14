@@ -25,7 +25,7 @@ namespace BccPay.Core.Cqrs.Commands
         }
 
         public Guid PaymentId { get; set; }
-        public string PaymentConfigurationId { get; set; }
+        public string ProviderDefinitionId { get; set; }
         public string AcceptLanguage { get; set; }
 
         public string Email { get; set; }
@@ -80,10 +80,10 @@ namespace BccPay.Core.Cqrs.Commands
                 || payment.PaymentStatus == PaymentStatus.Refunded)
                 throw new UpdatePaymentAttemptForbiddenException("Payment is completed.");
 
-            var countryCode = request.CountryCode ?? payment.CountryCode;
+            var countryCode = AddressConverter.ConvertCountry(request.CountryCode ?? payment.CountryCode);
 
             var paymentConfiguration = await _documentSession.LoadAsync<PaymentProviderDefinition>(
-                    PaymentProviderDefinition.GetDocumentId(request.PaymentConfigurationId), cancellationToken)
+                    PaymentProviderDefinition.GetDocumentId(request.ProviderDefinitionId), cancellationToken)
                     ?? throw new Exception("Invalid payment configuration ID");
 
             var countryAvailableConfigurations = await _mediator.Send(new GetPaymentConfigurationsByQuery(countryCode), cancellationToken);
@@ -103,8 +103,8 @@ namespace BccPay.Core.Cqrs.Commands
                 }
             }
 
-            if (!countryAvailableConfigurations.PaymentConfigurations.Any(x => x.PaymentProviderDefinitionIds.Contains(request.PaymentConfigurationId)))
-                throw new InvalidPaymentException($"The payment configuration {request.PaymentConfigurationId} is not available for the country '{countryCode}'");
+            if (!countryAvailableConfigurations.PaymentConfigurations.Any(x => x.PaymentProviderDefinitionIds.Contains(request.ProviderDefinitionId)))
+                throw new InvalidPaymentException($"The payment configuration {request.ProviderDefinitionId} is not available for the country '{countryCode}'");
 
             var (phonePrefix, phoneBody) = PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);
 
@@ -145,7 +145,8 @@ namespace BccPay.Core.Cqrs.Commands
                 StatusDetails = providerResult,
                 CountryCode = countryCode,
                 NotificationAccessToken = paymentRequest.NotificationAccessToken,
-                PaymentProvider = paymentConfiguration.Provider
+                PaymentProvider = paymentConfiguration.Provider,
+                ProviderDefinitionId = request.ProviderDefinitionId
             };
 
             payment.Updated = DateTime.UtcNow;

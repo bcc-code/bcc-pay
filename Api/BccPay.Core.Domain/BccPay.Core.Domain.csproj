@@ -10,11 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MediatR" Version="9.0.0" />
-    <PackageReference Include="RavenDB.Client" Version="5.2.1" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\BccPay.Core.Enums\BccPay.Core.Enums.csproj" />
     <ProjectReference Include="..\BccPay.Core.Notifications\BccPay.Core.Notifications.csproj" />
   </ItemGroup>
