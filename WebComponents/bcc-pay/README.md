@@ -2,6 +2,21 @@
 
 This webcomponent follows the [open-wc](https://github.com/open-wc/open-wc) recommendation.
 
+# Development
+
+To run webComponent in dev mode go to /webComponent/bcc-pay/
+`npm install`
+`npm run storybook`
+
+Currently we are pushing (after .npmrc update):
+`npm run versionCheck`
+`npm version patch`
+
+In application type:
+`npm install bcc-pay@latest`
+
+# Instalation
+
 Install of component:
 `npm install bcc-pay`
 
@@ -117,14 +132,3 @@ List of possible parameters and default values:
   @property({ type: String }) secondaryColor: string = 'white';
   @property({ type: String }) accentColor: string = '#bae1ff';
 ```
-
-# BCC Pay Development
-
-To run webComponent in dev mode go to /webComponent/bcc-pay/
-`npm run storybook`
-
-To use webComponent in external application you have to upgrade version number in package.json and publish component with command (after .npmrc update):
-`npm publish`
-
-In application type:
-`npm install bcc-pay@latest`
