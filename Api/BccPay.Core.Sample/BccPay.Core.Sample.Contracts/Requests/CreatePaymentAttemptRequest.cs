@@ -2,7 +2,7 @@
 {
     public class CreatePaymentAttemptRequest
     {
-        public string PaymentConfigurationId { get; set; }
+        public string ProviderDefinitionId { get; set; }
 
         public string Email { get; set; }
         public string PhoneNumber { get; set; }

@@ -85,10 +85,10 @@ namespace BccPay.Core.Domain.Entities
                     Amount = Amount,
                     Currency = CurrencyCode,
                     PaymentDetails = PaymentDetails,
-                    SuccessfulPaymentMethod = Attempts.Where(attempt
-                            => attempt.AttemptStatus == AttemptStatus.PaidSucceeded
-                            || attempt.AttemptStatus == AttemptStatus.RefundedSucceeded)
-                        .Select(x => $"{x.PaymentProvider}, {x.PaymentMethod}")
+                    SuccessfulPaymentMethod = Attempts.Where(x
+                        => x.AttemptStatus == AttemptStatus.PaidSucceeded
+                        || x.AttemptStatus == AttemptStatus.RefundedSucceeded)
+                    .Select(x => x.ProviderDefinitionId)
                         .FirstOrDefault()
                 });
 
