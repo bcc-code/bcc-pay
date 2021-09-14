@@ -71,7 +71,7 @@ jobs:
           npm run versionCheck
           npm run build
           npm config set registry https://${{ env.NPM_GITHUB_REGISTRY }}
-          npm publish
+          npm publish --access public
 
       - name: Replace Ai Token & API Url
         uses: cschleiden/replace-tokens@v1
