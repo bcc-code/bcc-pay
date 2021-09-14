@@ -86,6 +86,7 @@ jobs:
       - name: Update version of bcc-pay package
         run: |
           cd ./UI/dashboard/
+          npm config set registry https://${{ env.NPM_REGISTRY }}
           npm install bcc-pay@latest
           npm install
 
