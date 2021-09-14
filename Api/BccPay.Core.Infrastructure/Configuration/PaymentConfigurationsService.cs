@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
+using BccPay.Core.Shared.Helpers;
 using Microsoft.Extensions.Options;
 using Raven.Client.Documents.Session;
 
@@ -73,11 +74,13 @@ namespace BccPay.Core.Infrastructure.Configuration
             foreach (var paymentConfiguration in paymentConfigurations)
             {
                 var existingPaymentConfiguration = existingConfigurations.FirstOrDefault(x => x.CountryCode == paymentConfiguration.CountryCode);
-                if (existingPaymentConfiguration != null)
+
+                if (existingPaymentConfiguration != null && !existingPaymentConfiguration.EqualsInJson(paymentConfiguration))
                 {
                     existingPaymentConfiguration = paymentConfiguration;
                 }
-                else
+
+                if (existingPaymentConfiguration is null)
                 {
                     _documentSession.Store(new PaymentConfiguration
                     {
