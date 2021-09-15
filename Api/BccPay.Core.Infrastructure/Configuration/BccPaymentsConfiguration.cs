@@ -21,6 +21,7 @@ namespace BccPay.Core.Infrastructure.Configuration
 
     public class PaymentSettingModel
     {
+        public decimal Markup { get; set; }
         public PaymentMethod PaymentMethod { get; init; }
 
         public Currencies Currency { get; init; }

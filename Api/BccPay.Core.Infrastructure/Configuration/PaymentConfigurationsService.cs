@@ -59,7 +59,8 @@ namespace BccPay.Core.Infrastructure.Configuration
                         Settings = new Domain.PaymentSettings
                         {
                             Currency = definition.Settings.Currency,
-                            PaymentMethod = definition.Settings.PaymentMethod
+                            PaymentMethod = definition.Settings.PaymentMethod,
+                            Markup = definition.Settings.Markup
                         }
                     });
                 }
