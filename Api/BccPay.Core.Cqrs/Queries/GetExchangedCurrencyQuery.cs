@@ -15,16 +15,19 @@ namespace BccPay.Core.Cqrs.Queries
         public GetExchangedCurrencyQuery(
             decimal amount,
             Currencies fromCurrency,
+            Currencies toCurrency,
             PaymentMethod paymentMethod)
         {
             Amount = amount;
             FromCurrency = fromCurrency;
             PaymentMethod = paymentMethod;
+            ToCurrency = toCurrency;
         }
 
         public PaymentMethod PaymentMethod { get; set; }
         public decimal Amount { get; set; }
         public Currencies FromCurrency { get; set; }
+        public Currencies ToCurrency { get; set; }
     }
 
 
@@ -44,7 +47,9 @@ namespace BccPay.Core.Cqrs.Queries
         public async Task<ExchangeResult> Handle(GetExchangedCurrencyQuery request, CancellationToken cancellationToken)
         {
             var configuration = await _documentSession.Query<PaymentProviderDefinition>()
-                .Where(x => x.Settings.PaymentMethod == request.PaymentMethod)
+                .Where(x
+                    => x.Settings.PaymentMethod == request.PaymentMethod
+                    && x.Settings.Currency == request.ToCurrency)
                 .FirstOrDefaultAsync(token: cancellationToken);
 
             if (configuration.Settings.Currency == request.FromCurrency)

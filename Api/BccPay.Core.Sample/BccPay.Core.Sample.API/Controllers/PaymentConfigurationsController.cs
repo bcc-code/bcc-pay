@@ -34,9 +34,9 @@ namespace BccPay.Core.Sample.API.Controllers
         [HttpGet("exchange")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ExchangeResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreatePayment([FromQuery] Currencies currency, decimal amount, PaymentMethod paymentMethod)
+        public async Task<IActionResult> CreatePayment([FromQuery] Currencies fromCurrency, Currencies toCurrency, decimal amount, PaymentMethod paymentMethod)
         {
-            var query = new GetExchangedCurrencyQuery(amount, currency, paymentMethod);
+            var query = new GetExchangedCurrencyQuery(amount, fromCurrency, toCurrency, paymentMethod);
 
             var result = await Mediator.Send(query);
 
