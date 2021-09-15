@@ -36,7 +36,7 @@ namespace BccPay.Core.Infrastructure.Configuration
             _documentSession.SaveChanges();
         }
 
-        private void UpdatePaymentProviderDefinitions(List<PaymentProviderDefinitions> paymentDefinitions)
+        private void UpdatePaymentProviderDefinitions(List<PaymentProviderDefinitionModel> paymentDefinitions)
         {
             var oldPaymentDefinitions = _documentSession.Query<PaymentProviderDefinition>().ToList();
 
@@ -72,7 +72,7 @@ namespace BccPay.Core.Infrastructure.Configuration
                 .ForEach(_documentSession.Delete);
         }
 
-        private void UpdatePaymentConfigurations(List<PaymentConfigurations> paymentConfigurations)
+        private void UpdatePaymentConfigurations(List<PaymentConfigurationModel> paymentConfigurations)
         {
             var existingConfigurations = _documentSession.Query<PaymentConfiguration>().ToList();
 
