@@ -1,17 +1,16 @@
 ﻿using System.Collections.Generic;
-using BccPay.Core.Domain;
 using BccPay.Core.Enums;
 
 namespace BccPay.Core.Infrastructure.Configuration
 {
     public class BccPaymentsConfiguration
     {
-        public List<BccPaymentConfiguration> PaymentProviderDefinitions { get; set; } = new List<BccPaymentConfiguration>();
+        public List<PaymentProviderDefinitions> PaymentProviderDefinitions { get; set; } = new List<PaymentProviderDefinitions>();
 
-        public List<PaymentConditionConfigurations> PaymentConfigurations { get; set; } = new List<PaymentConditionConfigurations>();
+        public List<PaymentConfigurations> PaymentConfigurations { get; set; } = new List<PaymentConfigurations>();
     }
 
-    public class BccPaymentConfiguration
+    public class PaymentProviderDefinitions
     {
         public string Id { get; init; }
 
@@ -20,7 +19,14 @@ namespace BccPay.Core.Infrastructure.Configuration
         public PaymentSettings Settings { get; set; }
     }
 
-    public class PaymentConditionConfigurations
+    public class PaymentSettings
+    {
+        public PaymentMethod PaymentMethod { get; init; }
+
+        public Currencies Currency { get; init; }
+    }
+
+    public class PaymentConfigurations
     {
         public string CountryCode { get; set; }
         public Conditions Conditions { get; set; }

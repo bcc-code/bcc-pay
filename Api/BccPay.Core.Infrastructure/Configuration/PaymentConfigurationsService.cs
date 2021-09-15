@@ -31,12 +31,12 @@ namespace BccPay.Core.Infrastructure.Configuration
         {
             UpdatePaymentProviderDefinitions(_bccPaymentsConfiguration.Value.PaymentProviderDefinitions);
 
-            UpdatePaymentConditionConfigurations(_bccPaymentsConfiguration.Value.PaymentConfigurations);
+            UpdatePaymentConfigurations(_bccPaymentsConfiguration.Value.PaymentConfigurations);
 
             _documentSession.SaveChanges();
         }
 
-        private void UpdatePaymentProviderDefinitions(List<BccPaymentConfiguration> paymentDefinitions)
+        private void UpdatePaymentProviderDefinitions(List<PaymentProviderDefinitions> paymentDefinitions)
         {
             var oldPaymentDefinitions = _documentSession.Query<PaymentProviderDefinition>().ToList();
 
@@ -47,7 +47,8 @@ namespace BccPay.Core.Infrastructure.Configuration
                 if (oldDefinition != null)
                 {
                     oldDefinition.Provider = definition.Provider;
-                    oldDefinition.Settings = definition.Settings;
+                    oldDefinition.Settings.Currency = definition.Settings.Currency;
+                    oldDefinition.Settings.PaymentMethod = definition.Settings.PaymentMethod;
                 }
                 else
                 {
@@ -55,7 +56,11 @@ namespace BccPay.Core.Infrastructure.Configuration
                     {
                         PaymentDefinitionCode = definition.Id,
                         Provider = definition.Provider,
-                        Settings = definition.Settings
+                        Settings = new Domain.PaymentSettings
+                        {
+                            Currency = definition.Settings.Currency,
+                            PaymentMethod = definition.Settings.PaymentMethod
+                        }
                     });
                 }
             }
@@ -67,9 +72,9 @@ namespace BccPay.Core.Infrastructure.Configuration
                 .ForEach(_documentSession.Delete);
         }
 
-        private void UpdatePaymentConditionConfigurations(List<PaymentConditionConfigurations> paymentConfigurations)
+        private void UpdatePaymentConfigurations(List<PaymentConfigurations> paymentConfigurations)
         {
-            var existingConfigurations = _documentSession.Query<PaymentConditionConfigurations>().ToList();
+            var existingConfigurations = _documentSession.Query<PaymentConfiguration>().ToList();
 
             foreach (var paymentConfiguration in paymentConfigurations)
             {
@@ -77,7 +82,9 @@ namespace BccPay.Core.Infrastructure.Configuration
 
                 if (existingPaymentConfiguration != null && !existingPaymentConfiguration.EqualsInJson(paymentConfiguration))
                 {
-                    existingPaymentConfiguration = paymentConfiguration;
+                    existingPaymentConfiguration.Conditions.CurrencyCodes = paymentConfiguration.Conditions.CurrencyCodes;
+                    existingPaymentConfiguration.Conditions.PaymentTypes = paymentConfiguration.Conditions.PaymentTypes;
+                    existingPaymentConfiguration.PaymentProviderDefinitionIds = paymentConfiguration.PaymentProviderDefinitionIds;
                 }
 
                 if (existingPaymentConfiguration is null)
