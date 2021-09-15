@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BccPay.Core.Sample.API", "B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BccPay.Core.Sample.Contracts", "BccPay.Core.Sample\BccPay.Core.Sample.Contracts\BccPay.Core.Sample.Contracts.csproj", "{A1A2CC9C-B73F-4FC3-B037-46713C94080B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BccPay.Core.Test", "BccPay.Core.Test\BccPay.Core.Test.csproj", "{F022748E-C151-43A5-88C3-8C1F12EA5179}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{A1A2CC9C-B73F-4FC3-B037-46713C94080B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1A2CC9C-B73F-4FC3-B037-46713C94080B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1A2CC9C-B73F-4FC3-B037-46713C94080B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F022748E-C151-43A5-88C3-8C1F12EA5179}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F022748E-C151-43A5-88C3-8C1F12EA5179}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F022748E-C151-43A5-88C3-8C1F12EA5179}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F022748E-C151-43A5-88C3-8C1F12EA5179}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
