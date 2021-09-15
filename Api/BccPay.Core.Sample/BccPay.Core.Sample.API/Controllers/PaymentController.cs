@@ -25,7 +25,8 @@ namespace BccPay.Core.Sample.API.Controllers
                 filters.From,
                 filters.To,
                 filters.PaymentStatus,
-                filters.IsProblematicPayment);
+                filters.IsProblematicPayment,
+                filters.PaymentType);
 
             var result = await Mediator.Send(query);
 

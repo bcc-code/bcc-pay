@@ -25,6 +25,7 @@ namespace BccPay.Core.Domain.Entities
         /// Could indicate if it is a membership deposit of saving payment
         /// </summary>
         public IPaymentDetails PaymentDetails { get; set; }
+        public string PaymentType { get; set; }
         public string Description { get; set; }
         public bool IsProblematic { get; set; }
 
@@ -42,7 +43,8 @@ namespace BccPay.Core.Domain.Entities
             string countryCode,
             decimal amount,
             string description,
-            IPaymentDetails paymentDetails)
+            IPaymentDetails paymentDetails,
+            string paymentType)
         {
             PaymentId = Guid.NewGuid();
             PayerId = payerId;
@@ -53,6 +55,7 @@ namespace BccPay.Core.Domain.Entities
             Created = DateTime.UtcNow;
             Description = description;
             PaymentDetails = paymentDetails;
+            PaymentType = paymentType;
         }
 
         private void RefreshPaymentStatus()
@@ -88,7 +91,8 @@ namespace BccPay.Core.Domain.Entities
                         => x.AttemptStatus == AttemptStatus.PaidSucceeded
                         || x.AttemptStatus == AttemptStatus.RefundedSucceeded)
                     .Select(x => x.ProviderDefinitionId)
-                        .FirstOrDefault()
+                        .FirstOrDefault(),
+                    PaymentType = PaymentType
                 });
 
                 PaymentStatus = newStatus;

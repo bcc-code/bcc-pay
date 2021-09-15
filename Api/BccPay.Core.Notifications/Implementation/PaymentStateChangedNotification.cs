@@ -16,5 +16,6 @@ namespace BccPay.Core.Notifications.Implementation
         public decimal Amount { get; set; }
         public string Currency { get; set; }
         public object PaymentDetails { get; set; }
+        public string PaymentType { get; set; }
     }
 }
