@@ -55,6 +55,7 @@ function createComponentStyle(): string {
     }
 
     .card-cost {
+      display: flex;
       font-size: 1.125rem;
       font-weight: 900;
     }
@@ -64,6 +65,21 @@ function createComponentStyle(): string {
       width: 100%;
       justify-content: space-between;
       padding-bottom: 6px;
+    }
+
+    .amount-input {
+      font-size: 16px;
+      transition: 0.6s;
+      border: none;
+      border-bottom: 1px solid #ccc;
+      background-color: transparent;
+      &:focus {
+        outline: none;
+        border-bottom: 1px solid #28a2a2;
+      }
+    }
+    .currency-select {
+      margin-left: 10px;
     }
 
     input[type='text'] {
