@@ -1,6 +1,6 @@
 import { html, LitElement, property } from 'lit-element';
 import { applyStyles } from './SharedStyles';
-import { startNetsPayment } from './NetsClient';
+import { loadNestScript, startNetsPayment } from './NetsClient';
 import {
   disablePayments,
   getPaymentConfigurations,
@@ -23,10 +23,11 @@ export let mollieUrl: string;
 export let primaryColor: string;
 export let secondaryColor: string;
 export let accentColor: string;
+export let amountFixed: boolean;
 
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
-  @property({ type: Number }) amount = 5;
+  @property({ type: Number }) amount = 0;
   @property({ type: String }) currency = 'EUR';
   @property({ type: String }) country = 'NOR';
   @property({ type: User }) user: User = {};
@@ -41,25 +42,6 @@ export class BccPay extends LitElement {
   @property({ type: String }) secondaryColor: string = 'white';
   @property({ type: String }) accentColor: string = '#bae1ff';
 
-  loadNestScript() {
-    isDevEnv = this.isDevEnv;
-    requestHeaders = this.requestHeaders;
-    country = this.country;
-    primaryColor = this.primaryColor;
-    secondaryColor = this.secondaryColor;
-    accentColor = this.accentColor;
-
-    let nestScript = document.createElement('script');
-    if (isDevEnv === true) {
-      nestScript.src =
-        'https://test.checkout.dibspayment.eu/v1/checkout.js?v=1';
-    } else {
-      nestScript.src = 'https://checkout.dibspayment.eu/v1/checkout.js?v=1';
-    }
-
-    return nestScript;
-  }
-
   createRenderRoot() {
     return this;
   }
@@ -70,20 +52,25 @@ export class BccPay extends LitElement {
   }
 
   async init() {
+    isDevEnv = this.isDevEnv;
+    requestHeaders = this.requestHeaders;
+    country = this.country;
+    primaryColor = this.primaryColor;
+    secondaryColor = this.secondaryColor;
+    accentColor = this.accentColor;
+    amountFixed = this.amount !== 0;
+
     disablePayments();
-    getPaymentConfigurations(this.country, this.server);
 
     if (
-      this.paymentId === '' ||
-      this.paymentId === undefined ||
-      this.paymentId === null
+      (this.paymentId === '' ||
+        this.paymentId === undefined ||
+        this.paymentId === null) &&
+      this.amount !== 0
     ) {
-      this.paymentId = await initPayment(
-        this.currency,
-        this.country,
-        this.amount,
-        this.server
-      );
+      getPaymentConfigurations(this.country, this.server);
+
+      await this.initBccPayPayment();
     }
 
     if (this.paymentId === '') {
@@ -98,6 +85,17 @@ export class BccPay extends LitElement {
 
     (document.getElementById('country-select') as HTMLSelectElement).value =
       this.country;
+    (document.getElementById('currency-select') as HTMLSelectElement).value =
+      this.currency;
+  }
+
+  async initBccPayPayment() {
+    this.paymentId = await initPayment(
+      this.currency,
+      this.country,
+      this.amount,
+      this.server
+    );
   }
 
   async initMolliePayment(paymentConfigurationId: string, buttonId: string) {
@@ -120,11 +118,55 @@ export class BccPay extends LitElement {
   render() {
     return html`
       <div style="display: none">
-        ${this.loadNestScript()} ${this.applyCssStyles()} ${this.init()}
+        ${loadNestScript()} ${this.applyCssStyles()} ${this.init()}
       </div>
       <div class="card-square" id="main-div">
         <div id="first-screen" class="screen">
-          <div class="card-price">
+          <div
+            class="card-price"
+            style="display: ${amountFixed ? 'none' : 'block'}"
+          >
+            <div>
+              <div class="card-subtitle">
+                <h5>Choose amount</h5>
+              </div>
+              <div class="card-title">
+                <h3>${this.item}</h3>
+              </div>
+            </div>
+            <div class="card-row">
+              <span class="card-tag">Amount</span>
+              <span class="card-cost"
+                ><input
+                  type="number"
+                  id="amount-input"
+                  class="amount-input"
+                  name="tentacles"
+                  min="1"
+                  max="10000"
+                  value="${this.amount}"
+                  @focusout="${(e: any) => {
+                    this.amount = e.target.value;
+                    this.initBccPayPayment();
+                  }}"
+                />
+                <select
+                  id="currency-select"
+                  class="currency-select"
+                  @change="${(e: any) => (this.currency = e.target.value)}"
+                  value="${this.currency}"
+                >
+                  <option selected="${this.currency}" value="NOK">NOK</option>
+                  <option selected="${this.currency}" value="EUR">EUR</option>
+                  <option selected="${this.currency}" value="PLN">PLN</option>
+                </select>
+              </span>
+            </div>
+          </div>
+          <div
+            class="card-price"
+            style="display: ${!amountFixed ? 'none' : 'block'}"
+          >
             <div>
               <div class="card-subtitle">
                 <h5>you are paying for</h5>
@@ -170,7 +212,7 @@ export class BccPay extends LitElement {
                 'nets-cc-vipps-nok'
               )}"
           >
-            <span class="payment-button-text">CREDIT CARD</span>
+            <span class="payment-button-text">CREDIT CARD </span>
           </button>
           <button
             id="Giropay"
