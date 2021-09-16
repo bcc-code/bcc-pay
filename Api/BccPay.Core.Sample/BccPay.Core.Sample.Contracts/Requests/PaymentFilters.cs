@@ -9,5 +9,6 @@ namespace BccPay.Core.Sample.Contracts.Requests
         public DateTime? To { get; set; }
         public PaymentStatus? PaymentStatus { get; set; }
         public bool? IsProblematicPayment { get; set; }
+        public string PaymentType { get; set; }
     }
 }

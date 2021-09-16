@@ -7,6 +7,7 @@
         public string CountryCode { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; }
+        public string PaymentType { get; set; }
         public SamplePaymentDetails PaymentDetails { get; set; }
     }
 }

@@ -21,7 +21,8 @@ namespace BccPay.Core.Cqrs.Queries
             DateTime? from,
             DateTime? to,
             PaymentStatus? paymentStatus,
-            bool? isProblematicPayment)
+            bool? isProblematicPayment,
+            string paymentType)
         {
             Page = page;
             Size = size;
@@ -29,6 +30,7 @@ namespace BccPay.Core.Cqrs.Queries
             To = to;
             PaymentStatus = paymentStatus;
             IsProblematicPayment = isProblematicPayment;
+            PaymentType = paymentType;
         }
 
         public int Page { get; set; }
@@ -37,6 +39,7 @@ namespace BccPay.Core.Cqrs.Queries
         public DateTime? To { get; set; }
         public PaymentStatus? PaymentStatus { get; set; }
         public bool? IsProblematicPayment { get; set; }
+        public string PaymentType { get; set; }
     }
 
     public class PaymentWithFiltersResult
@@ -73,6 +76,9 @@ namespace BccPay.Core.Cqrs.Queries
 
             if (request.IsProblematicPayment is not null)
                 query = query.Where(paymentIndex => paymentIndex.IsProblematic == request.IsProblematicPayment);
+
+            if (!string.IsNullOrWhiteSpace(request.PaymentType))
+                query = query.Where(paymentIndex => paymentIndex.PaymentType == request.PaymentType);
 
             if (request.PaymentStatus is not null)
                 query = query.Where(paymentIndex => paymentIndex.PaymentStatus == request.PaymentStatus);

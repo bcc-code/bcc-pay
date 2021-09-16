@@ -25,6 +25,7 @@ namespace BccPay.Core.DataAccess.Indexes
                                             PaymentStatus = payment.PaymentStatus,
                                             IsProblematic = payment.IsProblematic,
                                             PaymentDetails = payment.PaymentDetails,
+                                            PaymentType = payment.PaymentType,
                                             Attempts = payment.Attempts.Select(x => new AttemptResult
                                             {
                                                 AttemptStatus = x.AttemptStatus,
@@ -52,6 +53,7 @@ namespace BccPay.Core.DataAccess.Indexes
             public decimal Amount { get; set; }
             public List<AttemptResult> Attempts { get; set; }
             public IPaymentDetails PaymentDetails { get; set; }
+            public string PaymentType { get; set; }
         }
 
         public class AttemptResult
