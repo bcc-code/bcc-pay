@@ -49,6 +49,7 @@ namespace BccPay.Core.Infrastructure.Configuration
                     oldDefinition.Provider = definition.Provider;
                     oldDefinition.Settings.Currency = definition.Settings.Currency;
                     oldDefinition.Settings.PaymentMethod = definition.Settings.PaymentMethod;
+                    oldDefinition.Settings.Markup = definition.Settings.Markup;
                 }
                 else
                 {
@@ -56,7 +57,7 @@ namespace BccPay.Core.Infrastructure.Configuration
                     {
                         PaymentDefinitionCode = definition.Id,
                         Provider = definition.Provider,
-                        Settings = new Domain.PaymentSettings
+                        Settings = new Domain.PaymentSetting
                         {
                             Currency = definition.Settings.Currency,
                             PaymentMethod = definition.Settings.PaymentMethod,

@@ -110,7 +110,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
             }
         }
 
-        public async Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSettings settings)
+        public async Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSetting settings)
         {
             INetsPaymentRequestBuilder requestBuilder = CreateRequestBuilder(settings);
             var referer = new Uri(_httpContextAccessor.HttpContext.Request.Headers["Referer"].ToString());
@@ -167,7 +167,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
             netsStatusDetails.InvoiceId = invoice?.Invoice?.InvoiceNumber;
         }
 
-        private INetsPaymentRequestBuilder CreateRequestBuilder(PaymentSettings settings)
+        private INetsPaymentRequestBuilder CreateRequestBuilder(PaymentSetting settings)
         {
             // create a builder depending on the settings
             return settings switch

@@ -12,12 +12,14 @@ namespace BccPay.Core.Domain
 
         public PaymentProvider Provider { get; set; }
 
-        public PaymentSettings Settings { get; set; }
+        public PaymentSetting Settings { get; set; }
     }
 
-    public class PaymentSettings
+    public class PaymentSetting
     {
-        public PaymentMethod PaymentMethod { get; init; }
+        public decimal Markup { get; set; }
+
+        public PaymentMethod PaymentMethod { get; set; }
 
         public Currencies Currency { get; set; }
     }
