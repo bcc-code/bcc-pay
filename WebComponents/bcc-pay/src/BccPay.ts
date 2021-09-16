@@ -62,14 +62,13 @@ export class BccPay extends LitElement {
 
     disablePayments();
 
-    if (
-      (this.paymentId === '' ||
-        this.paymentId === undefined ||
-        this.paymentId === null) &&
-      this.amount !== 0
-    ) {
-      getPaymentConfigurations(this.country, this.server);
+    if (this.amount !== 0) getPaymentConfigurations(this.country, this.server);
 
+    if (
+      this.paymentId === '' ||
+      this.paymentId === undefined ||
+      this.paymentId === null
+    ) {
       await this.initBccPayPayment();
     }
 
