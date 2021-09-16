@@ -12,14 +12,13 @@ namespace BccPay.Core.Shared.Converters
         /// <param name="inputValue"></param>
         /// <param name="provider"></param>
         /// <returns></returns>
-        public static string ConvertCountry(string inputValue,
-            CountryCodeFormat countryCodeFormat = CountryCodeFormat.Alpha3)
+        public static string ConvertCountry(string inputValue, CountryCodeFormat countryCodeFormat = CountryCodeFormat.Alpha3)
         {
             try
             {
                 Country countryInformation = null;
 
-                switch (inputValue.Length)
+                if (inputValue.Length == 2)
                 {
                     var normalize = inputValue.ToUpper();
                     countryInformation = Countries.GetCountryByAlpha2(normalize);
@@ -33,9 +32,9 @@ namespace BccPay.Core.Shared.Converters
 
                 if (int.TryParse(inputValue, out int countryCodeNumeric))
                     countryInformation = Countries.GetCountryByNumeric(countryCodeNumeric);
-                else
-                    countryInformation = Countries.GetCountryByShortName(inputValue);
 
+                if (inputValue.Length >= 4)
+                    countryInformation = Countries.GetCountryByShortName(inputValue);
 
                 return countryCodeFormat switch
                 {
