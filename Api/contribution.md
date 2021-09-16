@@ -4,9 +4,9 @@
 ## Preparation
   Before working with sample project:
    1. IDEA: Ensure that you have installed [Visual Studio](https://visualstudio.microsoft.com/) or Rider with [.NET 5.0](https://dotnet.microsoft.com/download/dotnet/5.0) SDK.
-   2. Data Base: prepare your RavenDB [certificates](https://ravendb.net/docs/article-page/4.2/csharp/start/getting-started)
+   2. Data Base: [register](https://cloud.ravendb.net/user/register) RavenDB account and generate certificates
 >NOTE: After getting the certificate you need to install them and convert into Base64
-string. You can use following [guide](https://blog.techfabric.com/convert-pfx-certificate-to-base64-string/) 
+string. You can use following [guide](https://blog.techfabric.com/convert-pfx-certificate-to-base64-string/) on Windows
    
    3. Currency exchange service: [Fixer](https://fixer.io/documentation) API-key with at least [Basic plan](https://fixer.io/product), to be able to use currency exchange service.
    4. Payment Provider: [Nets](https://developers.nets.eu/en-EU/) test API-key and checkout key, to be able to use Nets payment provider with the hosted checkout page. Admin panel: [URL](https://portal.dibspayment.eu/).
