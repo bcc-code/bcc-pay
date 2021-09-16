@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BccPay.Core.Domain;
 using BccPay.Core.Enums;
+using BccPay.Core.Infrastructure.Exceptions;
 using BccPay.Core.Infrastructure.Helpers;
 using MediatR;
 using Raven.Client.Documents;
@@ -46,16 +47,17 @@ namespace BccPay.Core.Cqrs.Queries
 
         public async Task<ExchangeResult> Handle(GetExchangedCurrencyQuery request, CancellationToken cancellationToken)
         {
-            var configuration = await _documentSession.Query<PaymentProviderDefinition>()
+            var providerDefinition = await _documentSession.Query<PaymentProviderDefinition>()
                 .Where(x
                     => x.Settings.PaymentMethod == request.PaymentMethod
                     && x.Settings.Currency == request.ToCurrency)
-                .FirstOrDefaultAsync(token: cancellationToken);
+                .FirstOrDefaultAsync(token: cancellationToken)
+                ?? throw new InvalidConfigurationException($"Unsupported currency or method");           
 
-            if (configuration.Settings.Currency == request.FromCurrency)
-                return new ExchangeResult(request.FromCurrency, configuration.Settings.Currency, request.Amount, request.Amount);
+            if (providerDefinition.Settings.Currency == request.FromCurrency)
+                return new ExchangeResult(request.FromCurrency, providerDefinition.Settings.Currency, request.Amount, request.Amount);
 
-            var result = await _currencyService.Exchange(request.FromCurrency, configuration.Settings.Currency, request.Amount, configuration.Settings.Markup);
+            var result = await _currencyService.Exchange(request.FromCurrency, providerDefinition.Settings.Currency, request.Amount, providerDefinition.Settings.Markup);
 
             return new ExchangeResult(result.FromCurrency, result.ToCurrency, request.Amount, result.ToAmount);
         }
