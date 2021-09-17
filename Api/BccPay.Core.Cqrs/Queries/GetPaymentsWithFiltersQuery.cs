@@ -98,8 +98,8 @@ namespace BccPay.Core.Cqrs.Queries
                     PaymentId = paymentIndex.PaymentId,
                     Updated = paymentIndex.Updated,
                     PaymentMethods = paymentIndex.Attempts.Select(x => x.PaymentMethod.ToString()).ToString(),
-                    PaymentDetails = (object)paymentIndex.PaymentDetails,
-                    PaymentType = request.PaymentType
+                    PaymentType = paymentIndex.PaymentType,
+                    PaymentDetails = (object)paymentIndex.PaymentDetails
                 }).ToListAsync(token: cancellationToken);
 
             var amountOfObjects = await query.Distinct().CountAsync(cancellationToken);
