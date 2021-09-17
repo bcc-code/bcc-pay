@@ -80,7 +80,10 @@ namespace BccPay.Core.Domain.Entities
             {
                 Notifications.Add(new PaymentStateChangedNotification
                 {
-                    Version = Notifications.OfType<PaymentStateChangedNotification>().Max(x => x.Version) + 1,
+                    Version = Notifications.OfType<PaymentStateChangedNotification>()
+                        .Select(x => x.Version)
+                        .DefaultIfEmpty()
+                        .Max() + 1,
                     PaymentId = PaymentId,
                     FromPaymentStatus = PaymentStatus,
                     ToPaymentStatus = newStatus,
