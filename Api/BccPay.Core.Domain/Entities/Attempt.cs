@@ -10,6 +10,7 @@ namespace BccPay.Core.Domain.Entities
         public PaymentProvider PaymentProvider { get; set; }
         public string CountryCode { get; set; }
         public DateTime Created { get; set; }
+        public DateTime? Updated { get; set; }
         public AttemptStatus AttemptStatus { get; set; }
         public IStatusDetails StatusDetails { get; set; }
         public string NotificationAccessToken { get; set; }
