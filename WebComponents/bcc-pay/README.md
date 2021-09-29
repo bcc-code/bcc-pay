@@ -122,9 +122,10 @@ List of possible parameters and default values:
 
 ```Typescript
   @property({ type: String }) item = 'Subscription';
-  @property({ type: Number }) amount = 5;
-  @property({ type: String }) currency = 'EUR';
+  @property({ type: Number }) amount = 0;
+  @property({ type: String }) currency = 'NOK';
   @property({ type: String }) country = 'NOR';
+  @property({ type: String }) paymentType = '';
   @property({ type: User }) user: User = {};
   @property({ type: String }) server = 'https://localhost:5001';
   @property({ type: String }) netsCheckoutKey = '#checkout_key#';
