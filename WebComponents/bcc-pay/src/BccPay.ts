@@ -4,6 +4,7 @@ import { loadNestScript, startNetsPayment } from './NetsClient';
 import {
   disablePayments,
   getPaymentConfigurations,
+  getPaymentConfigutraionIdForPaymentMethod,
   initPayment,
 } from './BccPayClient';
 import { User } from './User';
@@ -28,8 +29,9 @@ export let amountFixed: boolean;
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
   @property({ type: Number }) amount = 0;
-  @property({ type: String }) currency = 'EUR';
+  @property({ type: String }) currency = 'NOK';
   @property({ type: String }) country = 'NOR';
+  @property({ type: String }) paymentType = '';
   @property({ type: User }) user: User = {};
   @property({ type: String }) server = 'https://localhost:5001';
   @property({ type: String }) netsCheckoutKey = '#checkout_key#';
@@ -62,7 +64,13 @@ export class BccPay extends LitElement {
 
     disablePayments();
 
-    if (this.amount !== 0) getPaymentConfigurations(this.country, this.server);
+    if (this.amount !== 0)
+      getPaymentConfigurations(
+        this.country,
+        this.server,
+        this.currency,
+        this.paymentType
+      );
 
     if (
       this.paymentId === '' ||
@@ -202,13 +210,13 @@ export class BccPay extends LitElement {
             id="CreditCardOrVipps"
             class="payment-button"
             disabled="true"
-            @click="${() =>
+            @click="${e =>
               startNetsPayment(
                 this.paymentId,
                 this.user,
                 this.server,
                 this.netsCheckoutKey,
-                'nets-cc-vipps-nok'
+                getPaymentConfigutraionIdForPaymentMethod(e.target.id)
               )}"
           >
             <span class="payment-button-text">CREDIT CARD </span>
@@ -217,8 +225,11 @@ export class BccPay extends LitElement {
             id="Giropay"
             class="payment-button"
             disabled="true"
-            @click="${() =>
-              this.initMolliePayment('mollie-giropay-eur', 'Giropay')}"
+            @click="${e =>
+              this.initMolliePayment(
+                getPaymentConfigutraionIdForPaymentMethod(e.target.id),
+                e.target.id
+              )}"
           >
             <span class="payment-button-text">GIROPAY</span>
           </button>
@@ -226,8 +237,11 @@ export class BccPay extends LitElement {
             id="iDeal"
             class="payment-button"
             disabled="true"
-            @click="${() =>
-              this.initMolliePayment('mollie-ideal-eur', 'iDeal')}"
+            @click="${e =>
+              this.initMolliePayment(
+                getPaymentConfigutraionIdForPaymentMethod(e.target.id),
+                e.target.id
+              )}"
           >
             <span class="payment-button-text">iDeal</span>
           </button>
@@ -266,98 +280,6 @@ export class BccPay extends LitElement {
             </h5>
           </div>
           <div id="checkout-container-div"></div>
-        </div>
-
-        <div id="change-user-data-screen" class="screen" style="display: none">
-          <div class="card-subtitle">
-            <h5>Changing user data:</h5>
-          </div>
-
-          <div>
-            <span>Email</span>
-            <input
-              type="text"
-              value="${this.user.email}"
-              @change="${(e: any) => (this.user.email = e.target.value)}"
-            />
-          </div>
-
-          <div>
-            <span>Phone</span>
-            <input
-              type="text"
-              value="${this.user.phoneNumber}"
-              @change="${(e: any) => (this.user.phoneNumber = e.target.value)}"
-            />
-          </div>
-
-          <div>
-            <span>First Name</span>
-            <input
-              type="text"
-              value="${this.user.firstName}"
-              @change="${(e: any) => (this.user.firstName = e.target.value)}"
-            />
-          </div>
-
-          <div>
-            <span>Last Name</span>
-            <input
-              type="text"
-              value="${this.user.lastName}"
-              @change="${(e: any) => (this.user.lastName = e.target.value)}"
-            />
-          </div>
-
-          <div>
-            <span>Address Line 1</span>
-            <input
-              type="text"
-              value="${this.user.addressLine1}"
-              @change="${(e: any) => (this.user.addressLine1 = e.target.value)}"
-            />
-          </div>
-
-          <div>
-            <span>Address Line 2</span>
-            <input
-              type="text"
-              value="${this.user.addressLine2}"
-              @change="${(e: any) => (this.user.addressLine2 = e.target.value)}"
-            />
-          </div>
-
-          <div>
-            <span>City</span>
-            <input
-              type="text"
-              value="${this.user.city}"
-              @change="${(e: any) => (this.user.city = e.target.value)}"
-            />
-          </div>
-
-          <div>
-            <span>Postal code</span>
-            <input
-              type="text"
-              value="${this.user.postalCode}"
-              @change="${(e: any) => (this.user.postalCode = e.target.value)}"
-            />
-          </div>
-
-          <button
-            class="payment-button"
-            @click="${() =>
-              startNetsPayment(
-                this.paymentId,
-                this.user,
-                this.server,
-                this.netsCheckoutKey,
-                'nets-cc-vipps-nok'
-              )}"
-          >
-            CHANGE
-          </button>
         </div>
       </div>
     `;
