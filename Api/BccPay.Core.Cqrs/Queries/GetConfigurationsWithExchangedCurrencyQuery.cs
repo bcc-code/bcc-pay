@@ -52,9 +52,9 @@ namespace BccPay.Core.Cqrs.Queries
 
                     CurrencyConversionRecord currencyConversionResult = null;
 
-
                     var fromCurrencyValue = request.FromCurrency is null ? default : (Currencies)request.FromCurrency;
-                    currencyConversionResult = await _currencyService.Exchange(fromCurrencyValue, details.Currency, request.Amount, details.Markup);
+                    if (request.Amount > 0)
+                        currencyConversionResult = await _currencyService.Exchange(fromCurrencyValue, details.Currency, request.Amount, details.Markup);
 
                     combinedResult.Add(new ProviderDefinitionExchangeDefinition(definitionId,
                         details.PaymentProvider,
