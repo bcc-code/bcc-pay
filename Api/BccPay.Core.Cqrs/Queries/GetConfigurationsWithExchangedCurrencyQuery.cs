@@ -52,13 +52,14 @@ namespace BccPay.Core.Cqrs.Queries
 
                     CurrencyConversionRecord currencyConversionResult = null;
 
-                    if (request.FromCurrency is not null && request.ToCurrency is not null)
-                        currencyConversionResult = await _currencyService.Exchange(request.FromCurrency.Value, details.Currency, request.Amount, details.Markup);
+
+                    var fromCurrencyValue = request.FromCurrency is null ? default : (Currencies)request.FromCurrency;
+                    currencyConversionResult = await _currencyService.Exchange(fromCurrencyValue, details.Currency, request.Amount, details.Markup);
 
                     combinedResult.Add(new ProviderDefinitionExchangeDefinition(definitionId,
                         details.PaymentProvider,
                         details.PaymentMethod,
-                        request.FromCurrency,
+                        fromCurrencyValue,
                         details.Currency,
                         request.Amount,
                         currencyConversionResult is not null ? currencyConversionResult.ToAmount : request.Amount));
