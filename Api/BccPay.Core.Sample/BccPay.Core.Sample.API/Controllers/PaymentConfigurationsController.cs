@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using BccPay.Core.Cqrs.Queries;
-using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Helpers;
 using BccPay.Core.Sample.Contracts.Requests;
 using Microsoft.AspNetCore.Http;
@@ -31,12 +30,12 @@ namespace BccPay.Core.Sample.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("exchange")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ExchangeResult))]
+        [HttpGet("with-exchange")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetConfigurationsWithExchangedCurrencyQueryResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreatePayment([FromQuery] Currencies fromCurrency, Currencies toCurrency, decimal amount, PaymentMethod paymentMethod)
+        public async Task<IActionResult> CreatePayment([FromQuery] ExchangeWithConfigurationsRequestModel request)
         {
-            var query = new GetExchangedCurrencyQuery(amount, fromCurrency, toCurrency, paymentMethod);
+            var query = Mapper.Map<GetConfigurationsWithExchangedCurrencyQuery>(request);
 
             var result = await Mediator.Send(query);
 

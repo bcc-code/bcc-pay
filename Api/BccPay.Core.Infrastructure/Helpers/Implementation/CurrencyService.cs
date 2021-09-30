@@ -44,6 +44,14 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
             if (amount <= 0)
                 throw new CurrencyExchangeOperationException("Unable to convert values.");
 
+            if (fromCurrency == toCurrency)
+                return new CurrencyConversionRecord(null,
+                    fromCurrency,
+                    toCurrency,
+                    0,
+                    amount,
+                    amount);
+
             var (currencyRate, fromOpposite, updateTime) = await GetExhangeRateByCurrency(fromCurrency, toCurrency);
 
             decimal exchangeResult = 0;
