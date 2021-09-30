@@ -32,6 +32,7 @@ interface ArgTypes {
   slot?: TemplateResult;
   requestHeaders?: [{ key: string; value: string }];
   paymentId?: string;
+  paymentType?: string;
 }
 
 const Template: Story<ArgTypes> = ({
@@ -45,6 +46,7 @@ const Template: Story<ArgTypes> = ({
   slot,
   requestHeaders = [{ key: 'new_key', value: 'new_value' }],
   paymentId,
+  paymentType = 'Deposit',
 }: ArgTypes) => html`
   <bcc-pay
     .item=${item}
@@ -56,6 +58,7 @@ const Template: Story<ArgTypes> = ({
     .isDevEnv=${isDevEnv}
     .requestHeaders=${requestHeaders}
     .paymentId=${paymentId}
+    .paymentType=${paymentType}
   >
     ${slot}
   </bcc-pay>

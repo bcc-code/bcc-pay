@@ -46,7 +46,7 @@ export async function initMolliePayment(
   paymentConfigurationId: string
 ): Promise<string> {
   const body = {
-    paymentConfigurationId: paymentConfigurationId,
+    providerDefinitionId: paymentConfigurationId,
     email: user.email === null ? undefined : user.email,
     phoneNumber: user.phoneNumber === null ? undefined : user.phoneNumber,
     firstName: user.firstName === null ? undefined : user.firstName,

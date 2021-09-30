@@ -1,10 +1,15 @@
-<div class="w-full h-full flex flex-col justify-center z-10 ">
+<div class="w-full h-full flex flex-col justify-center z-10 mt-5 ">
     <div class="m-5 flex justify-center  ">
         <div class="min-w-400">
             <div *ngIf="server">
+                <h2>Passing amount to component:</h2>
                 <bcc-pay item="Sample Item" amount=70 [server]="server" [netsCheckoutKey]="netsCheckoutKey"
                     isDevEnv="true" [requestHeaders]="requestHeaders" primaryColor="#5C5CFF">
                 </bcc-pay>
+                <!-- <h2 class="mt-10 pt-10">User pass amount:</h2>
+                <bcc-pay item="New Item" [server]="server" [netsCheckoutKey]="netsCheckoutKey" isDevEnv="true"
+                    primaryColor="#ffbf00">
+                </bcc-pay> -->
             </div>
         </div>
     </div>

@@ -59,6 +59,7 @@ namespace BccPay.Core.Cqrs.Queries
         public string Amount { get; set; }
         public string PaymentMethods { get; set; }
         public object PaymentDetails { get; set; }
+        public string PaymentType { get; set; }
     }
 
     public class GetPaymentsWithFiltersQueryHandler : IRequestHandler<GetPaymentsWithFiltersQuery, PaymentWithFiltersResult>
@@ -97,6 +98,7 @@ namespace BccPay.Core.Cqrs.Queries
                     PaymentId = paymentIndex.PaymentId,
                     Updated = paymentIndex.Updated,
                     PaymentMethods = paymentIndex.Attempts.Select(x => x.PaymentMethod.ToString()).ToString(),
+                    PaymentType = paymentIndex.PaymentType,
                     PaymentDetails = (object)paymentIndex.PaymentDetails
                 }).ToListAsync(token: cancellationToken);
 

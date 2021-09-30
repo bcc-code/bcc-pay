@@ -126,3 +126,14 @@ export async function processNetsPayment(
 export async function cleanupNetsPayment() {
   checkout.cleanup();
 }
+
+export function loadNestScript() {
+  let nestScript = document.createElement('script');
+  if (isDevEnv === true) {
+    nestScript.src = 'https://test.checkout.dibspayment.eu/v1/checkout.js?v=1';
+  } else {
+    nestScript.src = 'https://checkout.dibspayment.eu/v1/checkout.js?v=1';
+  }
+
+  return nestScript;
+}

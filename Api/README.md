@@ -1,1 +1,0 @@
-# BCC Pay API

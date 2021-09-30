@@ -1,8 +1,12 @@
 import { requestHeaders } from './BccPay';
 
+let providerDefinitionIdList = {};
+
 export async function getPaymentConfigurations(
   country: string,
-  server: string
+  server: string,
+  currency: string,
+  paymentType: string
 ) {
   let possibleConfigurations: string = '';
 
@@ -16,7 +20,7 @@ export async function getPaymentConfigurations(
 
   try {
     disablePayments();
-    const url = `${server}/payment-configurations?countryCode=${country}`;
+    const url = `${server}/payment-configurations?countryCode=${country}&currencyCode=${currency}&paymentType=${paymentType}`;
     await fetch(url, {
       method: 'GET',
       headers: fetchHeaders,
@@ -35,6 +39,7 @@ export async function getPaymentConfigurations(
     paymentConfigurationsObject.paymentConfigurations.forEach(element => {
       element.providerDefinitionDetails.forEach(element => {
         enablePossiblePayments(element.paymentMethod);
+        providerDefinitionIdList[element.paymentMethod] = element.id;
       });
     });
     return possibleConfigurations;
@@ -110,4 +115,11 @@ export async function initPayment(
   } catch (e) {
     return '';
   }
+}
+
+export function getPaymentConfigutraionIdForPaymentMethod(
+  paymentMethod: string
+): string {
+  console.log('Getting payment config id for method: ' + paymentMethod);
+  return providerDefinitionIdList[paymentMethod];
 }

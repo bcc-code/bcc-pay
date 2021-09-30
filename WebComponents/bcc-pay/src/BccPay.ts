@@ -1,9 +1,10 @@
 import { html, LitElement, property } from 'lit-element';
 import { applyStyles } from './SharedStyles';
-import { startNetsPayment } from './NetsClient';
+import { loadNestScript, startNetsPayment } from './NetsClient';
 import {
   disablePayments,
   getPaymentConfigurations,
+  getPaymentConfigutraionIdForPaymentMethod,
   initPayment,
 } from './BccPayClient';
 import { User } from './User';
@@ -23,12 +24,14 @@ export let mollieUrl: string;
 export let primaryColor: string;
 export let secondaryColor: string;
 export let accentColor: string;
+export let amountFixed: boolean;
 
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
-  @property({ type: Number }) amount = 5;
-  @property({ type: String }) currency = 'EUR';
+  @property({ type: Number }) amount = 0;
+  @property({ type: String }) currency = 'NOK';
   @property({ type: String }) country = 'NOR';
+  @property({ type: String }) paymentType = '';
   @property({ type: User }) user: User = {};
   @property({ type: String }) server = 'https://localhost:5001';
   @property({ type: String }) netsCheckoutKey = '#checkout_key#';
@@ -41,25 +44,6 @@ export class BccPay extends LitElement {
   @property({ type: String }) secondaryColor: string = 'white';
   @property({ type: String }) accentColor: string = '#bae1ff';
 
-  loadNestScript() {
-    isDevEnv = this.isDevEnv;
-    requestHeaders = this.requestHeaders;
-    country = this.country;
-    primaryColor = this.primaryColor;
-    secondaryColor = this.secondaryColor;
-    accentColor = this.accentColor;
-
-    let nestScript = document.createElement('script');
-    if (isDevEnv === true) {
-      nestScript.src =
-        'https://test.checkout.dibspayment.eu/v1/checkout.js?v=1';
-    } else {
-      nestScript.src = 'https://checkout.dibspayment.eu/v1/checkout.js?v=1';
-    }
-
-    return nestScript;
-  }
-
   createRenderRoot() {
     return this;
   }
@@ -70,20 +54,30 @@ export class BccPay extends LitElement {
   }
 
   async init() {
+    isDevEnv = this.isDevEnv;
+    requestHeaders = this.requestHeaders;
+    country = this.country;
+    primaryColor = this.primaryColor;
+    secondaryColor = this.secondaryColor;
+    accentColor = this.accentColor;
+    amountFixed = this.amount !== 0;
+
     disablePayments();
-    getPaymentConfigurations(this.country, this.server);
+
+    if (this.amount !== 0)
+      getPaymentConfigurations(
+        this.country,
+        this.server,
+        this.currency,
+        this.paymentType
+      );
 
     if (
       this.paymentId === '' ||
       this.paymentId === undefined ||
       this.paymentId === null
     ) {
-      this.paymentId = await initPayment(
-        this.currency,
-        this.country,
-        this.amount,
-        this.server
-      );
+      await this.initBccPayPayment();
     }
 
     if (this.paymentId === '') {
@@ -98,6 +92,17 @@ export class BccPay extends LitElement {
 
     (document.getElementById('country-select') as HTMLSelectElement).value =
       this.country;
+    (document.getElementById('currency-select') as HTMLSelectElement).value =
+      this.currency;
+  }
+
+  async initBccPayPayment() {
+    this.paymentId = await initPayment(
+      this.currency,
+      this.country,
+      this.amount,
+      this.server
+    );
   }
 
   async initMolliePayment(paymentConfigurationId: string, buttonId: string) {
@@ -120,11 +125,55 @@ export class BccPay extends LitElement {
   render() {
     return html`
       <div style="display: none">
-        ${this.loadNestScript()} ${this.applyCssStyles()} ${this.init()}
+        ${loadNestScript()} ${this.applyCssStyles()} ${this.init()}
       </div>
       <div class="card-square" id="main-div">
         <div id="first-screen" class="screen">
-          <div class="card-price">
+          <div
+            class="card-price"
+            style="display: ${amountFixed ? 'none' : 'block'}"
+          >
+            <div>
+              <div class="card-subtitle">
+                <h5>Choose amount</h5>
+              </div>
+              <div class="card-title">
+                <h3>${this.item}</h3>
+              </div>
+            </div>
+            <div class="card-row">
+              <span class="card-tag">Amount</span>
+              <span class="card-cost"
+                ><input
+                  type="number"
+                  id="amount-input"
+                  class="amount-input"
+                  name="tentacles"
+                  min="1"
+                  max="10000"
+                  value="${this.amount}"
+                  @focusout="${(e: any) => {
+                    this.amount = e.target.value;
+                    this.initBccPayPayment();
+                  }}"
+                />
+                <select
+                  id="currency-select"
+                  class="currency-select"
+                  @change="${(e: any) => (this.currency = e.target.value)}"
+                  value="${this.currency}"
+                >
+                  <option selected="${this.currency}" value="NOK">NOK</option>
+                  <option selected="${this.currency}" value="EUR">EUR</option>
+                  <option selected="${this.currency}" value="PLN">PLN</option>
+                </select>
+              </span>
+            </div>
+          </div>
+          <div
+            class="card-price"
+            style="display: ${!amountFixed ? 'none' : 'block'}"
+          >
             <div>
               <div class="card-subtitle">
                 <h5>you are paying for</h5>
@@ -161,23 +210,26 @@ export class BccPay extends LitElement {
             id="CreditCardOrVipps"
             class="payment-button"
             disabled="true"
-            @click="${() =>
+            @click="${e =>
               startNetsPayment(
                 this.paymentId,
                 this.user,
                 this.server,
                 this.netsCheckoutKey,
-                'nets-cc-vipps-nok'
+                getPaymentConfigutraionIdForPaymentMethod(e.target.id)
               )}"
           >
-            <span class="payment-button-text">CREDIT CARD</span>
+            <span class="payment-button-text">CREDIT CARD </span>
           </button>
           <button
             id="Giropay"
             class="payment-button"
             disabled="true"
-            @click="${() =>
-              this.initMolliePayment('mollie-giropay-eur', 'Giropay')}"
+            @click="${e =>
+              this.initMolliePayment(
+                getPaymentConfigutraionIdForPaymentMethod(e.target.id),
+                e.target.id
+              )}"
           >
             <span class="payment-button-text">GIROPAY</span>
           </button>
@@ -185,8 +237,11 @@ export class BccPay extends LitElement {
             id="iDeal"
             class="payment-button"
             disabled="true"
-            @click="${() =>
-              this.initMolliePayment('mollie-ideal-eur', 'iDeal')}"
+            @click="${e =>
+              this.initMolliePayment(
+                getPaymentConfigutraionIdForPaymentMethod(e.target.id),
+                e.target.id
+              )}"
           >
             <span class="payment-button-text">iDeal</span>
           </button>
@@ -225,98 +280,6 @@ export class BccPay extends LitElement {
             </h5>
           </div>
           <div id="checkout-container-div"></div>
-        </div>
-
-        <div id="change-user-data-screen" class="screen" style="display: none">
-          <div class="card-subtitle">
-            <h5>Changing user data:</h5>
-          </div>
-
-          <div>
-            <span>Email</span>
-            <input
-              type="text"
-              value="${this.user.email}"
-              @change="${(e: any) => (this.user.email = e.target.value)}"
-            />
-          </div>
-
-          <div>
-            <span>Phone</span>
-            <input
-              type="text"
-              value="${this.user.phoneNumber}"
-              @change="${(e: any) => (this.user.phoneNumber = e.target.value)}"
-            />
-          </div>
-
-          <div>
-            <span>First Name</span>
-            <input
-              type="text"
-              value="${this.user.firstName}"
-              @change="${(e: any) => (this.user.firstName = e.target.value)}"
-            />
-          </div>
-
-          <div>
-            <span>Last Name</span>
-            <input
-              type="text"
-              value="${this.user.lastName}"
-              @change="${(e: any) => (this.user.lastName = e.target.value)}"
-            />
-          </div>
-
-          <div>
-            <span>Address Line 1</span>
-            <input
-              type="text"
-              value="${this.user.addressLine1}"
-              @change="${(e: any) => (this.user.addressLine1 = e.target.value)}"
-            />
-          </div>
-
-          <div>
-            <span>Address Line 2</span>
-            <input
-              type="text"
-              value="${this.user.addressLine2}"
-              @change="${(e: any) => (this.user.addressLine2 = e.target.value)}"
-            />
-          </div>
-
-          <div>
-            <span>City</span>
-            <input
-              type="text"
-              value="${this.user.city}"
-              @change="${(e: any) => (this.user.city = e.target.value)}"
-            />
-          </div>
-
-          <div>
-            <span>Postal code</span>
-            <input
-              type="text"
-              value="${this.user.postalCode}"
-              @change="${(e: any) => (this.user.postalCode = e.target.value)}"
-            />
-          </div>
-
-          <button
-            class="payment-button"
-            @click="${() =>
-              startNetsPayment(
-                this.paymentId,
-                this.user,
-                this.server,
-                this.netsCheckoutKey,
-                'nets-cc-vipps-nok'
-              )}"
-          >
-            CHANGE
-          </button>
         </div>
       </div>
     `;
