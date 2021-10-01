@@ -93,8 +93,7 @@ namespace BccPay.Core.Domain.Entities
                     Currency = CurrencyCode,
                     PaymentDetails = PaymentDetails,
                     SuccessfulProviderDefinitionId = Attempts.Where(x
-                        => x.AttemptStatus == AttemptStatus.PaidSucceeded
-                        || x.AttemptStatus == AttemptStatus.RefundedSucceeded)
+                        => x.AttemptStatus == AttemptStatus.PaidSucceeded)
                         .Select(x => x.ProviderDefinitionId)
                         .FirstOrDefault(),
                     ProviderDefinitionId = lastUpdatedAttempt.ProviderDefinitionId,
