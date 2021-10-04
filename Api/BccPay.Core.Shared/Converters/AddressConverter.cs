@@ -12,37 +12,30 @@ namespace BccPay.Core.Shared.Converters
         /// <param name="inputValue"></param>
         /// <param name="provider"></param>
         /// <returns></returns>
-        public static string ConvertCountry(string inputValue,
-            CountryCodeFormat countryCodeFormat = CountryCodeFormat.Alpha3)
+        public static string ConvertCountry(string inputValue, CountryCodeFormat countryCodeFormat = CountryCodeFormat.Alpha3)
         {
             try
             {
-                Country countryInformation;
+                Country countryInformation = null;
 
-                switch (inputValue.Length)
+                if (inputValue.Length == 2)
                 {
-                    case 2:
-                        {
-                            var normalize = inputValue.ToUpper();
-                            countryInformation = Countries.GetCountryByAlpha2(normalize);
-                            break;
-                        }
-                    case 3:
-                        {
-                            var normalize = inputValue.ToUpper();
-                            countryInformation = Countries.GetCountryByAlpha3(normalize);
-                            break;
-                        }
-                    default:
-                        {
-                            if (int.TryParse(inputValue, out int countryCodeNumeric))
-                                countryInformation = Countries.GetCountryByNumeric(countryCodeNumeric);
-                            else
-                                countryInformation = Countries.GetCountryByShortName(inputValue);
-                            break;
-                        }
+                    var normalize = inputValue.ToUpper();
+                    countryInformation = Countries.GetCountryByAlpha2(normalize);
                 }
-                
+
+                if (inputValue.Length == 3)
+                {
+                    var normalize = inputValue.ToUpper();
+                    countryInformation = Countries.GetCountryByAlpha3(normalize);
+                }
+
+                if (int.TryParse(inputValue, out int countryCodeNumeric))
+                    countryInformation = Countries.GetCountryByNumeric(countryCodeNumeric);
+
+                if (inputValue.Length >= 4)
+                    countryInformation = Countries.GetCountryByShortName(inputValue);
+
                 return countryCodeFormat switch
                 {
                     CountryCodeFormat.Alpha2 => countryInformation?.Alpha2.ToString(),

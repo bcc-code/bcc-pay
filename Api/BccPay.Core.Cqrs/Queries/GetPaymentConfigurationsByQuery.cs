@@ -18,17 +18,18 @@ namespace BccPay.Core.Cqrs.Queries
     public record GetPaymentConfigurationsByQuery(
         string CountryCode,
         string PaymentType = null,
-        string CurrencyCode = null) : IRequest<AvailableConfigurationsResult>;
+        Currencies? CurrencyCode = null) : IRequest<AvailableConfigurationsResult>;
 
     public record AvailableConfigurationsResult(List<PaymentConfigurationResult> PaymentConfigurations);
 
     public class PaymentConfigurationResult
     {
         public string CountryCode { get; set; }
-        internal string[] PaymentProviderDefinitionIds { get; set; }
         public List<PaymentProviderDefinitionResult> ProviderDefinitionDetails { get; set; }
         public string[] PaymentTypes { get; set; }
         public string[] CurrencyCodes { get; set; }
+
+        internal string[] PaymentProviderDefinitionIds { get; set; }
     }
 
     public class PaymentProviderDefinitionResult
@@ -36,6 +37,9 @@ namespace BccPay.Core.Cqrs.Queries
         public string Id { get; set; }
         public PaymentProvider PaymentProvider { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
+        public Currencies Currency { get; set; }
+
+        internal decimal Markup { get; set; }
     }
 
     public class GetPaymentConfigurationsByQueryHandler : IRequestHandler<GetPaymentConfigurationsByQuery, AvailableConfigurationsResult>
@@ -50,16 +54,23 @@ namespace BccPay.Core.Cqrs.Queries
 
         public async Task<AvailableConfigurationsResult> Handle(GetPaymentConfigurationsByQuery request, CancellationToken cancellationToken)
         {
-            var countryCodeAlpha3 = AddressConverter.ConvertCountry(request.CountryCode, CountryCodeFormat.Alpha3);
+            var query = _documentSession.Query<PaymentConfiguration>();
 
-            var query = _documentSession.Query<PaymentConfiguration>()
-                        .Where(paymentConfiguration
-                            => paymentConfiguration.CountryCode.In(new string[] { countryCodeAlpha3, Domain.Entities.Country.DefaultCountryCode }));
+            if (!string.IsNullOrWhiteSpace(request.CountryCode))
+            {
+                string countryCodeIso3 = AddressConverter.ConvertCountry(request.CountryCode, CountryCodeFormat.Alpha3);
+
+                query = query.Where(paymentConfiguration
+                             => paymentConfiguration.CountryCode.In(new string[]
+                             {
+                                 countryCodeIso3, Country.DefaultCountryCode
+                             }));
+            }
 
             if (!string.IsNullOrWhiteSpace(request.PaymentType))
                 query = query.Where(paymentConfiguration => paymentConfiguration.Conditions.PaymentTypes.Contains(request.PaymentType));
-            if (!string.IsNullOrWhiteSpace(request.CurrencyCode))
-                query = query.Where(paymentConfiguration => paymentConfiguration.Conditions.CurrencyCodes.Contains(request.CurrencyCode));
+            if (request.CurrencyCode is not null)
+                query = query.Where(paymentConfiguration => paymentConfiguration.Conditions.CurrencyCodes.Contains(request.CurrencyCode.ToString()));
 
             List<PaymentConfigurationResult> paymentConfigurations = new();
 
@@ -73,17 +84,19 @@ namespace BccPay.Core.Cqrs.Queries
                     }).ToListAsync(cancellationToken);
 
             var idsToCompare = paymentConfigurations
-                .SelectMany(x => x.PaymentProviderDefinitionIds)
+                .SelectMany(paymentConfiguration => paymentConfiguration.PaymentProviderDefinitionIds)
                 .ToArray();
 
             var paymentProviderDefinition = await _documentSession.Query<PaymentProviderDefinition>()
-                     .Where(x => x.PaymentDefinitionCode.In(idsToCompare))
-                     .Select(x
+                     .Where(providerDefinition => providerDefinition.PaymentDefinitionCode.In(idsToCompare))
+                     .Select(providerDefinition
                      => new PaymentProviderDefinitionResult
                      {
-                         Id = x.PaymentDefinitionCode,
-                         PaymentProvider = x.Provider,
-                         PaymentMethod = x.Settings.PaymentMethod
+                         Id = providerDefinition.PaymentDefinitionCode,
+                         PaymentProvider = providerDefinition.Provider,
+                         PaymentMethod = providerDefinition.Settings.PaymentMethod,
+                         Markup = providerDefinition.Settings.Markup,
+                         Currency = providerDefinition.Settings.Currency
                      })
                      .ToListAsync(cancellationToken);
 

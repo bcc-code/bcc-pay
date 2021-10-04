@@ -104,7 +104,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
             }
         }
 
-        public async Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSettings settings)
+        public async Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSetting settings)
         {
             IMollieRequestBuilder requestBuilder = CreateRequestBuilder(settings);
 
@@ -117,7 +117,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
                                     paymentRequest.Currency,
                                     Currencies.EUR.ToString(),
                                     paymentRequest.Amount,
-                                    _options.RateMarkup);
+                                    settings.Markup);
 
                 request.Amount.Value = currencyConversion.ToAmount.ToString();
             }
@@ -165,7 +165,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
             }
         }
 
-        private IMollieRequestBuilder CreateRequestBuilder(PaymentSettings settings)
+        private IMollieRequestBuilder CreateRequestBuilder(PaymentSetting settings)
         {
             /// NOTE: probably this part is useless and need to remove (giropay and ideal have the same request build options)
             return settings switch

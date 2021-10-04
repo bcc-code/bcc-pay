@@ -7,6 +7,5 @@
         public string RedirectUrl { get; set; }
         public string RedirectUrlMobileApp { get; set; }
         public string WebhookUrl { get; set; }
-        public decimal RateMarkup { get; set; }
     }
 }

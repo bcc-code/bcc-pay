@@ -21,5 +21,17 @@ namespace BccPay.Core.Sample.API.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet("with-exchange")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetConfigurationsWithExchangedCurrencyQueryResult))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetConfigurationsWithExchangedCurrency([FromQuery] ExchangeWithConfigurationsRequestModel request)
+        {
+            var query = Mapper.Map<GetConfigurationsWithExchangedCurrencyQuery>(request);
+
+            var result = await Mediator.Send(query);
+
+            return Ok(result);
+        }
     }
 }

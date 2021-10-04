@@ -46,7 +46,6 @@ namespace BccPay.Core.Sample
                     options.RedirectUrl = "https://test.api.samvirk.com/redirect";
                     options.WebhookUrl = "https://en46nkjh5kbngpp.m.pipedream.net/";
                     options.RedirectUrlMobileApp = "com.ionic.samvirk://overview";
-                    options.RateMarkup = 0.015M;
                 });
 
                 bccPay.AddNets(options =>
