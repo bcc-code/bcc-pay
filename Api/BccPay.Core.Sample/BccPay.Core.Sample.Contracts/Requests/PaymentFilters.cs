@@ -10,5 +10,6 @@ namespace BccPay.Core.Sample.Contracts.Requests
         public PaymentStatus? PaymentStatus { get; set; }
         public bool? IsProblematicPayment { get; set; }
         public string PaymentType { get; set; }
+        public string PayerId { get; set; }
     }
 }

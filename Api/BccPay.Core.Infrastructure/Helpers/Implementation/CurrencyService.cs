@@ -54,12 +54,9 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
 
             var (currencyRate, fromOpposite, updateTime) = await GetExhangeRateByCurrency(fromCurrency, toCurrency);
 
-            decimal exchangeResult = 0;
-
-            if (fromOpposite)
-                exchangeResult = Decimal.Divide(amount, currencyRate);
-            if (!fromOpposite)
-                exchangeResult = Decimal.Multiply(amount, currencyRate);
+            decimal exchangeResult = fromOpposite
+                ? Decimal.Divide(amount, currencyRate)
+                : Decimal.Multiply(amount, currencyRate);
 
             if (exchangeMarkup is not 0)
                 exchangeResult += exchangeResult * exchangeMarkup;
