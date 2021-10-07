@@ -2,7 +2,7 @@ import { html, LitElement, property } from 'lit-element';
 import { applyStyles } from './SharedStyles';
 import { loadNestScript, startNetsPayment } from './NetsClient';
 import {
-  disablePayments,
+  disablePaymentButtons,
   getPaymentConfigurations,
   getPaymentConfigutraionIdForPaymentMethod,
   initPayment,
@@ -25,6 +25,9 @@ export let primaryColor: string;
 export let secondaryColor: string;
 export let accentColor: string;
 export let amountFixed: boolean;
+export let server: string;
+export let amount: number;
+export let exchangeCurrency: string;
 
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
@@ -61,8 +64,10 @@ export class BccPay extends LitElement {
     secondaryColor = this.secondaryColor;
     accentColor = this.accentColor;
     amountFixed = this.amount !== 0;
+    server = this.server;
+    amount = this.amount;
 
-    disablePayments();
+    disablePaymentButtons();
 
     if (this.amount !== 0)
       getPaymentConfigurations(
@@ -193,12 +198,23 @@ export class BccPay extends LitElement {
             <select
               id="country-select"
               class="country-select"
-              @change="${(e: any) => (this.country = e.target.value)}"
+              @change="${(e: any) => {
+                if (e.target.value === 'NOR') {
+                  this.currency = '';
+                } else {
+                  this.currency = 'EUR';
+                }
+                this.country = e.target.value;
+              }}"
               value="${this.country}"
             >
               <option value="" selected disabled hidden>Change country</option>
-              <option selected="${this.country}" value="NOR">Norway</option>
-              <option selected="${this.country}" value="DEU">Germany</option>
+              <option selected="${this.country}" value="NOR">
+                Norway (NOK)
+              </option>
+              <option selected="${this.country}" value="DEU">
+                Germany (EUR)
+              </option>
               <option selected="${this.country}" value="UA">Ukraine</option>
               <option selected="${this.country}" value="PL">Poland</option>
               <option selected="${this.country}" value="NLD">
