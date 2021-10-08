@@ -16,6 +16,7 @@ import {
 } from './ScreenChange';
 import { RequestHeader } from './RequestHeader';
 import { startMolliePayment } from './MollieClient';
+import { isNullOrEmpty } from './Common';
 
 export let isDevEnv: boolean;
 export let requestHeaders: [RequestHeader] | undefined;
@@ -77,15 +78,11 @@ export class BccPay extends LitElement {
         this.paymentType
       );
 
-    if (
-      this.paymentId === '' ||
-      this.paymentId === undefined ||
-      this.paymentId === null
-    ) {
+    if (isNullOrEmpty(this.paymentId)) {
       await this.initBccPayPayment();
     }
 
-    if (this.paymentId === '') {
+    if (isNullOrEmpty(this.paymentId)) {
       displayErrorPage();
     } else {
       displayFirstScreen();
@@ -119,7 +116,7 @@ export class BccPay extends LitElement {
       buttonId
     );
 
-    if (mollieUrl !== '' || mollieUrl !== null || mollieUrl !== undefined) {
+    if (!isNullOrEmpty(mollieUrl)) {
       const paymentButton = document.getElementById(
         buttonId
       ) as HTMLButtonElement;

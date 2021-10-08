@@ -5,6 +5,7 @@ import {
   paymentCompleted,
   displayNetsPayment,
 } from './ScreenChange';
+import { isNullOrEmpty } from './Common';
 
 var checkout: any;
 
@@ -34,11 +35,7 @@ export async function startNetsPayment(
     console.log('Nets payment id is: ' + netsPaymentId);
   }
 
-  if (
-    netsPaymentId === null ||
-    netsPaymentId === undefined ||
-    netsPaymentId === ''
-  ) {
+  if (isNullOrEmpty(netsPaymentId)) {
     displayErrorPage();
     return false;
   }
