@@ -111,7 +111,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
             var request = requestBuilder.BuildMolliePaymentRequest(paymentRequest, settings.PaymentMethod);
 
             CurrencyConversionRecord currencyConversion = null;
-            if (settings.PaymentMethod == PaymentMethod.Giropay)
+            if (settings.PaymentMethod is PaymentMethod.Giropay or PaymentMethod.iDeal )
             {
                 currencyConversion = await _currencyService.Exchange(
                                     paymentRequest.Currency,
