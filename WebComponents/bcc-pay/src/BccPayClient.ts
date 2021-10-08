@@ -1,4 +1,4 @@
-import { requestHeaders, server, amount, exchangeCurrency } from './BccPay';
+import { requestHeaders, server, amount, isDevEnv } from './BccPay';
 
 let providerDefinitionIdList = {};
 
@@ -36,8 +36,10 @@ export async function getPaymentConfigurations(
       JSON.stringify(possibleConfigurations)
     );
 
-    console.log('PossibleConfigurations country: ' + country);
-    console.log(paymentConfigurationsObject);
+    if (isDevEnv === true) {
+      console.log('PossibleConfigurations country: ' + country);
+      console.log(paymentConfigurationsObject);
+    }
     paymentConfigurationsObject.paymentConfigurations.forEach(element => {
       element.providerDefinitionDetails.forEach(element => {
         enablePossiblePayment(
@@ -51,7 +53,6 @@ export async function getPaymentConfigurations(
     return possibleConfigurations;
   } catch (e) {
     console.log('getPaymentConfigurations exception: ' + e);
-
     return '';
   }
 }
@@ -68,7 +69,9 @@ export async function enablePossiblePayment(
     paymentButton.disabled = false;
     if (currency !== 'NOK') {
       const exchangeResult = await calculateExchange(paymentConfigurationId);
-      console.log('Exchange result is: ' + exchangeResult);
+      if (isDevEnv === true) {
+        console.log('Exchange result is: ' + exchangeResult);
+      }
       if (!paymentButton.textContent?.includes(exchangeResult)) {
         paymentButton.textContent += exchangeResult;
       }
@@ -100,8 +103,10 @@ export async function calculateExchange(
         Array.from(json.providerDefinitionExchangeDefinition).forEach(
           (element: any) => {
             if (paymentConfigurationId === element.definitionId) {
-              console.log(element);
-              console.log(element.toAmount);
+              if (isDevEnv === true) {
+                console.log('Calculate exchange result:');
+                console.log(element);
+              }
               result = `(${element.toAmount} ${element.toCurrency})`;
             }
           }
@@ -188,6 +193,5 @@ export async function initPayment(
 export function getPaymentConfigutraionIdForPaymentMethod(
   paymentMethod: string
 ): string {
-  console.log('Getting payment config id for method: ' + paymentMethod);
   return providerDefinitionIdList[paymentMethod];
 }

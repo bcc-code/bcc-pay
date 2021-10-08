@@ -28,7 +28,7 @@ export let accentColor: string;
 export let amountFixed: boolean;
 export let server: string;
 export let amount: number;
-export let exchangeCurrency: string;
+export let initCurrency: string;
 
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
@@ -50,6 +50,11 @@ export class BccPay extends LitElement {
 
   createRenderRoot() {
     return this;
+  }
+
+  constructor() {
+    super();
+    initCurrency = this.currency;
   }
 
   async applyCssStyles() {
@@ -186,7 +191,7 @@ export class BccPay extends LitElement {
             </div>
             <div class="card-row">
               <span class="card-tag">Amount</span>
-              <span class="card-cost">${this.amount} ${this.currency} </span>
+              <span class="card-cost">${this.amount} ${initCurrency} </span>
             </div>
           </div>
 

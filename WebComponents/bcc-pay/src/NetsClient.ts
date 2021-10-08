@@ -48,7 +48,9 @@ export async function initNetsPayment(
   server: string,
   paymentConfigurationId: string
 ): Promise<string> {
-  console.log('Nets payment country: ' + country);
+  if (isDevEnv === true) {
+    console.log('Nets payment country: ' + country);
+  }
   const body = {
     providerDefinitionId: paymentConfigurationId,
     email: user.email === null ? undefined : user.email,
