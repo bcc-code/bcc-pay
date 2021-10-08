@@ -1,4 +1,4 @@
-export function isNullOrEmpty(objectToCheck): boolean {
+export function isNullOrEmpty(objectToCheck: any): boolean {
   if (
     objectToCheck === null ||
     objectToCheck === '' ||

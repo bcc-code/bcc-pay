@@ -37,7 +37,7 @@ interface ArgTypes {
 
 const Template: Story<ArgTypes> = ({
   item = 'Subscription',
-  amount = 12,
+  amount = 200,
   currency = 'NOK',
   country = 'NOR',
   server = 'https://localhost:5001',
@@ -46,7 +46,7 @@ const Template: Story<ArgTypes> = ({
   slot,
   requestHeaders = [{ key: 'new_key', value: 'new_value' }],
   paymentId,
-  paymentType = 'Deposit',
+  paymentType = 'MembershipDeposit',
 }: ArgTypes) => html`
   <bcc-pay
     .item=${item}
