@@ -45,7 +45,7 @@ namespace BccPay.Core.Cqrs.Commands.Nets
                     Payment.GetDocumentId(request.PaymentId), cancellationToken)
                 ?? throw new NotFoundException($"Invalid payment ID {request.PaymentId}");
 
-            if (!payment.Attempts.Where(x => x.NotificationAccessToken.Contains(request.AccessToken)).Any())
+            if (!payment.Attempts.Where(x => x.NotificationAccessToken == request.AccessToken).Any())
                 throw new UnauthorizedException();
 
             var actualAttempt = payment.Attempts
