@@ -14,6 +14,7 @@ namespace BccPay.Core.Notifications.Implementation
         public PaymentStatus ToPaymentStatus { get; set; }
         public string SuccessfulProviderDefinitionId { get; set; }
         public decimal Amount { get; set; }
+        public decimal? AmountInCurrency { get; set; }
         public string Currency { get; set; }
         public object PaymentDetails { get; set; }
         public string PaymentType { get; set; }
