@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BccPay.Core.Enums;
 
 namespace BccPay.Core.Domain.Entities
 {
@@ -9,5 +10,7 @@ namespace BccPay.Core.Domain.Entities
         public string InvoiceId { get; set; }
         public List<string> Errors { get; set; }
         public bool IsSuccess { get; set; }
+        public Currencies Currency => Currencies.NOK;
+        public decimal? AmountInCurrency => null;
     }
 }

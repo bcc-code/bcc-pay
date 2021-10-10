@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BccPay.Core.Enums;
 
 namespace BccPay.Core.Domain.Entities
 {
@@ -15,5 +16,8 @@ namespace BccPay.Core.Domain.Entities
 
         public bool IsSuccess { get; set; }
         public List<string> Errors { get; set; }
+
+        public Currencies Currency => CurrencyConversionResult?.ToCurrency ?? Currencies.NOK;
+        public decimal? AmountInCurrency => CurrencyConversionResult?.ToAmount;
     }
 }
