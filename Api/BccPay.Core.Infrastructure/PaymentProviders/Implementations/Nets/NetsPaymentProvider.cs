@@ -9,6 +9,7 @@ using BccPay.Core.Infrastructure.BccPaymentSettings;
 using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
+using BccPay.Core.Infrastructure.PaymentModels.Response.Nets;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations;
 using BccPay.Core.Infrastructure.RefitClients;
@@ -149,9 +150,28 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
             }
         }
 
-        public Task<IPaymentResponse> GetPayment(string paymentId)
+        public async Task<IPaymentResponse> GetPayment(string paymentId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await _netsClient.RetrievePayment(_headers, paymentId);
+
+                return new NetsGetPaymentResponse
+                {
+                    IsSuccess = true,
+                    Checkout = result.Payment.Checkout,
+                    Order = result.Payment.Order,
+                    Summary = result.Payment.Summary
+                };
+            }
+            catch (ApiException exception)
+            {
+                return new NetsGetPaymentResponse
+                {
+                    IsSuccess = false,
+                    Error = exception?.Content
+                };
+            }
         }
 
         public async Task ChargePayment(Payment payment, Attempt attempt)
