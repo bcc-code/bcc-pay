@@ -79,7 +79,7 @@ namespace BccPay.Core.Domain.Entities
             if (newStatus != PaymentStatus)
             {
                 var lastUpdatedAttempt = Attempts.OrderByDescending(x => x.Updated).First();
-                var attemptCurrency = lastUpdatedAttempt.StatusDetails?.Currency ?? Currencies.NOK;
+                var attemptCurrency = lastUpdatedAttempt.StatusDetails?.Currency;
 
                 Notifications.Add(new PaymentStateChangedNotification
                 {
@@ -91,8 +91,9 @@ namespace BccPay.Core.Domain.Entities
                     FromPaymentStatus = PaymentStatus,
                     ToPaymentStatus = newStatus,
                     Amount = Amount,
-                    AmountInCurrency = lastUpdatedAttempt.StatusDetails?.AmountInCurrency,
-                    Currency = attemptCurrency.ToString(),
+                    ProviderAmount = lastUpdatedAttempt.StatusDetails?.AmountInCurrency,
+                    Currency = CurrencyCode,
+                    ProviderCurrency = attemptCurrency?.ToString() ?? CurrencyCode,
                     PaymentDetails = PaymentDetails,
                     SuccessfulProviderDefinitionId = Attempts.Where(x
                         => x.AttemptStatus == AttemptStatus.PaidSucceeded)
@@ -100,7 +101,7 @@ namespace BccPay.Core.Domain.Entities
                         .FirstOrDefault(),
                     ProviderDefinitionId = lastUpdatedAttempt.ProviderDefinitionId,
                     PaymentType = PaymentType,
-                });
+                }); ;
 
                 PaymentStatus = newStatus;
             }
