@@ -6,6 +6,7 @@ using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Exceptions;
+using BccPay.Core.Infrastructure.PaymentModels.Response.Nets;
 using BccPay.Core.Infrastructure.PaymentModels.Webhooks;
 using BccPay.Core.Infrastructure.PaymentProviders;
 using MediatR;
@@ -45,13 +46,15 @@ namespace BccPay.Core.Cqrs.Commands.Nets
                     Payment.GetDocumentId(request.PaymentId), cancellationToken)
                 ?? throw new NotFoundException($"Invalid payment ID {request.PaymentId}");
 
-            if (!payment.Attempts.Where(x => x.NotificationAccessToken.Contains(request.AccessToken)).Any())
+            var provider = _paymentProviderFactory.GetPaymentProvider(PaymentProvider.Nets);
+
+            if (!payment.Attempts.Where(x => x.NotificationAccessToken == request.AccessToken).Any())
                 throw new UnauthorizedException();
 
             var actualAttempt = payment.Attempts
-                    .Where(x => x.NotificationAccessToken.Contains(request.AccessToken))
+                    .Where(x => x.NotificationAccessToken == request.AccessToken)
                     .FirstOrDefault()
-                    ?? throw new UpdatePaymentAttemptForbiddenException("Attempt is inactive.");
+                    ?? throw new UpdatePaymentAttemptForbiddenException("Invalid attempt token.");
 
             var (webhookEvent, webhookStatus) = PaymentProviderConstants.Nets.Webhooks.Messages
                 .Where(x => x.Key == request.Webhook.Event.ToLower())
@@ -73,15 +76,24 @@ namespace BccPay.Core.Cqrs.Commands.Nets
 
             if (webhookEvent == PaymentProviderConstants.Nets.Webhooks.CheckoutCompleted)
             {
-                var provider = _paymentProviderFactory.GetPaymentProvider(PaymentProvider.Nets);
+                var providerPaymentInformation = (NetsGetPaymentResponse)await provider.GetPayment(request.Webhook.Data.PaymentId)
+                    ?? throw new UnauthorizedException();
+
+                if (!ValidateChargeAmount(request.Webhook, providerPaymentInformation))
+                    throw new UpdatePaymentAttemptForbiddenException("Unable to charge payment, invalid reserved amount.");
 
                 await provider.ChargePayment(payment, actualAttempt);
             }
 
             payment.UpdateAttempt(actualAttempt);
+
             await _documentSession.SaveChangesAsync(cancellationToken);
 
             return true;
         }
+
+        // NOTE: Additional check before charging.
+        private bool ValidateChargeAmount(NetsWebhook webhook, NetsGetPaymentResponse providerResponse)
+            => webhook.Data.Order.Amount.TotalAmount == providerResponse.Summary.ReservedAmount;
     }
 }
