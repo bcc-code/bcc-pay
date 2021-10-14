@@ -5,6 +5,7 @@ import {
   paymentCompleted,
   displayNetsPayment,
 } from './ScreenChange';
+import { isNullOrEmpty } from './Common';
 
 var checkout: any;
 
@@ -34,11 +35,7 @@ export async function startNetsPayment(
     console.log('Nets payment id is: ' + netsPaymentId);
   }
 
-  if (
-    netsPaymentId === null ||
-    netsPaymentId === undefined ||
-    netsPaymentId === ''
-  ) {
+  if (isNullOrEmpty(netsPaymentId)) {
     displayErrorPage();
     return false;
   }
@@ -51,7 +48,9 @@ export async function initNetsPayment(
   server: string,
   paymentConfigurationId: string
 ): Promise<string> {
-  console.log('Nets payment country: ' + country);
+  if (isDevEnv === true) {
+    console.log('Nets payment country: ' + country);
+  }
   const body = {
     providerDefinitionId: paymentConfigurationId,
     email: user.email === null ? undefined : user.email,

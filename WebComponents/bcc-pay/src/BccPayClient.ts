@@ -1,4 +1,4 @@
-import { requestHeaders } from './BccPay';
+import { requestHeaders, server, amount, isDevEnv } from './BccPay';
 
 let providerDefinitionIdList = {};
 
@@ -19,7 +19,8 @@ export async function getPaymentConfigurations(
   }
 
   try {
-    disablePayments();
+    disablePaymentButtons();
+    startPaymentButtonsLoading();
     const url = `${server}/payment-configurations?countryCode=${country}&currencyCode=${currency}&paymentType=${paymentType}`;
     await fetch(url, {
       method: 'GET',
@@ -27,6 +28,7 @@ export async function getPaymentConfigurations(
     })
       .then(response => response.json())
       .then(json => {
+        stopPaymentButtonsLoading();
         possibleConfigurations = json;
       });
 
@@ -34,46 +36,116 @@ export async function getPaymentConfigurations(
       JSON.stringify(possibleConfigurations)
     );
 
-    console.log('PossibleConfigurations country: ' + country);
-    console.log(paymentConfigurationsObject);
+    if (isDevEnv === true) {
+      console.log('PossibleConfigurations country: ' + country);
+      console.log(paymentConfigurationsObject);
+    }
     paymentConfigurationsObject.paymentConfigurations.forEach(element => {
       element.providerDefinitionDetails.forEach(element => {
-        enablePossiblePayments(element.paymentMethod);
+        enablePossiblePayment(
+          element.paymentMethod,
+          element.currency,
+          element.id
+        );
         providerDefinitionIdList[element.paymentMethod] = element.id;
       });
     });
     return possibleConfigurations;
   } catch (e) {
     console.log('getPaymentConfigurations exception: ' + e);
-
     return '';
   }
 }
 
-export function enablePossiblePayments(provider: string) {
-  const paymentButton = document.getElementById(provider) as HTMLButtonElement;
+export async function enablePossiblePayment(
+  paymentMethod: string,
+  currency: string,
+  paymentConfigurationId: string
+) {
+  const paymentButton = document.getElementById(
+    paymentMethod
+  ) as HTMLButtonElement;
   if (paymentButton) {
     paymentButton.disabled = false;
+    if (currency !== 'NOK') {
+      const exchangeResult = await calculateExchange(paymentConfigurationId);
+      if (isDevEnv === true) {
+        console.log('Exchange result is: ' + exchangeResult);
+      }
+      if (!paymentButton.textContent?.includes(exchangeResult)) {
+        paymentButton.textContent += exchangeResult;
+      }
+    }
   }
 }
 
-export function disablePayments() {
-  const creditCardButton = document.getElementById(
-    'CreditCardOrVipps'
-  ) as HTMLButtonElement;
-  if (creditCardButton) {
-    creditCardButton.disabled = true;
-  }
+export async function calculateExchange(
+  paymentConfigurationId: string
+): Promise<string> {
+  let result = '';
+  try {
+    const fetchHeaders = new Headers();
+    fetchHeaders.append('Content-Type', 'application/json');
+    if (requestHeaders) {
+      requestHeaders.forEach(requestHeaderObject => {
+        fetchHeaders.append(requestHeaderObject.key, requestHeaderObject.value);
+      });
+    }
 
-  const giropayButton = document.getElementById('Giropay') as HTMLButtonElement;
-  if (giropayButton) {
-    giropayButton.disabled = true;
+    const url = `${server}/payment-configurations/with-exchange?Amount=${amount}&FromCurrency=NOK&ToCurrency=EUR`;
+    await fetch(url, {
+      method: 'GET',
+      headers: fetchHeaders,
+    })
+      .then(response => response.json())
+      .then(json => {
+        stopPaymentButtonsLoading();
+        Array.from(json.providerDefinitionExchangeDefinition).forEach(
+          (element: any) => {
+            if (paymentConfigurationId === element.definitionId) {
+              if (isDevEnv === true) {
+                console.log('Calculate exchange result:');
+                console.log(element);
+              }
+              result = `(${element.toAmount} ${element.toCurrency})`;
+            }
+          }
+        );
+      });
+  } catch (e) {
+    console.log('calculateExchange exception: ' + e);
   }
+  return result;
+}
 
-  const idealButton = document.getElementById('iDeal') as HTMLButtonElement;
-  if (idealButton) {
-    idealButton.disabled = true;
-  }
+export function disablePaymentButtons() {
+  const paymentButtons = getPaymentButtons();
+
+  Array.from(paymentButtons).forEach(element => {
+    element.disabled = true;
+  });
+}
+
+export function startPaymentButtonsLoading() {
+  const paymentButtons = getPaymentButtons();
+
+  Array.from(paymentButtons).forEach(element => {
+    element.classList.add('payment-button--loading');
+  });
+}
+
+export function stopPaymentButtonsLoading() {
+  const paymentButtons = getPaymentButtons();
+
+  Array.from(paymentButtons).forEach(element => {
+    element.classList.remove('payment-button--loading');
+  });
+}
+
+function getPaymentButtons(): HTMLCollectionOf<HTMLButtonElement> {
+  return document.getElementsByClassName(
+    'payment-button'
+  ) as HTMLCollectionOf<HTMLButtonElement>;
 }
 
 export async function initPayment(
@@ -82,6 +154,7 @@ export async function initPayment(
   amount: number,
   server: string
 ): Promise<string> {
+  amount = amount;
   const body = {
     payerId: '123',
     currencyCode: currency,
@@ -100,7 +173,7 @@ export async function initPayment(
   }
 
   try {
-    disablePayments();
+    disablePaymentButtons();
     await fetch(`${server}/Payment`, {
       method: 'POST',
       body: JSON.stringify(body),
@@ -120,6 +193,5 @@ export async function initPayment(
 export function getPaymentConfigutraionIdForPaymentMethod(
   paymentMethod: string
 ): string {
-  console.log('Getting payment config id for method: ' + paymentMethod);
   return providerDefinitionIdList[paymentMethod];
 }

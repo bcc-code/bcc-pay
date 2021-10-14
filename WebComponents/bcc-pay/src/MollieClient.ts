@@ -1,6 +1,7 @@
 import { User } from './User';
 import { country, isDevEnv, requestHeaders } from './BccPay';
 import { displayErrorPage } from './ScreenChange';
+import { isNullOrEmpty } from './Common';
 
 export async function startMolliePayment(
   paymentId: string,
@@ -22,18 +23,12 @@ export async function startMolliePayment(
     console.log('Mollie checkoutUrl is: ' + mollieCheckoutUrl);
   }
 
-  if (
-    mollieCheckoutUrl === null ||
-    mollieCheckoutUrl === '' ||
-    mollieCheckoutUrl === undefined
-  ) {
+  if (isNullOrEmpty(mollieCheckoutUrl)) {
     displayErrorPage();
     return '';
   }
 
   mollieButton!.classList.remove('payment-button--loading');
-  // window.location.replace(mollieCheckoutUrl);
-  // window.open(mollieCheckoutUrl, '_self');
   window.open(mollieCheckoutUrl, '_system');
 
   return mollieCheckoutUrl;
@@ -80,6 +75,6 @@ export async function initMolliePayment(
   } catch (e) {
     displayErrorPage();
   }
-  if (mollieCheckoutUrl === undefined) displayErrorPage();
+  if (isNullOrEmpty(mollieCheckoutUrl)) displayErrorPage();
   return mollieCheckoutUrl;
 }

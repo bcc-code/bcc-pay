@@ -2,7 +2,7 @@ import { html, LitElement, property } from 'lit-element';
 import { applyStyles } from './SharedStyles';
 import { loadNestScript, startNetsPayment } from './NetsClient';
 import {
-  disablePayments,
+  disablePaymentButtons,
   getPaymentConfigurations,
   getPaymentConfigutraionIdForPaymentMethod,
   initPayment,
@@ -16,6 +16,7 @@ import {
 } from './ScreenChange';
 import { RequestHeader } from './RequestHeader';
 import { startMolliePayment } from './MollieClient';
+import { isNullOrEmpty } from './Common';
 
 export let isDevEnv: boolean;
 export let requestHeaders: [RequestHeader] | undefined;
@@ -25,6 +26,9 @@ export let primaryColor: string;
 export let secondaryColor: string;
 export let accentColor: string;
 export let amountFixed: boolean;
+export let server: string;
+export let amount: number;
+export let initCurrency: string;
 
 export class BccPay extends LitElement {
   @property({ type: String }) item = 'Subscription';
@@ -48,6 +52,11 @@ export class BccPay extends LitElement {
     return this;
   }
 
+  constructor() {
+    super();
+    initCurrency = this.currency;
+  }
+
   async applyCssStyles() {
     await this.updateComplete;
     applyStyles();
@@ -61,8 +70,10 @@ export class BccPay extends LitElement {
     secondaryColor = this.secondaryColor;
     accentColor = this.accentColor;
     amountFixed = this.amount !== 0;
+    server = this.server;
+    amount = this.amount;
 
-    disablePayments();
+    disablePaymentButtons();
 
     if (this.amount !== 0)
       getPaymentConfigurations(
@@ -72,15 +83,11 @@ export class BccPay extends LitElement {
         this.paymentType
       );
 
-    if (
-      this.paymentId === '' ||
-      this.paymentId === undefined ||
-      this.paymentId === null
-    ) {
+    if (isNullOrEmpty(this.paymentId)) {
       await this.initBccPayPayment();
     }
 
-    if (this.paymentId === '') {
+    if (isNullOrEmpty(this.paymentId)) {
       displayErrorPage();
     } else {
       displayFirstScreen();
@@ -114,7 +121,7 @@ export class BccPay extends LitElement {
       buttonId
     );
 
-    if (mollieUrl !== '' || mollieUrl !== null || mollieUrl !== undefined) {
+    if (!isNullOrEmpty(mollieUrl)) {
       const paymentButton = document.getElementById(
         buttonId
       ) as HTMLButtonElement;
@@ -184,7 +191,7 @@ export class BccPay extends LitElement {
             </div>
             <div class="card-row">
               <span class="card-tag">Amount</span>
-              <span class="card-cost">${this.amount} ${this.currency} </span>
+              <span class="card-cost">${this.amount} ${initCurrency} </span>
             </div>
           </div>
 
@@ -193,12 +200,23 @@ export class BccPay extends LitElement {
             <select
               id="country-select"
               class="country-select"
-              @change="${(e: any) => (this.country = e.target.value)}"
+              @change="${(e: any) => {
+                if (e.target.value === 'NOR') {
+                  this.currency = '';
+                } else {
+                  this.currency = 'EUR';
+                }
+                this.country = e.target.value;
+              }}"
               value="${this.country}"
             >
               <option value="" selected disabled hidden>Change country</option>
-              <option selected="${this.country}" value="NOR">Norway</option>
-              <option selected="${this.country}" value="DEU">Germany</option>
+              <option selected="${this.country}" value="NOR">
+                Norway (NOK)
+              </option>
+              <option selected="${this.country}" value="DEU">
+                Germany (EUR)
+              </option>
               <option selected="${this.country}" value="UA">Ukraine</option>
               <option selected="${this.country}" value="PL">Poland</option>
               <option selected="${this.country}" value="NLD">
