@@ -56,7 +56,8 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
                     amount,
                     amount);
 
-            var (currencyRate, fromOpposite, updateTime) = await GetExhangeRateByCurrency(fromCurrency, toCurrency);
+            (decimal currencyRate, bool fromOpposite, DateTime? updateTime) =
+                await GetExchangeRateByCurrency(fromCurrency, toCurrency);
 
             decimal exchangeResult = fromOpposite
                 ? Decimal.Divide(amount, currencyRate)
@@ -64,7 +65,7 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
 
             if (exchangeMarkup is not 0)
                 exchangeResult += (exchangeResult * exchangeMarkup);
-            
+
             return new CurrencyConversionRecord(
                 updateTime,
                 fromCurrency,
@@ -85,10 +86,10 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
                 .LoadAsync<CurrencyRate>(CurrencyRate.GetCurrencyRateId(currency), cancellationToken);
 
             Dictionary<Currencies, decimal> rates = new();
-            foreach (KeyValuePair<string, decimal> rate in fixerApiResult.Rates)
+            foreach ((string key, decimal value) in fixerApiResult.Rates)
             {
-                if (Enum.TryParse<Currencies>(rate.Key, out Currencies currencyResult))
-                    rates.Add(currencyResult, rate.Value);
+                if (Enum.TryParse<Currencies>(key, out Currencies currencyResult))
+                    rates.Add(currencyResult, value);
             }
 
             if (lastCurrencyRateUpdate is null ||
@@ -112,7 +113,7 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
             await _documentSession.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task<(decimal, bool, DateTime?)> GetExhangeRateByCurrency(Currencies fromCurrency,
+        private async Task<(decimal, bool, DateTime?)> GetExchangeRateByCurrency(Currencies fromCurrency,
             Currencies toCurrency)
         {
             var result = await _documentSession
@@ -128,7 +129,7 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
                     try
                     {
                         await UpsertByBaseCurrencyRate(fromCurrency);
-                        return await GetExhangeRateByCurrency(fromCurrency, toCurrency);
+                        return await GetExchangeRateByCurrency(fromCurrency, toCurrency);
                     }
                     catch
                     {
