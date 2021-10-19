@@ -23,23 +23,27 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
             IConfiguration configuration)
         {
             _documentSession = documentSession
-                ?? throw new ArgumentNullException(nameof(documentSession));
+                               ?? throw new ArgumentNullException(nameof(documentSession));
             _fixerClient = fixerClient
-                ?? throw new ArgumentNullException(nameof(fixerClient));
+                           ?? throw new ArgumentNullException(nameof(fixerClient));
             _configuration = configuration
-                ?? throw new ArgumentNullException(nameof(configuration));
+                             ?? throw new ArgumentNullException(nameof(configuration));
         }
 
-        public Task<CurrencyConversionRecord> Exchange(string fromCurrency, string toCurrency, decimal amount, decimal exchangeRateMarkup = 0)
+        public Task<CurrencyConversionRecord> Exchange(string fromCurrency, string toCurrency, decimal amount,
+            decimal exchangeRateMarkup = 0)
         {
-            if (Enum.TryParse<Currencies>(fromCurrency, out Currencies fromCurrencyResult) && Enum.TryParse<Currencies>(toCurrency, out Currencies toCurrencyResult))
+            if (Enum.TryParse<Currencies>(fromCurrency, out Currencies fromCurrencyResult) &&
+                Enum.TryParse<Currencies>(toCurrency, out Currencies toCurrencyResult))
             {
                 return Exchange(fromCurrencyResult, toCurrencyResult, amount, exchangeRateMarkup);
             }
+
             throw new CurrencyExchangeOperationException("Unable to convert values.");
         }
 
-        public async Task<CurrencyConversionRecord> Exchange(Currencies fromCurrency, Currencies toCurrency, decimal amount, decimal exchangeMarkup = 0)
+        public async Task<CurrencyConversionRecord> Exchange(Currencies fromCurrency, Currencies toCurrency,
+            decimal amount, decimal exchangeMarkup = 0)
         {
             if (amount <= 0)
                 throw new CurrencyExchangeOperationException("Unable to convert values.");
@@ -59,24 +63,26 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
                 : Decimal.Multiply(amount, currencyRate);
 
             if (exchangeMarkup is not 0)
-                exchangeResult += exchangeResult * exchangeMarkup;
+                exchangeResult += (exchangeResult * exchangeMarkup);
 
             return new CurrencyConversionRecord(
                 updateTime,
                 fromCurrency,
                 toCurrency,
-                currencyRate,
+                fromOpposite ? (currencyRate * 100) : currencyRate,
                 amount,
                 exchangeResult.TwoDigitsAfterPoint());
         }
 
-        public async Task UpsertByBaseCurrencyRate(Currencies currency = Currencies.NOK, CancellationToken cancellationToken = default)
+        public async Task UpsertByBaseCurrencyRate(Currencies currency = Currencies.NOK,
+            CancellationToken cancellationToken = default)
         {
-            var fixerApiResult = await _fixerClient.GetRatesByBaseCurrency(_configuration["FixerApiKey"], currency.ToString())
-                        ?? throw new Exception();
+            var fixerApiResult =
+                await _fixerClient.GetRatesByBaseCurrency(_configuration["FixerApiKey"], currency.ToString())
+                ?? throw new Exception();
 
             var lastCurrencyRateUpdate = await _documentSession
-                    .LoadAsync<CurrencyRate>(CurrencyRate.GetCurrencyRateId(currency), cancellationToken);
+                .LoadAsync<CurrencyRate>(CurrencyRate.GetCurrencyRateId(currency), cancellationToken);
 
             Dictionary<Currencies, decimal> rates = new();
             foreach (KeyValuePair<string, decimal> rate in fixerApiResult.Rates)
@@ -85,7 +91,8 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
                     rates.Add(currencyResult, rate.Value);
             }
 
-            if (lastCurrencyRateUpdate is null || fixerApiResult.BaseCurrency != lastCurrencyRateUpdate.BaseCurrency.ToString())
+            if (lastCurrencyRateUpdate is null ||
+                fixerApiResult.BaseCurrency != lastCurrencyRateUpdate.BaseCurrency.ToString())
             {
                 await _documentSession.StoreAsync(new CurrencyRate
                 {
@@ -98,16 +105,18 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
 
             if (lastCurrencyRateUpdate is not null)
             {
-                lastCurrencyRateUpdate.Update(rates, TimeStampConverter.UnixTimeStampToDateTime(fixerApiResult.Timestamp));
+                lastCurrencyRateUpdate.Update(rates,
+                    TimeStampConverter.UnixTimeStampToDateTime(fixerApiResult.Timestamp));
             }
 
             await _documentSession.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task<(decimal, bool, DateTime?)> GetExhangeRateByCurrency(Currencies fromCurrency, Currencies toCurrency)
+        private async Task<(decimal, bool, DateTime?)> GetExhangeRateByCurrency(Currencies fromCurrency,
+            Currencies toCurrency)
         {
             var result = await _documentSession
-                    .LoadAsync<CurrencyRate>(CurrencyRate.GetCurrencyRateId(fromCurrency));
+                .LoadAsync<CurrencyRate>(CurrencyRate.GetCurrencyRateId(fromCurrency));
 
             if (!IsCurrencyRateValid(result, 2))
             {

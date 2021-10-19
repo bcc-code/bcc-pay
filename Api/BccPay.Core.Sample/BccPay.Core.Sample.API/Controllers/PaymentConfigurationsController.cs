@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using BccPay.Core.Cqrs.Queries;
 using BccPay.Core.Sample.Contracts.Requests;
+using BccPay.Core.Sample.Contracts.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,9 +14,11 @@ namespace BccPay.Core.Sample.API.Controllers
     {
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<PaymentConfigurationResult>))]
-        public async Task<IActionResult> GetPaymentConfigurations([FromQuery] PaymentConfigurationRequest paymentConfiguration)
+        public async Task<IActionResult> GetPaymentConfigurations(
+            [FromQuery] PaymentConfigurationRequest paymentConfiguration)
         {
-            var query = new GetPaymentConfigurationsByQuery(paymentConfiguration.CountryCode, paymentConfiguration.PaymentType, paymentConfiguration.CurrencyCode);
+            var query = new GetPaymentConfigurationsByQuery(paymentConfiguration.CountryCode,
+                paymentConfiguration.PaymentType, paymentConfiguration.CurrencyCode);
 
             var result = await Mediator.Send(query);
 
@@ -23,11 +26,26 @@ namespace BccPay.Core.Sample.API.Controllers
         }
 
         [HttpGet("with-exchange")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetConfigurationsWithExchangedCurrencyQueryResult))]
+        [ProducesResponseType(StatusCodes.Status200OK,
+            Type = typeof(GetConfigurationsWithExchangedCurrencyQueryResult))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetConfigurationsWithExchangedCurrency([FromQuery] ExchangeWithConfigurationsRequestModel request)
+        public async Task<IActionResult> GetConfigurationsWithExchangedCurrency(
+            [FromQuery] ExchangeWithConfigurationsRequestModel request)
         {
             var query = Mapper.Map<GetConfigurationsWithExchangedCurrencyQuery>(request);
+
+            var result = await Mediator.Send(query);
+
+            return Ok(result);
+        }
+
+        [HttpGet("exchange-by-definition")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetCurrencyExchangeByDefinitionResponse))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetExchangedByDefinition([FromQuery] ExchangeByDefinitionRequest request)
+        {
+            var query = new GetCurrencyExchangeByDefinitionIdQuery(request.DefinitionId, request.FromCurrency,
+                request.ToCurrency, request.Amount);
 
             var result = await Mediator.Send(query);
 
