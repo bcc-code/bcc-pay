@@ -90,7 +90,9 @@ namespace BccPay.Core.Domain.Entities
                     FromPaymentStatus = PaymentStatus,
                     ToPaymentStatus = newStatus,
                     Amount = Amount,
+                    ProviderAmount = lastUpdatedAttempt.StatusDetails?.ProviderAmount,
                     Currency = CurrencyCode,
+                    ProviderCurrency = lastUpdatedAttempt.StatusDetails?.ProviderCurrency,
                     PaymentDetails = PaymentDetails,
                     SuccessfulProviderDefinitionId = Attempts.Where(x
                         => x.AttemptStatus == AttemptStatus.PaidSucceeded)

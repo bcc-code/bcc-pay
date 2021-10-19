@@ -9,5 +9,7 @@ namespace BccPay.Core.Domain.Entities
         public string InvoiceId { get; set; }
         public List<string> Errors { get; set; }
         public bool IsSuccess { get; set; }
+        public string ProviderCurrency => null;
+        public decimal? ProviderAmount => null;
     }
 }

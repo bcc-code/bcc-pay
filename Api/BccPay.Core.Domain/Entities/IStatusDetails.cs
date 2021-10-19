@@ -9,5 +9,9 @@ namespace BccPay.Core.Domain.Entities
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<string> Errors { get; set; }
+
+        public string ProviderCurrency { get; }
+
+        public decimal? ProviderAmount { get; }
     }
 }

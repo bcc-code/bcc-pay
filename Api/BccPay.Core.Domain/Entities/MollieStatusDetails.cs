@@ -15,5 +15,8 @@ namespace BccPay.Core.Domain.Entities
 
         public bool IsSuccess { get; set; }
         public List<string> Errors { get; set; }
+
+        public string ProviderCurrency => CurrencyConversionResult?.ToCurrency.ToString();
+        public decimal? ProviderAmount => CurrencyConversionResult?.ToAmount;
     }
 }
