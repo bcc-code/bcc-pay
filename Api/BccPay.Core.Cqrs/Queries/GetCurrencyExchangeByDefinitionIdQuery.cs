@@ -12,7 +12,7 @@ using Raven.Client.Documents.Session;
 namespace BccPay.Core.Cqrs.Queries
 {
     public record GetCurrencyExchangeByDefinitionIdQuery
-    (string DefinitionId, Currencies FromCurrency, Currencies ToCurrency,
+    (string DefinitionId, Currencies? FromCurrency, Currencies? ToCurrency,
         decimal Amount) : IRequest<GetCurrencyExchangeByDefinitionResponse>;
 
     public class GetCurrencyExchangeByDefinitionIdQueryHandler : IRequestHandler<GetCurrencyExchangeByDefinitionIdQuery,
@@ -39,7 +39,7 @@ namespace BccPay.Core.Cqrs.Queries
                                          cancellationToken)
                                      ?? throw new NotFoundException("No definition found");
 
-            var result = await _currencyService.Exchange(request.FromCurrency, request.ToCurrency, request.Amount,
+            var result = await _currencyService.Exchange(request.FromCurrency ?? Currencies.NOK, request.ToCurrency ?? providerDefinition.Settings.Currency, request.Amount,
                 providerDefinition.Settings.Markup);
 
             return new GetCurrencyExchangeByDefinitionResponse(result.FromCurrency, result.ToCurrency,
