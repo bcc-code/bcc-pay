@@ -64,12 +64,12 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
 
             if (exchangeMarkup is not 0)
                 exchangeResult += (exchangeResult * exchangeMarkup);
-
+            
             return new CurrencyConversionRecord(
                 updateTime,
                 fromCurrency,
                 toCurrency,
-                fromOpposite ? (currencyRate * 100) : currencyRate,
+                exchangeResult / amount,
                 amount,
                 exchangeResult.TwoDigitsAfterPoint());
         }
