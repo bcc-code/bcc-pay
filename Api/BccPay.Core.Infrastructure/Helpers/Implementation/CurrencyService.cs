@@ -113,7 +113,7 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
             await _documentSession.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task<(decimal, bool, DateTime?)> GetExchangeRateByCurrency(Currencies fromCurrency,
+        public async Task<(decimal, bool, DateTime?)> GetExchangeRateByCurrency(Currencies fromCurrency,
             Currencies toCurrency)
         {
             var result = await _documentSession

@@ -2,5 +2,5 @@
 
 namespace BccPay.Core.Sample.Contracts.Requests
 {
-    public record ExchangeByDefinitionRequest(string DefinitionId, Currencies? FromCurrency, Currencies? ToCurrency, decimal Amount);
+    public record ExchangeByDefinitionRequest(string DefinitionId, Currencies? FromCurrency, Currencies? ToCurrency);
 }
