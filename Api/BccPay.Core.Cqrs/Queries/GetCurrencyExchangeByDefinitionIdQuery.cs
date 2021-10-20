@@ -5,7 +5,6 @@ using BccPay.Core.Domain;
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Exceptions;
 using BccPay.Core.Infrastructure.Helpers;
-using BccPay.Core.Infrastructure.RefitClients;
 using BccPay.Core.Sample.Contracts.Responses;
 using MediatR;
 using Raven.Client.Documents.Session;
@@ -21,18 +20,14 @@ namespace BccPay.Core.Cqrs.Queries
     {
         private readonly IAsyncDocumentSession _documentSession;
         private readonly ICurrencyService _currencyService;
-        private readonly IFixerClient _fixerClient;
 
         public GetCurrencyExchangeByDefinitionIdQueryHandler(IAsyncDocumentSession documentSession,
-            ICurrencyService currencyService,
-            IFixerClient fixerClient)
+            ICurrencyService currencyService)
         {
             _documentSession = documentSession
                                ?? throw new ArgumentNullException(nameof(documentSession));
             _currencyService = currencyService
                                ?? throw new ArgumentNullException(nameof(currencyService));
-            _fixerClient = fixerClient
-                           ?? throw new ArgumentNullException(nameof(fixerClient));
         }
 
         public async Task<GetCurrencyExchangeByDefinitionResponse> Handle(
