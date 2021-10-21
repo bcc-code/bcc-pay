@@ -40,16 +40,18 @@ namespace BccPay.Core.Cqrs.Queries
                                      ?? throw new NotFoundException("No definition found");
 
             Currencies fromCurrency = request.FromCurrency ?? Currencies.NOK;
-            Currencies toCurrency = request.ToCurrency ?? providerDefinition.Settings.Currency;
-            decimal rate = 0;
+            Currencies toCurrency = providerDefinition.Settings.Currency;
 
-            (decimal exchangeRate, bool fromOpposite, DateTime? _) =
+            if (request.ToCurrency is not null)
+                if (request.ToCurrency != providerDefinition.Settings.Currency)
+                    throw new NotFoundException("Currency is not supported");
+
+            (decimal exchangeRate, bool _, DateTime? _) =
                 await _currencyService.GetExchangeRateByCurrency(fromCurrency, toCurrency);
 
-            rate = fromOpposite ? exchangeRate * 100 : exchangeRate;
-            rate += providerDefinition.Settings.Markup;
+            exchangeRate += providerDefinition.Settings.Markup;
 
-            return new GetCurrencyExchangeByDefinitionResponse(fromCurrency, toCurrency, rate);
+            return new GetCurrencyExchangeByDefinitionResponse(fromCurrency, toCurrency, exchangeRate);
         }
     }
 }
