@@ -44,8 +44,7 @@ namespace BccPay.Core.Sample.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetExchangedByDefinition([FromQuery] ExchangeByDefinitionRequest request)
         {
-            var query = new GetCurrencyExchangeByDefinitionIdQuery(request.DefinitionId, request.FromCurrency,
-                request.ToCurrency);
+            var query = new GetCurrencyExchangeByDefinitionIdQuery(request.DefinitionId, request.FromCurrency);
 
             var result = await Mediator.Send(query);
 
