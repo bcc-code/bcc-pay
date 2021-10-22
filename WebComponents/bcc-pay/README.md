@@ -16,6 +16,8 @@ We are pushing new version from CI/CD to NPM and Github repositories:
 Pushing webComponent manually:
 `npm run versionCheck`
 `npm version patch`
+`npm run build`
+`npm publish`
 
 In application type:
 `npm install bcc-pay@latest`
