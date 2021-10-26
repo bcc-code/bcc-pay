@@ -48,11 +48,11 @@ namespace BccPay.Core.Cqrs.Queries
             {
                 foreach (var definitionId in configurations.PaymentProviderDefinitionIds)
                 {
-                    var details = configurations.ProviderDefinitionDetails.Where(x => x.Id == definitionId).Single();
+                    var details = configurations.ProviderDefinitionDetails.First(x => x.Id == definitionId);
 
                     CurrencyConversionRecord currencyConversionResult = null;
 
-                    var fromCurrencyValue = request.FromCurrency is null ? default : (Currencies)request.FromCurrency;
+                    var fromCurrencyValue = request.FromCurrency ?? default;
                     if (request.Amount > 0)
                         currencyConversionResult = await _currencyService.Exchange(fromCurrencyValue, details.Currency, request.Amount, details.Markup);
 
@@ -62,7 +62,7 @@ namespace BccPay.Core.Cqrs.Queries
                         fromCurrencyValue,
                         details.Currency,
                         request.Amount,
-                        currencyConversionResult is not null ? currencyConversionResult.ToAmount : request.Amount));
+                        currencyConversionResult?.ToAmount ?? request.Amount));
                 }
             }
 
