@@ -14,22 +14,23 @@ namespace BccPay.Core.Domain.Entities
 
         public string PaymentDefinitionId { get; set; }
         public string PayerId { get; set; }
+        public string CountryCode { get; set; }
 
         public Currencies BaseCurrency { get; set; }
-        public Currencies DefinitionCurrency { get; set; }
+        public Currencies DefinedCurrency { get; set; }
 
-        public decimal SourceCurrencyAmount { get; set; }
-        public decimal DestinationCurrencyAmount { get; set; }
+        public decimal? InputAmount { get; set; }
+        public decimal? OutputAmount { get; set; }
+        public decimal? ExchangeRate { get; set; }
 
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
 
         public void Create(Currencies baseCurrency,
-            Currencies definitionCurrency,
+            Currencies definedCurrency,
             string paymentDefinitionId,
             string payerId,
-            decimal sourceCurrencyAmount,
-            decimal destinationCurrencyAmount)
+            string countryCode)
         {
             TicketId = Guid.NewGuid();
             Created = DateTime.UtcNow;
@@ -37,24 +38,20 @@ namespace BccPay.Core.Domain.Entities
 
             PaymentDefinitionId = paymentDefinitionId;
             BaseCurrency = baseCurrency;
-            DefinitionCurrency = definitionCurrency;
-            SourceCurrencyAmount = sourceCurrencyAmount;
-            DestinationCurrencyAmount = destinationCurrencyAmount;
+            CountryCode = countryCode;
+            DefinedCurrency = definedCurrency;
         }
 
-        public void Update(Currencies baseCurrency,
-            Currencies definitionCurrency,
-            string paymentDefinitionId,
-            decimal sourceCurrencyAmount,
-            decimal destinationCurrencyAmount)
+        public void Update(
+            decimal inputAmount,
+            decimal outputAmount,
+            decimal exchangeRate)
         {
             Updated = DateTime.UtcNow;
-
-            PaymentDefinitionId = paymentDefinitionId;
-            BaseCurrency = baseCurrency;
-            DefinitionCurrency = definitionCurrency;
-            SourceCurrencyAmount = sourceCurrencyAmount;
-            DestinationCurrencyAmount = destinationCurrencyAmount;
+            
+            InputAmount = inputAmount;
+            OutputAmount = outputAmount;
+            ExchangeRate = exchangeRate;
         }
     }
 }
