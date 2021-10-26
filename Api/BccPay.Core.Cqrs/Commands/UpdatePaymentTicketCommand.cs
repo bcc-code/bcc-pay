@@ -83,8 +83,8 @@ namespace BccPay.Core.Cqrs.Commands
                 exchangeRate);
             await _documentSession.SaveChangesAsync(cancellationToken);
 
-            return new PaymentTicketResponse(ticket.BaseCurrencyAmount, ticket.OtherCurrencyAmount,
-                ticket.ExchangeRate);
+            return new PaymentTicketResponse(ticket.TicketId, ticket.BaseCurrencyAmount, ticket.OtherCurrencyAmount,
+                ticket.ExchangeRate, ticket.Updated);
         }
     }
 }
