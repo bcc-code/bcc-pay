@@ -73,7 +73,7 @@ namespace BccPay.Core.Cqrs.Commands
             (decimal exchangeRate, _) =
                 await _currencyService.GetExchangeRateByCurrency(ticket.BaseCurrency, ticket.DefinedCurrency);
 
-            exchangeRate *= (1 - providerDefinition.Settings.Markup);
+            exchangeRate *= (1 + providerDefinition.Settings.Markup);
 
             decimal exchangeResult = isOppositeConversion
                 ? Decimal.Divide(amount, exchangeRate)

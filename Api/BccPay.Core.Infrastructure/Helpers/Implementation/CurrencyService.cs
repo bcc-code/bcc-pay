@@ -60,7 +60,7 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
                 await GetExchangeRateByCurrency(fromCurrency, toCurrency);
 
             if (exchangeMarkup is not 0)
-                currencyRate *= (1 - exchangeMarkup);
+                currencyRate *= (1 + exchangeMarkup);
 
             decimal exchangeResult = Decimal.Multiply(amount, currencyRate);
 
