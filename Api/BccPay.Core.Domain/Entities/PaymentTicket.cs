@@ -19,8 +19,8 @@ namespace BccPay.Core.Domain.Entities
         public Currencies BaseCurrency { get; set; }
         public Currencies DefinedCurrency { get; set; }
 
-        public decimal? InputAmount { get; set; }
-        public decimal? OutputAmount { get; set; }
+        public decimal? BaseCurrencyAmount { get; set; }
+        public decimal? OtherCurrencyAmount { get; set; }
         public decimal? ExchangeRate { get; set; }
 
         public DateTime Created { get; set; }
@@ -43,14 +43,24 @@ namespace BccPay.Core.Domain.Entities
         }
 
         public void Update(
+            bool isOpposite,
             decimal inputAmount,
             decimal outputAmount,
             decimal exchangeRate)
         {
             Updated = DateTime.UtcNow;
-            
-            InputAmount = inputAmount;
-            OutputAmount = outputAmount;
+
+            if (isOpposite)
+            {
+                BaseCurrencyAmount = outputAmount;
+                OtherCurrencyAmount = inputAmount;
+            }
+            else
+            {
+                BaseCurrencyAmount = inputAmount;
+                OtherCurrencyAmount = outputAmount;
+            }
+
             ExchangeRate = exchangeRate;
         }
     }

@@ -33,8 +33,8 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
         public Task<CurrencyConversionRecord> Exchange(string fromCurrency, string toCurrency, decimal amount,
             decimal exchangeRateMarkup = 0)
         {
-            if (Enum.TryParse<Currencies>(fromCurrency, out Currencies fromCurrencyResult) &&
-                Enum.TryParse<Currencies>(toCurrency, out Currencies toCurrencyResult))
+            if (Enum.TryParse(fromCurrency, out Currencies fromCurrencyResult) &&
+                Enum.TryParse(toCurrency, out Currencies toCurrencyResult))
             {
                 return Exchange(fromCurrencyResult, toCurrencyResult, amount, exchangeRateMarkup);
             }
@@ -56,23 +56,22 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
                     amount,
                     amount);
 
-            (decimal currencyRate, bool fromOpposite, DateTime? updateTime) =
+            (decimal currencyRate, DateTime? updateTime) =
                 await GetExchangeRateByCurrency(fromCurrency, toCurrency);
 
-            decimal exchangeResult = fromOpposite
-                ? Decimal.Divide(amount, currencyRate)
-                : Decimal.Multiply(amount, currencyRate);
-
             if (exchangeMarkup is not 0)
-                exchangeResult += (exchangeResult * exchangeMarkup);
+                currencyRate *= (1 - exchangeMarkup);
+
+            decimal exchangeResult = Decimal.Multiply(amount, currencyRate);
+
 
             return new CurrencyConversionRecord(
                 updateTime,
                 fromCurrency,
                 toCurrency,
-                exchangeResult / amount,
+                currencyRate,
                 amount,
-                exchangeResult.TwoDigitsAfterPoint());
+                exchangeResult);
         }
 
         public async Task UpsertByBaseCurrencyRate(Currencies currency = Currencies.NOK,
@@ -88,7 +87,7 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
             Dictionary<Currencies, decimal> rates = new();
             foreach ((string key, decimal value) in fixerApiResult.Rates)
             {
-                if (Enum.TryParse<Currencies>(key, out Currencies currencyResult))
+                if (Enum.TryParse(key, out Currencies currencyResult))
                     rates.Add(currencyResult, value);
             }
 
@@ -104,51 +103,36 @@ namespace BccPay.Core.Infrastructure.Helpers.Implementation
                 }, cancellationToken);
             }
 
-            if (lastCurrencyRateUpdate is not null)
-            {
-                lastCurrencyRateUpdate.Update(rates,
-                    TimeStampConverter.UnixTimeStampToDateTime(fixerApiResult.Timestamp));
-            }
+            lastCurrencyRateUpdate?.Update(rates,
+                TimeStampConverter.UnixTimeStampToDateTime(fixerApiResult.Timestamp));
 
             await _documentSession.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<(decimal, bool, DateTime?)> GetExchangeRateByCurrency(Currencies fromCurrency,
+        public async Task<(decimal, DateTime?)> GetExchangeRateByCurrency(Currencies fromCurrency,
             Currencies toCurrency)
         {
             var result = await _documentSession
                 .LoadAsync<CurrencyRate>(CurrencyRate.GetCurrencyRateId(fromCurrency));
 
-            if (!IsCurrencyRateValid(result, 2))
+            if (IsCurrencyRateValid(result, 2))
             {
-                var oppositeResult = await _documentSession
-                    .LoadAsync<CurrencyRate>(CurrencyRate.GetCurrencyRateId(toCurrency));
-
-                if (!IsCurrencyRateValid(oppositeResult, 2))
-                {
-                    try
-                    {
-                        await UpsertByBaseCurrencyRate(fromCurrency);
-                        return await GetExchangeRateByCurrency(fromCurrency, toCurrency);
-                    }
-                    catch
-                    {
-                        throw new CurrencyExchangeOperationException("The exchange operation cannot be performed");
-                    }
-                }
-
-                return (oppositeResult.Rates[fromCurrency], true, oppositeResult.FixerServerUpdate);
+                return (result.Rates[toCurrency], result.FixerServerUpdate);
             }
 
-            return (result.Rates[toCurrency], false, result.FixerServerUpdate);
+            try
+            {
+                await UpsertByBaseCurrencyRate(fromCurrency);
+                return await GetExchangeRateByCurrency(fromCurrency, toCurrency);
+            }
+            catch
+            {
+                throw new CurrencyExchangeOperationException("The exchange operation cannot be performed");
+            }
         }
 
         private static bool IsCurrencyRateValid(CurrencyRate currencyRate, int expirationTimeInHours)
-        {
-            if (currencyRate is null)
-                return false;
-
-            return DateTime.UtcNow.Subtract(currencyRate.ServerUpdate).TotalHours < expirationTimeInHours;
-        }
+            => currencyRate is not null &&
+               DateTime.UtcNow.Subtract(currencyRate.ServerUpdate).TotalHours < expirationTimeInHours;
     }
 }

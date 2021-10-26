@@ -24,7 +24,8 @@ namespace BccPay.Core.Cqrs.Commands
             _documentSession = documentSession;
 
             RuleFor(x => new {x.BaseCurrencyAmount, x.OtherCurrencyAmount})
-                .Must(x => x.BaseCurrencyAmount > 0 || x.OtherCurrencyAmount > 0)
+                .Must(x => (x.BaseCurrencyAmount > 0 && x.OtherCurrencyAmount == 0) ||
+                           (x.BaseCurrencyAmount == 0 && x.OtherCurrencyAmount > 0))
                 .WithMessage("The amount must be greater than 0");
 
             RuleFor(x => x.TicketId)
@@ -62,60 +63,28 @@ namespace BccPay.Core.Cqrs.Commands
             var ticket = await _documentSession.LoadAsync<PaymentTicket>(PaymentTicket.GetDocumentId(request.TicketId),
                 cancellationToken);
 
-            bool fromOpposite = request.BaseCurrencyAmount is not 0;
-
-            Currencies fromCurrency;
-            Currencies toCurrency;
-
-            if (fromOpposite)
-            {
-                toCurrency = ticket.DefinedCurrency;
-                fromCurrency = ticket.BaseCurrency;
-            }
-            else
-            {
-                fromCurrency = ticket.DefinedCurrency;
-                toCurrency = ticket.BaseCurrency;
-            }
+            bool isOppositeConversion = request.BaseCurrencyAmount is 0;
+            decimal amount = isOppositeConversion ? request.OtherCurrencyAmount : request.BaseCurrencyAmount;
 
             var providerDefinition = await _documentSession.LoadAsync<PaymentProviderDefinition>(
                 PaymentProviderDefinition.GetDocumentId(ticket.PaymentDefinitionId),
                 cancellationToken);
 
-            (decimal exchangeRate, bool _, DateTime? _) =
-                await _currencyService.GetExchangeRateByCurrency(fromCurrency, toCurrency);
+            (decimal exchangeRate, _) =
+                await _currencyService.GetExchangeRateByCurrency(ticket.BaseCurrency, ticket.DefinedCurrency);
 
-            exchangeRate *= (1 + providerDefinition.Settings.Markup);
+            exchangeRate *= (1 - providerDefinition.Settings.Markup);
 
-            (decimal input, decimal output) =
-                ExchangeAndNormalize(fromOpposite, request.BaseCurrencyAmount, request.OtherCurrencyAmount,
-                    exchangeRate);
+            decimal exchangeResult = isOppositeConversion
+                ? Decimal.Divide(amount, exchangeRate)
+                : Decimal.Multiply(amount, exchangeRate);
 
-            ticket.Update(input, output, exchangeRate);
-
+            ticket.Update(isOppositeConversion, amount, exchangeResult,
+                exchangeRate);
             await _documentSession.SaveChangesAsync(cancellationToken);
 
-            return new PaymentTicketResponse(input, output, exchangeRate);
-        }
-
-        private static (decimal, decimal) ExchangeAndNormalize(bool fromOpposite, decimal baseAmount,
-            decimal otherAmount, decimal rate)
-        {
-            decimal baseResult;
-            decimal otherResult;
-
-            if (fromOpposite)
-            {
-                baseResult = baseAmount;
-                otherResult = baseAmount * rate;
-            }
-            else
-            {
-                baseResult = otherAmount * rate;
-                otherResult = otherAmount;
-            }
-
-            return (baseResult, otherResult);
+            return new PaymentTicketResponse(ticket.BaseCurrencyAmount, ticket.OtherCurrencyAmount,
+                ticket.ExchangeRate);
         }
     }
 }

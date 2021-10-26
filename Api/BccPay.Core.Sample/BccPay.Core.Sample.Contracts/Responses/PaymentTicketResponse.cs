@@ -3,7 +3,7 @@
 namespace BccPay.Core.Sample.Contracts.Responses
 {
     public record PaymentTicketResponse(
-        decimal BaseCurrencyAmount,
-        decimal OtherCurrencyAmount,
-        decimal ExchangeRate);
+        decimal? BaseCurrencyAmount,
+        decimal? OtherCurrencyAmount,
+        decimal? ExchangeRate);
 }

@@ -17,7 +17,7 @@ namespace BccPay.Core.Infrastructure.Helpers
         Task UpsertByBaseCurrencyRate(Currencies currency = Currencies.NOK,
             CancellationToken cancellationToken = default);
 
-        Task<(decimal, bool, DateTime?)> GetExchangeRateByCurrency(Currencies fromCurrency,
+        Task<(decimal, DateTime?)> GetExchangeRateByCurrency(Currencies fromCurrency,
             Currencies toCurrency);
     }
 }
