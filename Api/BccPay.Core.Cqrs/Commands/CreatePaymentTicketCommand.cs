@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
+using BccPay.Core.Infrastructure.Helpers;
 using FluentValidation;
 using MediatR;
 using Raven.Client.Documents;
@@ -64,11 +65,15 @@ namespace BccPay.Core.Cqrs.Commands
             Guid>
     {
         private readonly IAsyncDocumentSession _documentSession;
+        private readonly ICurrencyService _currencyService;
 
-        public CreatePaymentTicketCommandHandler(IAsyncDocumentSession documentSession)
+        public CreatePaymentTicketCommandHandler(IAsyncDocumentSession documentSession,
+            ICurrencyService currencyService)
         {
             _documentSession = documentSession
                                ?? throw new ArgumentNullException(nameof(documentSession));
+            _currencyService = currencyService
+                               ?? throw new ArgumentNullException(nameof(currencyService));
         }
 
         public async Task<Guid> Handle(CreatePaymentTicketCommand request,
@@ -77,13 +82,20 @@ namespace BccPay.Core.Cqrs.Commands
             var definition = await _documentSession.LoadAsync<PaymentProviderDefinition>(
                 PaymentProviderDefinition.GetDocumentId(request.PaymentDefinitionId), cancellationToken);
 
+            (decimal exchangeRate, _) =
+                await _currencyService.GetExchangeRateByCurrency(request.BaseCurrency,
+                    definition.Settings.Currency);
+
+            exchangeRate *= (1 + definition.Settings.Markup);
+
             var ticket = new PaymentTicket();
 
             ticket.Create(request.BaseCurrency,
                 definition.Settings.Currency,
                 request.PaymentDefinitionId,
                 request.PayerId,
-                request.CountryCode);
+                request.CountryCode,
+                exchangeRate);
 
             await _documentSession.StoreAsync(ticket, cancellationToken);
 

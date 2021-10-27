@@ -7,5 +7,7 @@ namespace BccPay.Core.Sample.Contracts.Responses
         decimal? BaseCurrencyAmount,
         decimal? OtherCurrencyAmount,
         decimal? ExchangeRate,
-        DateTime? LastUpdate);
+        DateTime? LastUpdate,
+        string PaymentDefinition,
+        string CountryCode);
 }

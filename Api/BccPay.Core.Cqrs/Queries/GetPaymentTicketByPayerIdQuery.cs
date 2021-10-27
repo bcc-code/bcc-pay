@@ -31,9 +31,9 @@ namespace BccPay.Core.Cqrs.Queries
                 .OrderByDescending(x => x.Updated)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (ticket is not null && !(ticket.Updated < DateTime.UtcNow.AddHours(-1)))
+            if (ticket is not null && !((ticket.Updated ?? ticket.Created) < DateTime.UtcNow.AddHours(-1)))
                 return new PaymentTicketResponse(ticket.TicketId, ticket.BaseCurrencyAmount, ticket.OtherCurrencyAmount,
-                    ticket.ExchangeRate, ticket.Updated);
+                    ticket.ExchangeRate, ticket.Updated ?? ticket.Created, ticket.PaymentDefinitionId, ticket.CountryCode);
             
             throw new Exception("Ticket is not valid");
         }

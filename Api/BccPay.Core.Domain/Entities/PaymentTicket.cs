@@ -6,7 +6,7 @@ namespace BccPay.Core.Domain.Entities
     public class PaymentTicket
     {
         public static string GetDocumentId(Guid ticketId)
-            => $"paymentTickets/{ticketId}";
+            => $"payment-tickets/{ticketId}";
 
         public string Id => GetDocumentId(TicketId);
 
@@ -21,7 +21,7 @@ namespace BccPay.Core.Domain.Entities
 
         public decimal? BaseCurrencyAmount { get; set; }
         public decimal? OtherCurrencyAmount { get; set; }
-        public decimal? ExchangeRate { get; set; }
+        public decimal ExchangeRate { get; set; }
 
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
@@ -30,7 +30,8 @@ namespace BccPay.Core.Domain.Entities
             Currencies definedCurrency,
             string paymentDefinitionId,
             string payerId,
-            string countryCode)
+            string countryCode,
+            decimal exchangeRate)
         {
             TicketId = Guid.NewGuid();
             Created = DateTime.UtcNow;
@@ -40,6 +41,7 @@ namespace BccPay.Core.Domain.Entities
             BaseCurrency = baseCurrency;
             CountryCode = countryCode;
             DefinedCurrency = definedCurrency;
+            ExchangeRate = exchangeRate;
         }
 
         public void Update(
