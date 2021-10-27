@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BccPay.Core.Sample.Contracts.Responses
+namespace BccPay.Core.Infrastructure.Dtos
 {
     public record PaymentTicketResponse(
         Guid TicketId,

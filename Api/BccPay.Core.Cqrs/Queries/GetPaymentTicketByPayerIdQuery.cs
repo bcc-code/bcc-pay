@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BccPay.Core.Domain.Entities;
-using BccPay.Core.Sample.Contracts.Responses;
+using BccPay.Core.Infrastructure.Dtos;
 using MediatR;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
