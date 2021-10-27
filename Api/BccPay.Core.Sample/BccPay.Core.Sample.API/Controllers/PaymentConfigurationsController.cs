@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using BccPay.Core.Cqrs.Queries;
 using BccPay.Core.Sample.Contracts.Requests;
-using BccPay.Core.Sample.Contracts.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,18 +32,6 @@ namespace BccPay.Core.Sample.API.Controllers
             [FromQuery] ExchangeWithConfigurationsRequestModel request)
         {
             var query = Mapper.Map<GetConfigurationsWithExchangedCurrencyQuery>(request);
-
-            var result = await Mediator.Send(query);
-
-            return Ok(result);
-        }
-
-        [HttpGet("exchange-by-definition")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetCurrencyExchangeByDefinitionResponse))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetExchangedByDefinition([FromQuery] ExchangeByDefinitionRequest request)
-        {
-            var query = new GetCurrencyExchangeByDefinitionIdQuery(request.DefinitionId, request.FromCurrency);
 
             var result = await Mediator.Send(query);
 
