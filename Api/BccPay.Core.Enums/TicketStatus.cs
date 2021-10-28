@@ -3,7 +3,6 @@
     public enum TicketStatus
     {
         Initialized,
-        Stored,
-        Expired
+        Stored
     }
 }

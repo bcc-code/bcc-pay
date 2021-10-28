@@ -47,7 +47,7 @@ namespace BccPay.Core.Cqrs.Commands
                 await _documentSession.LoadAsync<PaymentTicket>(PaymentTicket.GetDocumentId(ticketId),
                     cancellationToken);
 
-            return ticket.TicketStatus is not TicketStatus.Expired;
+            return ticket is not null && !((ticket.Updated ?? ticket.Created) < DateTime.UtcNow.AddHours(-1));
         }
     }
 
@@ -95,9 +95,6 @@ namespace BccPay.Core.Cqrs.Commands
                 exchangeRate);
 
             await _documentSession.SaveChangesAsync(cancellationToken);
-
-            if (ticket.TicketStatus is TicketStatus.Expired)
-                throw new Exception("Ticket is expired");
 
             return new PaymentTicketResponse(ticket.TicketId, ticket.BaseCurrency, ticket.DefinedCurrency,
                 ticket.BaseCurrencyAmount, ticket.OtherCurrencyAmount,

@@ -46,15 +46,6 @@ namespace BccPay.Core.Domain.Entities
             ExchangeRate = exchangeRate;
         }
 
-        private bool IsTicketExpired()
-        {
-            if (!(Updated < DateTime.UtcNow.AddHours(-1)))
-                return false;
-
-            TicketStatus = TicketStatus.Expired;
-            return true;
-        }
-
         public void Update(
             bool isOpposite,
             decimal inputAmount,
@@ -62,9 +53,6 @@ namespace BccPay.Core.Domain.Entities
             decimal exchangeRate)
         {
             Updated = DateTime.UtcNow;
-
-            if (IsTicketExpired())
-                return;
 
             TicketStatus = TicketStatus.Stored;
 
