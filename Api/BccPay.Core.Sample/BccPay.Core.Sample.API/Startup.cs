@@ -23,6 +23,7 @@ namespace BccPay.Core.Sample
         {
             Configuration = configuration;
         }
+
         private const string _allowOrigins = "_allowOrigins";
 
         public IConfiguration Configuration { get; }
@@ -55,6 +56,8 @@ namespace BccPay.Core.Sample
                     options.TermsUrl = "http://localhost:8000";
                     options.SecretKey = Configuration["NetsSecretKey"];
                     options.NotificationUrl = "https://localhost:5001/Payment/webhook/";
+                    options.MobileReturnUrl = "com.ionic.samvirk://membership";
+                    options.ReturnUrl = "https://my.test.samvirk.com/membership";
                 });
             });
 
@@ -79,13 +82,15 @@ namespace BccPay.Core.Sample
                 {
                     op.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
-                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblies(new List<Assembly> { typeof(CreatePaymentCommandValidator).Assembly }));
+                .AddFluentValidation(fv =>
+                    fv.RegisterValidatorsFromAssemblies(new List<Assembly>
+                        {typeof(CreatePaymentCommandValidator).Assembly}));
             services.AddAutoMapper(typeof(PaymentProfile).Assembly);
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "BccPay.Core.Sample", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "BccPay.Core.Sample", Version = "v1"});
             });
         }
 
@@ -97,6 +102,7 @@ namespace BccPay.Core.Sample
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BccPay.Core.Sample v1"));
             }
+
             app.UseMiddleware<ErrorHandlingMiddleware>();
 
             app.UseHttpsRedirection();

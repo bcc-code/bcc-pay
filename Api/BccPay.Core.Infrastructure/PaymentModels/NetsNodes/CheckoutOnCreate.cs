@@ -6,6 +6,7 @@
 
         public bool PublicDevice { get; set; }
 
+        public string ReturnUrl { get; set; }
         public bool Charge { get; set; }
 
         public string IntegrationType { get; set; }

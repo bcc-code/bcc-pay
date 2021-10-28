@@ -14,5 +14,6 @@
         public string AddressLine2 { get; set; }
         public string City { get; set; }
         public string PostalCode { get; set; }
+        public bool IsHostedCheckout { get; set; }
     }
 }

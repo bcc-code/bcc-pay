@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BccPay.Core.Infrastructure.BccPaymentSettings;
 using BccPay.Core.Infrastructure.Constants;
 using BccPay.Core.Infrastructure.Dtos;
@@ -17,20 +18,17 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
             _options = options;
         }
 
-        public NetsPaymentRequest BuildNetsPaymentRequest(PaymentRequestDto paymentRequest, string originUrl, bool IsUserDataValid = true)
+        public NetsPaymentRequest BuildNetsPaymentRequest(PaymentRequestDto paymentRequest, string originUrl,
+            bool isUserDataValid = true)
         {
-            int amountMonets = Convert.ToInt32(paymentRequest.Amount * 100);
-            List<Webhook> webhooks = new();
+            int amountInCoins = Convert.ToInt32(paymentRequest.Amount * 100);
 
-            foreach (var webhookEvent in PaymentProviderConstants.Nets.Webhooks.Messages)
+            List<Webhook> webhooks = PaymentProviderConstants.Nets.Webhooks.Messages.Select(webhookEvent => new Webhook
             {
-                webhooks.Add(new Webhook
-                {
-                    Authorization = paymentRequest.NotificationAccessToken,
-                    EventName = webhookEvent.Key,
-                    Url = _options.NotificationUrl + $"/{ paymentRequest.PaymentId }"
-                });
-            }
+                Authorization = paymentRequest.NotificationAccessToken,
+                EventName = webhookEvent.Key,
+                Url = _options.NotificationUrl + $"/{paymentRequest.PaymentId}"
+            }).ToList();
 
             PaymentModels.NetsNodes.Notifications notifications = new()
             {
@@ -39,7 +37,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
 
             Order order = new()
             {
-                Amount = amountMonets,
+                Amount = amountInCoins,
                 Currency = paymentRequest.Currency,
                 Items =
                     new List<Item>
@@ -50,23 +48,33 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
                             Name = $"DONATION-{paymentRequest.Amount}",
                             Quantity = 1,
                             Unit = PaymentProviderConstants.Nets.Order.ItemUnit,
-                            UnitPrice = amountMonets,
-                            GrossTotalAmount = amountMonets,
-                            NetTotalAmount = amountMonets
+                            UnitPrice = amountInCoins,
+                            GrossTotalAmount = amountInCoins,
+                            NetTotalAmount = amountInCoins
                         }
                     }
             };
 
-            if (IsUserDataValid)
+
+            string integrationType = paymentRequest.IsHostedCheckout
+                ? PaymentProviderConstants.Nets.IntegrationType.HostedPaymentPage
+                : PaymentProviderConstants.Nets.IntegrationType.EmbeddedCheckout;
+            string hostedReturnUrl = paymentRequest.IsHostedCheckout
+                ? (paymentRequest.IsMobile ? _options.MobileReturnUrl : _options.ReturnUrl)
+                : null;
+            string embeddedUrl = paymentRequest.IsHostedCheckout ? null : $"{originUrl}{_options.CheckoutPageUrl}";
+
+            if (isUserDataValid)
             {
                 return new NetsPaymentRequest()
                 {
                     Checkout = new CheckoutOnCreate
                     {
-                        IntegrationType = PaymentProviderConstants.Nets.Order.IntegrationType,
+                        IntegrationType = integrationType,
                         Charge = true,
                         MerchantHandlesConsumerData = true,
-                        Url = $"{originUrl}{_options.CheckoutPageUrl}",
+                        Url = embeddedUrl,
+                        ReturnUrl = hostedReturnUrl,
                         TermsUrl = _options.TermsUrl,
                         Consumer = new ConsumerOnCreate
                         {
@@ -102,10 +110,11 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
                     Checkout =
                         new CheckoutOnCreate
                         {
-                            IntegrationType = PaymentProviderConstants.Nets.Order.IntegrationType,
+                            IntegrationType = integrationType,
+                            ReturnUrl = hostedReturnUrl,
                             Charge = false,
                             MerchantHandlesConsumerData = false,
-                            Url = $"{originUrl}{_options.CheckoutPageUrl}",
+                            Url = embeddedUrl,
                             TermsUrl = _options.TermsUrl,
                         },
                     Order = order,

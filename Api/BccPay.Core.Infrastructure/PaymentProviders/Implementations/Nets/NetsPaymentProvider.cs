@@ -136,6 +136,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
                     {
                         IsSuccess = true,
                         PaymentCheckoutId = result.PaymentId,
+                        HostedPaymentPageUrl = result.HostedPaymentPageUrl,
                         Errors = new List<string> { "{\"notValidUserBillingDataInTheSystem\":" + retryException?.Content + "}" }
                     };
                 }
