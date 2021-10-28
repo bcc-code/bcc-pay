@@ -27,7 +27,8 @@ namespace BccPay.Core.Cqrs.Queries
                 cancellationToken);
 
             if (ticket is not null && !((ticket.Updated ?? ticket.Created) < DateTime.UtcNow.AddHours(-1)))
-                return new PaymentTicketResponse(ticket.TicketId, ticket.BaseCurrencyAmount, ticket.OtherCurrencyAmount,
+                return new PaymentTicketResponse(ticket.TicketId, ticket.BaseCurrency, ticket.DefinedCurrency,
+                    ticket.BaseCurrencyAmount, ticket.OtherCurrencyAmount,
                     ticket.ExchangeRate, ticket.Updated ?? ticket.Created, ticket.PaymentDefinitionId,
                     ticket.CountryCode);
 

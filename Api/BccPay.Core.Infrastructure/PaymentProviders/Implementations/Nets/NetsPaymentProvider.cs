@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using Refit;
 
-namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations
+namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Nets
 {
     internal class NetsPaymentProvider : IPaymentProvider
     {

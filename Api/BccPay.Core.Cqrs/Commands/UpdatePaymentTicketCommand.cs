@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
+using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.Helpers;
 using FluentValidation;
@@ -92,9 +93,11 @@ namespace BccPay.Core.Cqrs.Commands
 
             ticket.Update(isOppositeConversion, amount.Value, exchangeResult,
                 exchangeRate);
+
             await _documentSession.SaveChangesAsync(cancellationToken);
 
-            return new PaymentTicketResponse(ticket.TicketId, ticket.BaseCurrencyAmount, ticket.OtherCurrencyAmount,
+            return new PaymentTicketResponse(ticket.TicketId, ticket.BaseCurrency, ticket.DefinedCurrency,
+                ticket.BaseCurrencyAmount, ticket.OtherCurrencyAmount,
                 ticket.ExchangeRate, ticket.Updated, ticket.PaymentDefinitionId, ticket.CountryCode);
         }
     }

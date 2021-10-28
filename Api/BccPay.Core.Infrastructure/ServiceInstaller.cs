@@ -7,6 +7,7 @@ using BccPay.Core.Infrastructure.Helpers.Implementation;
 using BccPay.Core.Infrastructure.PaymentProviders;
 using BccPay.Core.Infrastructure.PaymentProviders.Implementations;
 using BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie;
+using BccPay.Core.Infrastructure.PaymentProviders.Implementations.Nets;
 using BccPay.Core.Infrastructure.RefitClients;
 using BccPay.Core.Shared.Helpers;
 using Microsoft.AspNetCore.Builder;
