@@ -1,4 +1,6 @@
-﻿namespace BccPay.Core.Infrastructure.Dtos
+﻿using BccPay.Core.Domain.Entities;
+
+namespace BccPay.Core.Infrastructure.Dtos
 {
     public class PaymentRequestDto
     {
@@ -17,5 +19,6 @@
         public bool IsMobile { get; set; }
         public bool IsHostedCheckout { get; set; }
         public AddressDto Address { get; set; }
+        public PaymentTicket Ticket { get; set; }
     }
 }

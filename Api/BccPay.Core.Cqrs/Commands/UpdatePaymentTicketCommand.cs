@@ -83,7 +83,7 @@ namespace BccPay.Core.Cqrs.Commands
                 cancellationToken);
 
             (decimal exchangeRate, _) =
-                await _currencyService.GetExchangeRateByCurrency(ticket.BaseCurrency, ticket.DefinedCurrency);
+                await _currencyService.GetExchangeRateByCurrency(ticket.BaseCurrency, ticket.OtherCurrency);
 
             exchangeRate *= (1 + providerDefinition.Settings.Markup);
 
@@ -96,7 +96,7 @@ namespace BccPay.Core.Cqrs.Commands
 
             await _documentSession.SaveChangesAsync(cancellationToken);
 
-            return new PaymentTicketResponse(ticket.TicketId, ticket.BaseCurrency, ticket.DefinedCurrency,
+            return new PaymentTicketResponse(ticket.TicketId, ticket.BaseCurrency, ticket.OtherCurrency,
                 ticket.BaseCurrencyAmount, ticket.OtherCurrencyAmount,
                 ticket.ExchangeRate, ticket.Updated, ticket.PaymentDefinitionId, ticket.CountryCode);
         }

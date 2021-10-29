@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
@@ -12,6 +13,7 @@ using BccPay.Core.Infrastructure.PaymentModels.Response.Mollie;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations;
 using BccPay.Core.Infrastructure.RefitClients;
+using BccPay.Core.Shared.Converters;
 using Refit;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
@@ -27,9 +29,9 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
             ICurrencyService currencyService)
         {
             _mollieClient = mollieClient
-                ?? throw new ArgumentNullException(nameof(mollieClient));
+                            ?? throw new ArgumentNullException(nameof(mollieClient));
             _currencyService = currencyService
-                ?? throw new ArgumentNullException(nameof(currencyService));
+                               ?? throw new ArgumentNullException(nameof(currencyService));
             _options = options;
         }
 
@@ -106,24 +108,24 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
 
         public async Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSetting settings)
         {
-            IMollieRequestBuilder requestBuilder = CreateRequestBuilder(settings);
-
-            var request = requestBuilder.BuildMolliePaymentRequest(paymentRequest, settings.PaymentMethod);
-
             CurrencyConversionRecord currencyConversion = null;
-            if (settings.PaymentMethod is PaymentMethod.Giropay or PaymentMethod.iDeal )
+            
+            if (settings.PaymentMethod is PaymentMethod.Giropay or PaymentMethod.iDeal && paymentRequest.Ticket is null)
             {
                 currencyConversion = await _currencyService.Exchange(
-                                    paymentRequest.Currency,
-                                    Currencies.EUR.ToString(),
-                                    paymentRequest.Amount,
-                                    settings.Markup);
+                    paymentRequest.Currency,
+                    Currencies.EUR.ToString(),
+                    paymentRequest.Amount,
+                    settings.Markup);
 
-                request.Amount.Value = currencyConversion.ToAmount.ToString();
+                paymentRequest.Amount = currencyConversion.ToAmount;
             }
+
+            IMollieRequestBuilder requestBuilder = CreateRequestBuilder(settings);
+            var request = requestBuilder.BuildMolliePaymentRequest(paymentRequest, settings.PaymentMethod);
+
             try
             {
-
                 var paymentResult = await _mollieClient.CreatePayment(request);
 
                 return new MollieStatusDetails
@@ -142,7 +144,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
                 return new MollieStatusDetails
                 {
                     IsSuccess = false,
-                    Errors = new List<string> { exception.Content }
+                    Errors = new List<string> {exception.Content}
                 };
             }
         }
@@ -167,11 +169,11 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
 
         private IMollieRequestBuilder CreateRequestBuilder(PaymentSetting settings)
         {
-            /// NOTE: probably this part is useless and need to remove (giropay and ideal have the same request build options)
+            // NOTE: probably this part is useless and need to remove (giropay and ideal have the same request build options)
             return settings switch
             {
-                { PaymentMethod: PaymentMethod.Giropay } => new MollieRequestBuilder(_options),
-                { PaymentMethod: PaymentMethod.iDeal } => new MollieRequestBuilder(_options),
+                {PaymentMethod: PaymentMethod.Giropay} => new MollieRequestBuilder(_options),
+                {PaymentMethod: PaymentMethod.iDeal} => new MollieRequestBuilder(_options),
                 _ => throw new NotImplementedException()
             };
         }

@@ -32,9 +32,7 @@ namespace BccPay.Core.Cqrs.Queries
             var normalizedPayments = NormalizePayments(payments);
 
             var paymentsCsvByteArray = ExportPaymentsToCsvQuery.CreateCSVEncodedPaymentResults(normalizedPayments.OrderByDescending(payment
-                => payment.Updated is null
-                ? payment.Created
-                : payment.Updated)
+                => payment.Updated ?? payment.Created)
                     .Reverse()
                     .ToList());
 
