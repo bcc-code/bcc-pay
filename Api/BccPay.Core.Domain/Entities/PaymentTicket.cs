@@ -17,7 +17,7 @@ namespace BccPay.Core.Domain.Entities
         public string CountryCode { get; set; }
 
         public Currencies BaseCurrency { get; set; }
-        public Currencies DefinedCurrency { get; set; }
+        public Currencies OtherCurrency { get; set; }
 
         public decimal? BaseCurrencyAmount { get; set; }
         public decimal? OtherCurrencyAmount { get; set; }
@@ -42,7 +42,7 @@ namespace BccPay.Core.Domain.Entities
             PaymentDefinitionId = paymentDefinitionId;
             BaseCurrency = baseCurrency;
             CountryCode = countryCode;
-            DefinedCurrency = definedCurrency;
+            OtherCurrency = definedCurrency;
             ExchangeRate = exchangeRate;
         }
 

@@ -1,9 +1,12 @@
-﻿namespace BccPay.Core.Infrastructure.Dtos
+﻿using BccPay.Core.Domain.Entities;
+
+namespace BccPay.Core.Infrastructure.Dtos
 {
     public class PaymentRequestDto
     {
         public string PaymentId { get; set; }
-        public string Currency { get; set; }
+        public string BaseCurrency { get; set; }
+        public string OtherCurrency { get; set; }
         public decimal Amount { get; set; }
 
         public string Email { get; set; }
@@ -17,5 +20,6 @@
         public bool IsMobile { get; set; }
         public bool IsHostedCheckout { get; set; }
         public AddressDto Address { get; set; }
+        public PaymentTicket Ticket { get; set; }
     }
 }

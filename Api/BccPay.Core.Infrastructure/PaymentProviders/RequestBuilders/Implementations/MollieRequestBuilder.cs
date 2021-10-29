@@ -20,16 +20,15 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
         public MolliePaymentRequest BuildMolliePaymentRequest(PaymentRequestDto paymentRequest,
             PaymentMethod paymentMethod)
         {
-            string normalizedAmount = String.Format("{0:0.00}", paymentRequest.Amount.TwoDigitsAfterPoint());
             return new MolliePaymentRequest
             {
                 Amount = new MollieAmount
                 {
-                    Currency = Currencies.EUR.ToString(),
-                    Value = normalizedAmount
+                    Currency = paymentRequest.Ticket?.OtherCurrency.ToString() ?? paymentRequest.OtherCurrency, // TODO: change default value
+                    Value = $"{paymentRequest.Ticket?.OtherCurrencyAmount?.TwoDigitsAfterPoint() ?? paymentRequest.Amount.TwoDigitsAfterPoint()}"
                 },
                 Locale = GetLocale(paymentRequest.AcceptLanguage),
-                Method = new string[] {paymentMethod.ToString().ToLower()},
+                Method = new[] {paymentMethod.ToString().ToLower()},
                 Description = paymentRequest.Description,
                 RedirectUrl = GetRedirectUrl(paymentRequest.IsMobile),
                 WebhookUrl = _options.WebhookUrl + $"/{paymentRequest.PaymentId}",
