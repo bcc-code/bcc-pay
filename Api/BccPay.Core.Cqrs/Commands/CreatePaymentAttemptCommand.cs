@@ -77,17 +77,34 @@ namespace BccPay.Core.Cqrs.Commands
             if (payment.PaymentStatus is PaymentStatus.Closed or PaymentStatus.Paid or PaymentStatus.Refunded)
                 throw new UpdatePaymentAttemptForbiddenException("Payment is completed.");
 
-            var countryCode = AddressConverter.ConvertCountry(request.CountryCode ?? payment.CountryCode);
+            PaymentProviderDefinition paymentProviderDefinition = null;
+            PaymentTicket ticket = null;
 
-            var paymentConfiguration = await _documentSession.LoadAsync<PaymentProviderDefinition>(
-                                           PaymentProviderDefinition.GetDocumentId(request.ProviderDefinitionId),
-                                           cancellationToken)
-                                       ?? throw new Exception("Invalid payment configuration ID");
+            if (request.TicketId is not null)
+            {
+                ticket = await _documentSession.LoadAsync<PaymentTicket>(
+                    PaymentTicket.GetDocumentId(request.TicketId.Value), cancellationToken);
+
+                paymentProviderDefinition = await _documentSession.LoadAsync<PaymentProviderDefinition>(
+                    PaymentProviderDefinition.GetDocumentId(ticket.PaymentDefinitionId),
+                    cancellationToken);
+            }
+            else
+            {
+                paymentProviderDefinition = await _documentSession.LoadAsync<PaymentProviderDefinition>(
+                                                PaymentProviderDefinition.GetDocumentId(request.ProviderDefinitionId),
+                                                cancellationToken)
+                                            ?? throw new Exception("Invalid payment configuration ID");
+            }
+
+            var countryCode = AddressConverter.ConvertCountry(ticket is not null
+                ? ticket.CountryCode
+                : request.CountryCode ?? payment.CountryCode);
 
             var countryAvailableConfigurations =
                 await _mediator.Send(new GetPaymentConfigurationsByQuery(countryCode), cancellationToken);
 
-            var provider = _paymentProviderFactory.GetPaymentProvider(paymentConfiguration.Provider);
+            var provider = _paymentProviderFactory.GetPaymentProvider(paymentProviderDefinition.Provider);
 
             if (payment.Attempts?.Count >= 1)
             {
@@ -104,18 +121,13 @@ namespace BccPay.Core.Cqrs.Commands
             }
 
             if (!countryAvailableConfigurations.PaymentConfigurations.Any(x =>
-                x.PaymentProviderDefinitionIds.Contains(request.ProviderDefinitionId)))
+                x.PaymentProviderDefinitionIds.Contains(paymentProviderDefinition.PaymentDefinitionCode)))
                 throw new InvalidPaymentException(
                     $"The payment configuration {request.ProviderDefinitionId} is not available for the country '{countryCode}'");
 
             (string phonePrefix, string phoneBody) =
                 PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);
 
-            PaymentTicket ticket = null;
-            
-            if (request.TicketId is not null)
-                ticket = await _documentSession.LoadAsync<PaymentTicket>(PaymentTicket.GetDocumentId(request.TicketId.Value), cancellationToken);
-            
             var paymentRequest = new PaymentRequestDto
             {
                 PaymentId = payment.PaymentId.ToString(),
@@ -135,7 +147,8 @@ namespace BccPay.Core.Cqrs.Commands
                 LastName = request.LastName,
                 PhoneNumberBody = phoneBody,
                 PhoneNumberPrefix = phonePrefix,
-                Currency = payment.CurrencyCode,
+                BaseCurrency = payment.CurrencyCode,
+                OtherCurrency = paymentProviderDefinition.Settings.Currency.ToString(),
                 NotificationAccessToken = Guid.NewGuid().ToString(),
                 AcceptLanguage = request.AcceptLanguage,
                 Description = payment.Description,
@@ -144,18 +157,18 @@ namespace BccPay.Core.Cqrs.Commands
                 Ticket = ticket
             };
 
-            var providerResult = await provider.CreatePayment(paymentRequest, paymentConfiguration.Settings);
+            var providerResult = await provider.CreatePayment(paymentRequest, paymentProviderDefinition.Settings);
 
             var attemptToAdd = new Attempt
             {
                 PaymentAttemptId = Guid.NewGuid(),
-                PaymentMethod = paymentConfiguration.Settings.PaymentMethod,
+                PaymentMethod = paymentProviderDefinition.Settings.PaymentMethod,
                 AttemptStatus = providerResult.IsSuccess ? AttemptStatus.Processing : AttemptStatus.Failed,
                 Created = DateTime.UtcNow,
                 StatusDetails = providerResult,
                 CountryCode = countryCode,
                 NotificationAccessToken = paymentRequest.NotificationAccessToken,
-                PaymentProvider = paymentConfiguration.Provider,
+                PaymentProvider = paymentProviderDefinition.Provider,
                 ProviderDefinitionId = request.ProviderDefinitionId
             };
 

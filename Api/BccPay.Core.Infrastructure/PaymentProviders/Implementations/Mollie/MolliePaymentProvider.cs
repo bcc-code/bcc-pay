@@ -113,8 +113,8 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
             if (settings.PaymentMethod is PaymentMethod.Giropay or PaymentMethod.iDeal && paymentRequest.Ticket is null)
             {
                 currencyConversion = await _currencyService.Exchange(
-                    paymentRequest.Currency,
-                    Currencies.EUR.ToString(),
+                    paymentRequest.BaseCurrency,
+                    paymentRequest.OtherCurrency,
                     paymentRequest.Amount,
                     settings.Markup);
 

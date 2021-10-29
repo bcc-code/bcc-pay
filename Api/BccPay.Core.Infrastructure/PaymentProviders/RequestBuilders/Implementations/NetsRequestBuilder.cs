@@ -38,7 +38,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
             Order order = new()
             {
                 Amount = amountInCoins,
-                Currency = paymentRequest.Currency,
+                Currency = paymentRequest.BaseCurrency,
                 Items =
                     new List<Item>
                     {

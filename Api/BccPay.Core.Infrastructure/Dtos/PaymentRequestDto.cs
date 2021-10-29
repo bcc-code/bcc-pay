@@ -5,7 +5,8 @@ namespace BccPay.Core.Infrastructure.Dtos
     public class PaymentRequestDto
     {
         public string PaymentId { get; set; }
-        public string Currency { get; set; }
+        public string BaseCurrency { get; set; }
+        public string OtherCurrency { get; set; }
         public decimal Amount { get; set; }
 
         public string Email { get; set; }
