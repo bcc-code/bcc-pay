@@ -70,7 +70,6 @@ namespace BccPay.Core.Cqrs.Commands
         public async Task<IStatusDetails> Handle(CreatePaymentAttemptCommand request,
             CancellationToken cancellationToken)
         {
-            request.TicketId = Guid.Parse("f8926da7-570d-4193-8778-061dc9b635e3");
             var payment = await _documentSession.LoadAsync<Payment>(
                               Payment.GetDocumentId(request.PaymentId), cancellationToken)
                           ?? throw new NotFoundException("Invalid payment ID");
