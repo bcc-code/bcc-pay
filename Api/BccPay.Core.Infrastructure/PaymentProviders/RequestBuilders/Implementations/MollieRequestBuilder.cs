@@ -24,8 +24,8 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
             {
                 Amount = new MollieAmount
                 {
-                    Currency = paymentRequest.Ticket?.OtherCurrency.ToString() ?? paymentRequest.OtherCurrency, // TODO: change default value
-                    Value = $"{paymentRequest.Ticket?.OtherCurrencyAmount?.TwoDigitsAfterPoint() ?? paymentRequest.Amount.TwoDigitsAfterPoint()}"
+                    Currency = Currencies.EUR.ToString(),
+                    Value =  $"{paymentRequest.Ticket?.OtherCurrencyAmount?.TwoDigitsAfterPoint() ?? paymentRequest.Amount.TwoDigitsAfterPoint():0.00}"
                 },
                 Locale = GetLocale(paymentRequest.AcceptLanguage),
                 Method = new[] {paymentMethod.ToString().ToLower()},

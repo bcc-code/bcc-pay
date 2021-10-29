@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Helpers;
+using BccPay.Core.Shared.Converters;
 using MediatR;
 
 namespace BccPay.Core.Cqrs.Queries
@@ -61,8 +62,8 @@ namespace BccPay.Core.Cqrs.Queries
                         details.PaymentMethod,
                         fromCurrencyValue,
                         details.Currency,
-                        request.Amount,
-                        currencyConversionResult?.ToAmount ?? request.Amount));
+                        request.Amount.TwoDigitsAfterPoint(),
+                        currencyConversionResult?.ToAmount.TwoDigitsAfterPoint() ?? request.Amount.TwoDigitsAfterPoint()));
                 }
             }
 
