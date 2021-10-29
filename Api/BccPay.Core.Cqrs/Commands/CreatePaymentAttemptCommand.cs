@@ -20,10 +20,6 @@ namespace BccPay.Core.Cqrs.Commands
 {
     public class CreatePaymentAttemptCommand : IRequest<IStatusDetails>
     {
-        public CreatePaymentAttemptCommand()
-        {
-        }
-
         public Guid PaymentId { get; set; }
         public string ProviderDefinitionId { get; set; }
         public string AcceptLanguage { get; set; }
@@ -40,6 +36,7 @@ namespace BccPay.Core.Cqrs.Commands
         public string PostalCode { get; set; }
         public bool IsMobile { get; set; }
         public bool IsHostedCheckout { get; set; }
+        public Guid? TicketId { get; set; }
     }
 
     public class CreatePaymentAttemptValidator : AbstractValidator<CreatePaymentAttemptCommand>
@@ -114,6 +111,11 @@ namespace BccPay.Core.Cqrs.Commands
             (string phonePrefix, string phoneBody) =
                 PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);
 
+            PaymentTicket ticket = null;
+            
+            if (request.TicketId is not null)
+                ticket = await _documentSession.LoadAsync<PaymentTicket>(PaymentTicket.GetDocumentId(request.TicketId.Value), cancellationToken);
+            
             var paymentRequest = new PaymentRequestDto
             {
                 PaymentId = payment.PaymentId.ToString(),
@@ -138,7 +140,8 @@ namespace BccPay.Core.Cqrs.Commands
                 AcceptLanguage = request.AcceptLanguage,
                 Description = payment.Description,
                 IsMobile = request.IsMobile,
-                IsHostedCheckout = request.IsHostedCheckout
+                IsHostedCheckout = request.IsHostedCheckout,
+                Ticket = ticket
             };
 
             var providerResult = await provider.CreatePayment(paymentRequest, paymentConfiguration.Settings);
