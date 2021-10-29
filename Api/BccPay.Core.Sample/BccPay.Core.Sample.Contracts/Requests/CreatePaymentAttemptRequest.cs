@@ -17,6 +17,5 @@ namespace BccPay.Core.Sample.Contracts.Requests
         public string City { get; set; }
         public string PostalCode { get; set; }
         public bool IsHostedCheckout { get; set; }
-        public Guid? TicketId { get; set; }
     }
 }
