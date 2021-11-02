@@ -26,36 +26,38 @@ namespace BccPay.Core.Cqrs.Queries
 
         public async Task<byte[]> Handle(GetPaymentsBase64CsvQuery request, CancellationToken cancellationToken)
         {
-            var payments = await _documentSession.Query<Payment>()
-                .ToListAsync(token: cancellationToken);
+            var query = _documentSession.Query<Payment>();
+
+            var results = await _documentSession.Advanced.StreamAsync(query, cancellationToken);
+
+            List<Payment> payments = new();
+
+            while (await results.MoveNextAsync())
+            {
+                payments.Add(results.Current.Document);
+            }
 
             var normalizedPayments = NormalizePayments(payments);
 
-            var paymentsCsvByteArray = ExportPaymentsToCsvQuery.CreateCSVEncodedPaymentResults(normalizedPayments.OrderByDescending(payment
-                => payment.Updated ?? payment.Created)
-                    .Reverse()
-                    .ToList());
+            var paymentsCsvByteArray = ExportPaymentsToCsvQuery.CreateCSVEncodedPaymentResults(normalizedPayments
+                .OrderByDescending(payment
+                    => payment.Updated ?? payment.Created)
+                .Reverse()
+                .ToList());
 
             return paymentsCsvByteArray;
         }
 
-        private static List<NormalizePayment> NormalizePayments(List<Payment> payments)
+        private static IEnumerable<NormalizePayment> NormalizePayments(List<Payment> payments)
         {
             var normalized = new List<NormalizePayment>();
 
             foreach (Payment payment in payments)
             {
                 if (payment.Attempts is not null)
-                {
-                    foreach (Attempt attempt in payment.Attempts)
-                    {
-                        normalized.Add(new NormalizePayment(payment, attempt));
-                    }
-                }
+                    normalized.AddRange(payment.Attempts.Select(attempt => new NormalizePayment(payment, attempt)));
                 else
-                {
                     normalized.Add(new NormalizePayment(payment));
-                }
             }
 
             return normalized;
