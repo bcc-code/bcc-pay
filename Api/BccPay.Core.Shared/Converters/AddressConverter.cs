@@ -40,11 +40,15 @@ namespace BccPay.Core.Shared.Converters
                 if (inputValue.Length >= 4)
                     countryInformation = Countries.GetCountryByShortName(inputValue);
 
+                if (countryInformation is null)
+                    return "default";
+                
                 return countryCodeFormat switch
                 {
                     CountryCodeFormat.Alpha2 => countryInformation?.Alpha2.ToString(),
                     CountryCodeFormat.Alpha3 => countryInformation?.Alpha3.ToString(),
                     CountryCodeFormat.Numeric => countryInformation?.Numeric.ToString(),
+                    CountryCodeFormat.ShortName => countryInformation?.ShortName,
                     _ => countryInformation?.Alpha3.ToString(),
                 };
             }

@@ -6,6 +6,7 @@ using BccPay.Core.Infrastructure.Configuration;
 using BccPay.Core.Sample.Mappers;
 using BccPay.Core.Sample.Middleware;
 using BccPay.Core.Sample.Validation;
+using BccPay.Core.Shared.Helpers;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -38,6 +39,12 @@ namespace BccPay.Core.Sample
 
             services.ConfigureBccPayInfrastructureServices(bccPay =>
             {
+                bccPay.AddCustomSettings(options =>
+                {
+                    options.StoreCountryCodeFormat = CountryCodeFormat.Alpha2;
+                    options.DisplayCountryCodeFormat = CountryCodeFormat.ShortName;
+                });
+
                 bccPay.AddFixer(options => options.BaseAddress = "https://data.fixer.io");
 
                 bccPay.AddMollie(options =>

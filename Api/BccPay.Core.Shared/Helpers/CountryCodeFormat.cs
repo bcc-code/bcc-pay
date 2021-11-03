@@ -14,6 +14,6 @@
         /// tree-digits
         /// </summary>
         Numeric,
-        FullName
+        ShortName
     }
 }

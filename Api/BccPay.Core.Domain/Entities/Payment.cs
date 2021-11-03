@@ -107,7 +107,7 @@ namespace BccPay.Core.Domain.Entities
         }
 
         public void AddAttempt(
-            List<Attempt> attempts)
+            IEnumerable<Attempt> attempts)
         {
             if (Attempts?.Any() == true)
             {
