@@ -10,7 +10,7 @@ namespace BccPay.Core.Shared.Converters
         /// Temp solution TODO: return value in accordance to payment provider requirements
         /// </summary>
         /// <param name="inputValue"></param>
-        /// <param name="provider"></param>
+        /// <param name="countryCodeFormat"></param>
         /// <returns></returns>
         public static string ConvertCountry(string inputValue, CountryCodeFormat countryCodeFormat = CountryCodeFormat.Alpha3)
         {
@@ -18,16 +18,20 @@ namespace BccPay.Core.Shared.Converters
             {
                 Country countryInformation = null;
 
-                if (inputValue.Length == 2)
+                switch (inputValue.Length)
                 {
-                    var normalize = inputValue.ToUpper();
-                    countryInformation = Countries.GetCountryByAlpha2(normalize);
-                }
-
-                if (inputValue.Length == 3)
-                {
-                    var normalize = inputValue.ToUpper();
-                    countryInformation = Countries.GetCountryByAlpha3(normalize);
+                    case 2:
+                        {
+                            var normalize = inputValue.ToUpper();
+                            countryInformation = Countries.GetCountryByAlpha2(normalize);
+                            break;
+                        }
+                    case 3:
+                        {
+                            var normalize = inputValue.ToUpper();
+                            countryInformation = Countries.GetCountryByAlpha3(normalize);
+                            break;
+                        }
                 }
 
                 if (int.TryParse(inputValue, out int countryCodeNumeric))

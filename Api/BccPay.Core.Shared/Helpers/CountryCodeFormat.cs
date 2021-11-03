@@ -13,6 +13,7 @@
         /// <summary>
         /// tree-digits
         /// </summary>
-        Numeric
+        Numeric,
+        FullName
     }
 }
