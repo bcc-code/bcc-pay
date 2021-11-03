@@ -27,19 +27,17 @@ namespace Microsoft.Extensions.DependencyInjection
             configuration(defaultOptions);
             CheckSettings(defaultOptions);
 
-            services.AddScoped<IPaymentProvider, NetsPaymentProvider>(implementationFactory =>
-            {
-                return new NetsPaymentProvider(implementationFactory.GetRequiredService<INetsClient>(),
-                    defaultOptions.Nets,
-                    implementationFactory.GetRequiredService<IHttpContextAccessor>());
-            });
+            services.AddTransient(_ => defaultOptions.Settings);
+
+            services.AddScoped<IPaymentProvider, NetsPaymentProvider>(implementationFactory => new NetsPaymentProvider(
+                implementationFactory.GetRequiredService<INetsClient>(),
+                defaultOptions.Nets,
+                implementationFactory.GetRequiredService<IHttpContextAccessor>()));
 
             services.AddScoped<IPaymentProvider, MolliePaymentProvider>(implementationFactory =>
-            {
-                return new MolliePaymentProvider(defaultOptions.Mollie,
+                new MolliePaymentProvider(defaultOptions.Mollie,
                     implementationFactory.GetRequiredService<IMollieClient>(),
-                    implementationFactory.GetRequiredService<ICurrencyService>());
-            });
+                    implementationFactory.GetRequiredService<ICurrencyService>()));
 
             services.AddScoped<IPaymentProviderFactory, PaymentProviderFactory>();
             services.AddScoped<IPaymentConfigurationsService, PaymentConfigurationsService>();
@@ -50,7 +48,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .ConfigureHttpClient(client =>
                 {
                     client.BaseAddress = new Uri(defaultOptions.Mollie.BaseAddress);
-                    client.DefaultRequestHeaders.TryAddWithoutValidation(HeaderNames.Authorization, $"Bearer {defaultOptions.Mollie.AuthToken}");
+                    client.DefaultRequestHeaders.TryAddWithoutValidation(HeaderNames.Authorization,
+                        $"Bearer {defaultOptions.Mollie.AuthToken}");
                 });
             services.AddRefitClient<IFixerClient>()
                 .ConfigureHttpClient(client => client.BaseAddress = new Uri(defaultOptions.Fixer.BaseAddress));
@@ -63,7 +62,8 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             using var serviceScope = app.ApplicationServices.CreateScope();
 
-            var paymentConfigurationsService = serviceScope.ServiceProvider.GetRequiredService<IPaymentConfigurationsService>();
+            var paymentConfigurationsService =
+                serviceScope.ServiceProvider.GetRequiredService<IPaymentConfigurationsService>();
 
             paymentConfigurationsService.InitPaymentsConfiguration();
         }

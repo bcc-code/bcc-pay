@@ -3,6 +3,8 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using BccPay.Core.Domain.Entities;
+using BccPay.Core.Infrastructure.BccPaymentSettings;
+using BccPay.Core.Shared.Converters;
 using FluentValidation;
 using MediatR;
 using Raven.Client.Documents.Session;
@@ -54,6 +56,10 @@ namespace BccPay.Core.Cqrs.Commands
                 .MinimumLength(2)
                 .MaximumLength(3)
                 .WithMessage("Invalid country code, use alpha2, alpha3 or numeric codes");
+            
+            RuleFor(x => x.Description)
+                .MinimumLength(2)
+                .WithMessage("Description is required");
 
             RuleFor(x => x.Amount)
                 .GreaterThan(0)
@@ -64,18 +70,23 @@ namespace BccPay.Core.Cqrs.Commands
     public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand, string>
     {
         private readonly IAsyncDocumentSession _documentSession;
+        private readonly InternalSettings _internalSettings;
 
-        public CreatePaymentCommandHandler(IAsyncDocumentSession documentSession)
+        public CreatePaymentCommandHandler(IAsyncDocumentSession documentSession, InternalSettings internalSettings)
         {
             _documentSession = documentSession
-                ?? throw new ArgumentNullException(nameof(documentSession));
+                               ?? throw new ArgumentNullException(nameof(documentSession));
+            _internalSettings = internalSettings
+                                ?? throw new ArgumentNullException(nameof(internalSettings));
         }
 
         public async Task<string> Handle(CreatePaymentCommand request, CancellationToken cancellationToken)
         {
             var payment = new Payment();
 
-            payment.Create(request.PayerId, request.CurrencyCode, request.CountryCode, request.Amount, request.Description, (IPaymentDetails)request.PaymentDetails, request.PaymentType);
+            payment.Create(request.PayerId, request.CurrencyCode,
+                AddressConverter.ConvertCountry(request.CountryCode, _internalSettings.StoreCountryCodeFormat),
+                request.Amount, request.Description, (IPaymentDetails)request.PaymentDetails, request.PaymentType);
 
             await _documentSession.StoreAsync(payment, cancellationToken);
             await _documentSession.SaveChangesAsync(cancellationToken);
