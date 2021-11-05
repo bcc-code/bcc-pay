@@ -91,7 +91,8 @@ namespace BccPay.Core.Cqrs.Commands
                 ? Decimal.Divide(amount.Value, exchangeRate)
                 : Decimal.Multiply(amount.Value, exchangeRate);
 
-            ticket.Update(isOppositeConversion, amount.Value, exchangeResult,
+            ticket.Update(isOppositeConversion, amount.ToAmountOfDigitsAfterPoint(),
+                exchangeResult.ToAmountOfDigitsAfterPoint(),
                 exchangeRate);
 
             await _documentSession.SaveChangesAsync(cancellationToken);
