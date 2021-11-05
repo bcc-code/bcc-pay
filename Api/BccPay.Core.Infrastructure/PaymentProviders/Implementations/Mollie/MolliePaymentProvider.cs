@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Threading.Tasks;
 using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
@@ -13,7 +12,6 @@ using BccPay.Core.Infrastructure.PaymentModels.Response.Mollie;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders;
 using BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations;
 using BccPay.Core.Infrastructure.RefitClients;
-using BccPay.Core.Shared.Converters;
 using Refit;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
@@ -109,14 +107,28 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
         public async Task<IStatusDetails> CreatePayment(PaymentRequestDto paymentRequest, PaymentSetting settings)
         {
             CurrencyConversionRecord currencyConversion = null;
-            
-            if (settings.PaymentMethod is PaymentMethod.Giropay or PaymentMethod.iDeal && paymentRequest.Ticket is null)
+
+            if (settings.PaymentMethod is PaymentMethod.Giropay or PaymentMethod.iDeal)
             {
-                currencyConversion = await _currencyService.Exchange(
-                    paymentRequest.BaseCurrency,
-                    paymentRequest.OtherCurrency,
-                    paymentRequest.Amount,
-                    settings.Markup);
+                if (paymentRequest.Ticket is null)
+                {
+                    currencyConversion = await _currencyService.Exchange(
+                        paymentRequest.BaseCurrency,
+                        paymentRequest.OtherCurrency,
+                        paymentRequest.Amount,
+                        settings.Markup);
+                }
+                else
+                {
+                    var ticket = paymentRequest.Ticket;
+                    currencyConversion = new CurrencyConversionRecord(
+                        ticket.Updated,
+                        ticket.BaseCurrency,
+                        ticket.OtherCurrency,
+                        ticket.ExchangeRate,
+                        ticket.BaseCurrencyAmount.GetValueOrDefault(),
+                        ticket.OtherCurrencyAmount.GetValueOrDefault());
+                }
 
                 paymentRequest.Amount = currencyConversion.ToAmount;
             }
@@ -144,7 +156,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
                 return new MollieStatusDetails
                 {
                     IsSuccess = false,
-                    Errors = new List<string> {exception.Content}
+                    Errors = new List<string> { exception.Content }
                 };
             }
         }
@@ -172,8 +184,8 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.Implementations.Mollie
             // NOTE: probably this part is useless and need to remove (giropay and ideal have the same request build options)
             return settings switch
             {
-                {PaymentMethod: PaymentMethod.Giropay} => new MollieRequestBuilder(_options),
-                {PaymentMethod: PaymentMethod.iDeal} => new MollieRequestBuilder(_options),
+                { PaymentMethod: PaymentMethod.Giropay } => new MollieRequestBuilder(_options),
+                { PaymentMethod: PaymentMethod.iDeal } => new MollieRequestBuilder(_options),
                 _ => throw new NotImplementedException()
             };
         }
