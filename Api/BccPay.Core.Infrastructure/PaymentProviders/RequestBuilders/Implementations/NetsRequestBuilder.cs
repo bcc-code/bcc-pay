@@ -9,7 +9,7 @@ using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations
 {
-    internal class NetsRequestBuilder : INetsPaymentRequestBuilder
+    internal class NetsRequestBuilder : BaseRequestBuilder, INetsPaymentRequestBuilder
     {
         private readonly NetsProviderOptions _options;
 
@@ -60,8 +60,11 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
                 ? PaymentProviderConstants.Nets.IntegrationType.HostedPaymentPage
                 : PaymentProviderConstants.Nets.IntegrationType.EmbeddedCheckout;
             string hostedReturnUrl = paymentRequest.IsHostedCheckout
-                ? (paymentRequest.IsMobile ? _options.MobileReturnUrl : _options.ReturnUrl)
+                ? GetRedirectUrl(paymentRequest.IsMobile, _options.MobileReturnUrl, _options.ReturnUrl,
+                    paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null || false ? null : paymentRequest.PaymentId)
                 : null;
+
+
             string embeddedUrl = paymentRequest.IsHostedCheckout ? null : $"{originUrl}{_options.CheckoutPageUrl}";
 
             if (isUserDataValid)

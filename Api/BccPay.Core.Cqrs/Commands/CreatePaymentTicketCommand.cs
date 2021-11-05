@@ -27,7 +27,6 @@ namespace BccPay.Core.Cqrs.Commands
 
             RuleFor(x => x.CountryCode)
                 .MinimumLength(2)
-                .MaximumLength(3)
                 .WithMessage("Invalid country code, use alpha2, alpha3 or numeric codes");
 
             RuleFor(x => new {x.PaymentDefinitionId, x.CountryCode})
