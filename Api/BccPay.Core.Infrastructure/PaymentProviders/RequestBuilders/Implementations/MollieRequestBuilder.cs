@@ -30,7 +30,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
                 {
                     Currency = Currencies.EUR.ToString(),
                     Value =
-                        $"{paymentRequest.Ticket?.OtherCurrencyAmount?.TwoDigitsAfterPoint() ?? paymentRequest.Amount.TwoDigitsAfterPoint():0.00}"
+                        $"{paymentRequest.Ticket?.OtherCurrencyAmount?.ToAmountOfDigitsAfterPoint() ?? paymentRequest.Amount.ToAmountOfDigitsAfterPoint():0.00}"
                 },
                 Locale = GetLocale(paymentRequest.AcceptLanguage),
                 Method = new[] {paymentMethod.ToString().ToLower()},

@@ -62,8 +62,8 @@ namespace BccPay.Core.Cqrs.Queries
                         details.PaymentMethod,
                         fromCurrencyValue,
                         details.Currency,
-                        request.Amount.TwoDigitsAfterPoint(),
-                        currencyConversionResult?.ToAmount.TwoDigitsAfterPoint() ?? request.Amount.TwoDigitsAfterPoint()));
+                        request.Amount.ToAmountOfDigitsAfterPoint(),
+                        currencyConversionResult?.ToAmount.ToAmountOfDigitsAfterPoint() ?? request.Amount.ToAmountOfDigitsAfterPoint()));
                 }
             }
 
