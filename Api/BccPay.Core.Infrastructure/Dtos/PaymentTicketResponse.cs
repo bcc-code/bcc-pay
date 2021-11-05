@@ -10,6 +10,7 @@ namespace BccPay.Core.Infrastructure.Dtos
         decimal? BaseCurrencyAmount,
         decimal? OtherCurrencyAmount,
         decimal? ExchangeRate,
+        decimal? OppositeExchangeRate,
         DateTime? LastUpdate,
         string PaymentDefinition,
         string CountryCode);

@@ -19,6 +19,7 @@ namespace BccPay.Core.Infrastructure.Dtos
         public string AcceptLanguage { get; set; }
         public bool IsMobile { get; set; }
         public bool IsHostedCheckout { get; set; }
+        public bool? UsePaymentIdAsRouteInRedirectUrl { get; set; }
         public AddressDto Address { get; set; }
         public PaymentTicket Ticket { get; set; }
     }

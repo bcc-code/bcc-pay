@@ -29,7 +29,8 @@ namespace BccPay.Core.Cqrs.Queries
             if (ticket is not null && !((ticket.Updated ?? ticket.Created) < DateTime.UtcNow.AddHours(-1)))
                 return new PaymentTicketResponse(ticket.TicketId, ticket.BaseCurrency, ticket.OtherCurrency,
                     ticket.BaseCurrencyAmount, ticket.OtherCurrencyAmount,
-                    ticket.ExchangeRate, ticket.Updated ?? ticket.Created, ticket.PaymentDefinitionId,
+                    ticket.ExchangeRate, 1 / ticket.ExchangeRate, ticket.Updated ?? ticket.Created,
+                    ticket.PaymentDefinitionId,
                     ticket.CountryCode);
 
             throw new Exception("Ticket is not valid");

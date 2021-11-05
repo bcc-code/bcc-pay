@@ -37,6 +37,7 @@ namespace BccPay.Core.Cqrs.Commands
         public bool IsMobile { get; set; }
         public bool IsHostedCheckout { get; set; }
         public Guid? TicketId { get; set; }
+        public bool? UsePaymentIdAsRouteInRedirectUrl { get; set; }
     }
 
     public class CreatePaymentAttemptValidator : AbstractValidator<CreatePaymentAttemptCommand>
@@ -158,7 +159,8 @@ namespace BccPay.Core.Cqrs.Commands
                 Description = payment.Description,
                 IsMobile = request.IsMobile,
                 IsHostedCheckout = request.IsHostedCheckout,
-                Ticket = ticket
+                Ticket = ticket,
+                UsePaymentIdAsRouteInRedirectUrl = request.UsePaymentIdAsRouteInRedirectUrl
             };
 
             var providerResult = await provider.CreatePayment(paymentRequest, paymentProviderDefinition.Settings);

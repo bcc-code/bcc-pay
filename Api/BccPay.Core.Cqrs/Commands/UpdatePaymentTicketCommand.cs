@@ -95,10 +95,10 @@ namespace BccPay.Core.Cqrs.Commands
                 exchangeRate);
 
             await _documentSession.SaveChangesAsync(cancellationToken);
-
+            
             return new PaymentTicketResponse(ticket.TicketId, ticket.BaseCurrency, ticket.OtherCurrency,
                 ticket.BaseCurrencyAmount, ticket.OtherCurrencyAmount,
-                ticket.ExchangeRate, ticket.Updated, ticket.PaymentDefinitionId, ticket.CountryCode);
+                ticket.ExchangeRate, 1 / ticket.ExchangeRate, ticket.Updated, ticket.PaymentDefinitionId, ticket.CountryCode);
         }
     }
 }
