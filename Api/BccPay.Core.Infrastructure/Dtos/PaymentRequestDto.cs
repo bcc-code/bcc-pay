@@ -8,6 +8,7 @@ namespace BccPay.Core.Infrastructure.Dtos
         public string BaseCurrency { get; set; }
         public string OtherCurrency { get; set; }
         public decimal Amount { get; set; }
+        public string AttemptId { get; set; }
 
         public string Email { get; set; }
         public string PhoneNumberPrefix { get; set; }

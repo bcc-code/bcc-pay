@@ -133,6 +133,17 @@ namespace BccPay.Core.Cqrs.Commands
             (string phonePrefix, string phoneBody) =
                 PhoneNumberConverter.ParseToNationalNumberAndPrefix(request.PhoneNumber);
 
+
+            var attemptToAdd = new Attempt
+            {
+                PaymentAttemptId = Guid.NewGuid(),
+                PaymentMethod = paymentProviderDefinition.Settings.PaymentMethod,
+                Created = DateTime.UtcNow,
+                CountryCode = countryCode,
+                PaymentProvider = paymentProviderDefinition.Provider,
+                ProviderDefinitionId = request.ProviderDefinitionId
+            };
+
             var paymentRequest = new PaymentRequestDto
             {
                 PaymentId = payment.PaymentId.ToString(),
@@ -160,26 +171,18 @@ namespace BccPay.Core.Cqrs.Commands
                 IsMobile = request.IsMobile,
                 IsHostedCheckout = request.IsHostedCheckout,
                 Ticket = ticket,
-                UsePaymentIdAsRouteInRedirectUrl = request.UsePaymentIdAsRouteInRedirectUrl
+                UsePaymentIdAsRouteInRedirectUrl = request.UsePaymentIdAsRouteInRedirectUrl,
+                AttemptId = attemptToAdd.PaymentAttemptId.ToString()
             };
 
             var providerResult = await provider.CreatePayment(paymentRequest, paymentProviderDefinition.Settings);
 
-            var attemptToAdd = new Attempt
-            {
-                PaymentAttemptId = Guid.NewGuid(),
-                PaymentMethod = paymentProviderDefinition.Settings.PaymentMethod,
-                AttemptStatus = providerResult.IsSuccess ? AttemptStatus.Processing : AttemptStatus.Failed,
-                Created = DateTime.UtcNow,
-                StatusDetails = providerResult,
-                CountryCode = countryCode,
-                NotificationAccessToken = paymentRequest.NotificationAccessToken,
-                PaymentProvider = paymentProviderDefinition.Provider,
-                ProviderDefinitionId = request.ProviderDefinitionId
-            };
+            attemptToAdd.StatusDetails = providerResult;
+            attemptToAdd.AttemptStatus = providerResult.IsSuccess ? AttemptStatus.Processing : AttemptStatus.Failed;
+            attemptToAdd.NotificationAccessToken = paymentRequest.NotificationAccessToken;
 
             payment.Updated = DateTime.UtcNow;
-            payment.AddAttempt(new List<Attempt> {attemptToAdd});
+            payment.AddAttempt(new List<Attempt> { attemptToAdd });
             await _documentSession.SaveChangesAsync(cancellationToken);
 
             return providerResult;
