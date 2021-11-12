@@ -38,7 +38,8 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
                 RedirectUrl = GetRedirectUrl(paymentRequest.IsMobile,
                     _options.RedirectUrlMobileApp,
                     _options.RedirectUrl,
-                    paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null || false ? null : paymentRequest.PaymentId),
+                    paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null || false ? null : paymentRequest.PaymentId,
+                paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null || false ? null : paymentRequest.AttemptId),
                 WebhookUrl = _options.WebhookUrl + $"/{paymentRequest.PaymentId}",
                 Links = new { }
             };
