@@ -7,6 +7,7 @@ using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.BccPaymentSettings;
+using BccPay.Core.Shared.Constants;
 using BccPay.Core.Shared.Converters;
 using BccPay.Core.Shared.Helpers;
 using MediatR;
@@ -69,7 +70,7 @@ namespace BccPay.Core.Cqrs.Queries
                 query = query.Where(paymentConfiguration
                     => paymentConfiguration.CountryCode.In(new string[]
                     {
-                        convertCountry, Country.DefaultCountryCode
+                        convertCountry, BccPayConstants.Default
                     }));
             }
 

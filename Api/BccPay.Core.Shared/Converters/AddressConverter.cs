@@ -1,4 +1,5 @@
 ﻿using System;
+using BccPay.Core.Shared.Constants;
 using BccPay.Core.Shared.Helpers;
 using Bia.Countries.Iso3166;
 
@@ -41,7 +42,7 @@ namespace BccPay.Core.Shared.Converters
                     countryInformation = Countries.GetCountryByShortName(inputValue);
 
                 if (countryInformation is null)
-                    return "default";
+                    return BccPayConstants.Default;
                 
                 return countryCodeFormat switch
                 {

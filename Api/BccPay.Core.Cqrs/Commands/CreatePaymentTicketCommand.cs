@@ -6,6 +6,7 @@ using BccPay.Core.Domain;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 using BccPay.Core.Infrastructure.Helpers;
+using BccPay.Core.Shared.Constants;
 using FluentValidation;
 using MediatR;
 using Raven.Client.Documents;
@@ -48,6 +49,9 @@ namespace BccPay.Core.Cqrs.Commands
 
             if (definition is null)
                 return false;
+
+            if (countryCode == BccPayConstants.Default)
+                return true;
 
             var isAvailableInCountry = await _documentSession
                 .Query<PaymentConfiguration>()
