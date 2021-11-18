@@ -30,7 +30,7 @@ namespace BccPay.Core.Cqrs.Commands
                 .MinimumLength(2)
                 .WithMessage("Invalid country code, use alpha2, alpha3 or numeric codes");
 
-            RuleFor(x => new {x.PaymentDefinitionId, x.CountryCode})
+            RuleFor(x => new { x.PaymentDefinitionId, x.CountryCode })
                 .MustAsync(
                     async (condition, cancellationToken) => await IsDefinitionValid(condition.PaymentDefinitionId,
                         condition.CountryCode, cancellationToken))
@@ -53,13 +53,12 @@ namespace BccPay.Core.Cqrs.Commands
             if (countryCode == BccPayConstants.Default)
                 return true;
 
-            var isAvailableInCountry = await _documentSession
+            var availableConfigurations = await _documentSession
                 .Query<PaymentConfiguration>()
-                .Where(x => x.CountryCode == countryCode)
                 .Where(x => x.PaymentProviderDefinitionIds.Contains(definitionId))
-                .AnyAsync(cancellationToken);
+                .ToListAsync(cancellationToken);
 
-            return isAvailableInCountry;
+            return availableConfigurations.Where(x => x.CountryCode == BccPayConstants.Default || x.CountryCode == countryCode).Any();
         }
     }
 
