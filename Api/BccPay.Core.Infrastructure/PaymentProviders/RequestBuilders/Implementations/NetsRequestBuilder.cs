@@ -59,11 +59,14 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
             string integrationType = paymentRequest.IsHostedCheckout
                 ? PaymentProviderConstants.Nets.IntegrationType.HostedPaymentPage
                 : PaymentProviderConstants.Nets.IntegrationType.EmbeddedCheckout;
-            string hostedReturnUrl = paymentRequest.IsHostedCheckout
-                ? GetRedirectUrl(paymentRequest.IsMobile, _options.MobileReturnUrl, _options.ReturnUrl,
-                    paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null || false ? null : paymentRequest.PaymentId)
-                : null;
 
+            var hostedUrl = GetRedirectUrl(paymentRequest.IsMobile, 
+                _options.MobileReturnUrl, 
+                _options.ReturnUrl,
+                paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null || false ? null : paymentRequest.PaymentId,
+                paymentRequest.AttemptId);
+            
+            string hostedReturnUrl = paymentRequest.IsHostedCheckout ? hostedUrl : null;
 
             string embeddedUrl = paymentRequest.IsHostedCheckout ? null : $"{originUrl}{_options.CheckoutPageUrl}";
 

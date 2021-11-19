@@ -64,7 +64,7 @@ namespace BccPay.Core.Sample
                     options.SecretKey = Configuration["NetsSecretKey"];
                     options.NotificationUrl = "https://localhost:5001/Payment/webhook/";
                     options.MobileReturnUrl = "com.ionic.samvirk://membership";
-                    options.ReturnUrl = "https://my.test.samvirk.com/membership";
+                    options.ReturnUrl = "https://my.test.samvirk.com/payments/{{paymentId}}/attempts/{{attemptId}}/status";
                 });
             });
 
