@@ -54,9 +54,15 @@ namespace BccPay.Core.Sample.API.Controllers
         [HttpGet("csv")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetPaymentsCsv()
+        public async Task<IActionResult> GetPaymentsCsv([FromQuery] PaymentFilters filters)
         {
-            var query = new GetPaymentsBase64CsvQuery();
+            var query = new GetPaymentsBase64CsvQuery(
+                filters.From,
+                filters.To,
+                filters.PaymentStatus,
+                filters.IsProblematicPayment,
+                filters.PaymentType,
+                filters.PayerId);
 
             var result = await Mediator.Send(query);
 

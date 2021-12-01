@@ -5,15 +5,21 @@ using System.Threading;
 using System.Threading.Tasks;
 using BccPay.Core.Cqrs.CsvExports;
 using BccPay.Core.Domain.Entities;
+using BccPay.Core.Enums;
 using MediatR;
 using Raven.Client.Documents;
+using Raven.Client.Documents.Linq;
 using Raven.Client.Documents.Session;
 
 namespace BccPay.Core.Cqrs.Queries
 {
-    public class GetPaymentsBase64CsvQuery : IRequest<byte[]>
-    {
-    }
+    public record GetPaymentsBase64CsvQuery(
+            DateTime? From,
+            DateTime? To,
+            PaymentStatus? PaymentStatus,
+            bool? IsProblematicPayment,
+            string PaymentType = null,
+            string PayerId = null) : IRequest<byte[]>;
 
     public class GetPaymentsToCsvQueryHandler : IRequestHandler<GetPaymentsBase64CsvQuery, byte[]>
     {
@@ -27,6 +33,21 @@ namespace BccPay.Core.Cqrs.Queries
         public async Task<byte[]> Handle(GetPaymentsBase64CsvQuery request, CancellationToken cancellationToken)
         {
             var query = _documentSession.Query<Payment>();
+
+            if (request.IsProblematicPayment is not null)
+                query = query.Where(paymentIndex => paymentIndex.IsProblematic == request.IsProblematicPayment);
+
+            if (!string.IsNullOrWhiteSpace(request.PayerId))
+                query = query.Where(paymentIndex => paymentIndex.PayerId == request.PayerId);
+
+            if (!string.IsNullOrWhiteSpace(request.PaymentType))
+                query = query.Where(paymentIndex => paymentIndex.PaymentType == request.PaymentType);
+
+            if (request.PaymentStatus is not null)
+                query = query.Where(paymentIndex => paymentIndex.PaymentStatus == request.PaymentStatus);
+
+            if (request.From is not null && request.To is not null)
+                query = query.Where(paymentIndex => paymentIndex.Created >= request.From && paymentIndex.Created <= request.To);
 
             var results = await _documentSession.Advanced.StreamAsync(query, cancellationToken);
 
