@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using System.Threading;
 using System.Threading.Tasks;
 using BccPay.Core.Cqrs.CsvExports;
@@ -9,8 +8,8 @@ using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 using MediatR;
 using Raven.Client.Documents;
-using Raven.Client.Documents.Session;
 using Raven.Client.Documents.Linq;
+using Raven.Client.Documents.Session;
 
 namespace BccPay.Core.Cqrs.Queries
 {
