@@ -11,6 +11,7 @@ using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -51,9 +52,8 @@ namespace BccPay.Core.Sample
                 {
                     options.BaseAddress = "https://api.mollie.com";
                     options.AuthToken = Configuration["MollieSecretKey"];
-                    options.RedirectUrl = "https://test.api.samvirk.com/redirect";
                     options.WebhookUrl = "https://en46nkjh5kbngpp.m.pipedream.net/";
-                    options.RedirectUrlMobileApp = "com.ionic.samvirk://overview";
+                    options.RedirectUrl = "{{host}}/Payment/webhook/";
                 });
 
                 bccPay.AddNets(options =>
@@ -63,8 +63,7 @@ namespace BccPay.Core.Sample
                     options.TermsUrl = "http://localhost:8000";
                     options.SecretKey = Configuration["NetsSecretKey"];
                     options.NotificationUrl = "https://localhost:5001/Payment/webhook/";
-                    options.MobileReturnUrl = "com.ionic.samvirk://membership";
-                    options.ReturnUrl = "https://my.test.samvirk.com/payments/{{paymentId}}/attempts/{{attemptId}}/status";
+                    options.ReturnUrl = "https://localhost:2001/Payment/webhook/";
                 });
             });
 
@@ -99,6 +98,8 @@ namespace BccPay.Core.Sample
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "BccPay.Core.Sample", Version = "v1"});
             });
+            
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -112,6 +113,8 @@ namespace BccPay.Core.Sample
 
             app.UseMiddleware<ErrorHandlingMiddleware>();
 
+            HttpContextHelper.Configure(app.ApplicationServices.GetRequiredService<IHttpContextAccessor>());
+            
             app.UseHttpsRedirection();
 
             app.UseRouting();

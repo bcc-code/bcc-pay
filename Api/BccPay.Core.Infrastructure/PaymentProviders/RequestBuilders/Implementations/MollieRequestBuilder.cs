@@ -35,11 +35,10 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
                 Locale = GetLocale(paymentRequest.AcceptLanguage),
                 Method = new[] {paymentMethod.ToString().ToLower()},
                 Description = paymentRequest.Description,
-                RedirectUrl = GetRedirectUrl(paymentRequest.IsMobile,
-                    _options.RedirectUrlMobileApp,
+                RedirectUrl = GetRedirectUrl(
                     _options.RedirectUrl,
-                    paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null || false ? null : paymentRequest.PaymentId,
-                paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null || false ? null : paymentRequest.AttemptId),
+                    paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null ? null : paymentRequest.PaymentId,
+                paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null ? null : paymentRequest.AttemptId),
                 WebhookUrl = _options.WebhookUrl + $"/{paymentRequest.PaymentId}",
                 Links = new { }
             };

@@ -1,19 +1,17 @@
-﻿using BccPay.Core.Shared.Helpers;
+﻿using System.Text.RegularExpressions;
+using BccPay.Core.Shared.Helpers;
 
 namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations
 {
     internal class BaseRequestBuilder
     {
-        protected string GetRedirectUrl(bool isMobile, string forMobile, string forBrowser, string paymentId = null, string attemptId = null)
-        {
-            string schema = isMobile
-                ? forMobile
-                : forBrowser;
-
-            var result = TemplateHelper.ProcessPlaceholders<ReplaceModel>(schema, new ReplaceModel { AttemptId = attemptId, PaymentId = paymentId }, new(@"\{\{\s*(?<token>\w+)\s*\}\}"));
-
-            return result;
-        }
+        protected string GetRedirectUrl(
+            string redirectUrl, 
+            string paymentId = null,
+            string attemptId = null)
+            => TemplateHelper.ProcessPlaceholders(redirectUrl,
+                new ReplaceModel {AttemptId = attemptId, PaymentId = paymentId, Host = HttpContextHelper.AppReferrerUrl},
+                new Regex(@"\{\{\s*(?<token>\w+)\s*\}\}"));
 
         protected static string GetLocale(string browserLanguage)
         {
@@ -26,6 +24,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
         {
             public string PaymentId { get; set; }
             public string AttemptId { get; set; }
+            public string Host { get; set; }
         }
     }
 }

@@ -7,7 +7,6 @@
         public string SecretKey { get; set; }
         public string TermsUrl { get; set; }
         public string NotificationUrl { get; set; }
-        public string MobileReturnUrl { get; set; }
         public string ReturnUrl { get; set; }
     }
 }
