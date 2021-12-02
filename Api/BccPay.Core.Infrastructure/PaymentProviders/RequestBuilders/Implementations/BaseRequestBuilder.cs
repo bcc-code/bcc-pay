@@ -10,7 +10,7 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
             string paymentId = null,
             string attemptId = null)
             => TemplateHelper.ProcessPlaceholders(redirectUrl,
-                new ReplaceModel {AttemptId = attemptId, PaymentId = paymentId, Host = HttpContextHelper.AppBaseUrl},
+                new ReplaceModel {AttemptId = attemptId, PaymentId = paymentId, Host = HttpContextHelper.AppReferrerUrl},
                 new Regex(@"\{\{\s*(?<token>\w+)\s*\}\}"));
 
         protected static string GetLocale(string browserLanguage)

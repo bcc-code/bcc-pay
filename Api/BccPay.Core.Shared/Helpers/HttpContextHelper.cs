@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using Microsoft.AspNetCore.Http;
 
 namespace BccPay.Core.Shared.Helpers
 {
@@ -6,10 +7,16 @@ namespace BccPay.Core.Shared.Helpers
     {
         private static IHttpContextAccessor _httpContextAccessor;
 
-        private static HttpContext Current 
+        private static HttpContext Current
             => _httpContextAccessor.HttpContext;
 
-        public static string AppBaseUrl => Current.Request.Headers["Referer"].ToString();
+        public static string AppReferrerUrl => ClearReferrer(Current.Request.Headers["Referer"].ToString());
+
+        private static string ClearReferrer(string referer)
+        {
+            var url = new Uri(referer);
+            return $"{url.Scheme}://{url.Host}";
+        }
 
         public static void Configure(IHttpContextAccessor contextAccessor)
             => _httpContextAccessor = contextAccessor;

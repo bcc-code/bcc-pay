@@ -53,7 +53,7 @@ namespace BccPay.Core.Sample
                     options.BaseAddress = "https://api.mollie.com";
                     options.AuthToken = Configuration["MollieSecretKey"];
                     options.WebhookUrl = "https://en46nkjh5kbngpp.m.pipedream.net/";
-                    options.RedirectUrl = "https://localhost:2001/Payment/webhook/";
+                    options.RedirectUrl = "{{host}}/Payment/webhook/";
                 });
 
                 bccPay.AddNets(options =>
