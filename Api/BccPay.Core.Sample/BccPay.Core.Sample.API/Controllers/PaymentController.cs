@@ -92,12 +92,6 @@ namespace BccPay.Core.Sample.API.Controllers
                 command.AcceptLanguage = userLanguage.ToString().Substring(0, 5);
             }
 
-            if (HttpContext.Request.Headers.TryGetValue("is-mobile-app", out var isMobileApp))
-            {
-                if (Boolean.TryParse(isMobileApp, out bool isMobile))
-                    command.IsMobile = isMobile;
-            }
-
             command.PaymentId = paymentId;
 
             var result = await Mediator.Send(command);

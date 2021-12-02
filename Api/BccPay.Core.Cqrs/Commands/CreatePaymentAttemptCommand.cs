@@ -34,7 +34,6 @@ namespace BccPay.Core.Cqrs.Commands
         public string AddressLine1 { get; set; }
         public string AddressLine2 { get; set; }
         public string PostalCode { get; set; }
-        public bool IsMobile { get; set; }
         public bool IsHostedCheckout { get; set; }
         public Guid? TicketId { get; set; }
         public bool? UsePaymentIdAsRouteInRedirectUrl { get; set; }
@@ -168,7 +167,6 @@ namespace BccPay.Core.Cqrs.Commands
                 NotificationAccessToken = Guid.NewGuid().ToString(),
                 AcceptLanguage = request.AcceptLanguage,
                 Description = payment.Description,
-                IsMobile = request.IsMobile,
                 IsHostedCheckout = request.IsHostedCheckout,
                 Ticket = ticket,
                 UsePaymentIdAsRouteInRedirectUrl = request.UsePaymentIdAsRouteInRedirectUrl,

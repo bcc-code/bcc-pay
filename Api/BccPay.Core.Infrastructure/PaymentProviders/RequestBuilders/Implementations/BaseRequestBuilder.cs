@@ -5,19 +5,13 @@ namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementa
 {
     internal class BaseRequestBuilder
     {
-        protected string GetRedirectUrl(bool isMobile, string forMobile, string forBrowser, string paymentId = null,
+        protected string GetRedirectUrl(
+            string redirectUrl, 
+            string paymentId = null,
             string attemptId = null)
-        {
-            string schema = isMobile
-                ? forMobile
-                : forBrowser;
-
-            var result = TemplateHelper.ProcessPlaceholders<ReplaceModel>(schema,
+            => TemplateHelper.ProcessPlaceholders(redirectUrl,
                 new ReplaceModel {AttemptId = attemptId, PaymentId = paymentId, Host = HttpContextHelper.AppBaseUrl},
                 new Regex(@"\{\{\s*(?<token>\w+)\s*\}\}"));
-
-            return result;
-        }
 
         protected static string GetLocale(string browserLanguage)
         {

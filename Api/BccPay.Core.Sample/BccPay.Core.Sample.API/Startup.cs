@@ -53,9 +53,7 @@ namespace BccPay.Core.Sample
                     options.BaseAddress = "https://api.mollie.com";
                     options.AuthToken = Configuration["MollieSecretKey"];
                     options.WebhookUrl = "https://en46nkjh5kbngpp.m.pipedream.net/";
-                    
-                    options.RedirectUrlMobileApp = "com.ionic.samvirk://overview";
-                    options.RedirectUrl = "{{host}}/{{paymentId}}/attempts/{{attemptId}}";
+                    options.RedirectUrl = "https://localhost:2001/Payment/webhook/";
                 });
 
                 bccPay.AddNets(options =>
@@ -65,9 +63,7 @@ namespace BccPay.Core.Sample
                     options.TermsUrl = "http://localhost:8000";
                     options.SecretKey = Configuration["NetsSecretKey"];
                     options.NotificationUrl = "https://localhost:5001/Payment/webhook/";
-                    
-                    options.MobileReturnUrl = "com.ionic.samvirk://membership";
-                    options.ReturnUrl = "{{host}}/payments/{{paymentId}}/attempts/{{attemptId}}/status";
+                    options.ReturnUrl = "https://localhost:2001/Payment/webhook/";
                 });
             });
 
