@@ -9,8 +9,7 @@ namespace BccPay.Core.Shared.Helpers
         private static HttpContext Current 
             => _httpContextAccessor.HttpContext;
 
-        public static string AppBaseUrl =>
-            $"{Current.Request.Scheme}://{Current.Request.Host}{Current.Request.PathBase}";
+        public static string AppBaseUrl => Current.Request.Headers["Referer"].ToString();
 
         public static void Configure(IHttpContextAccessor contextAccessor)
             => _httpContextAccessor = contextAccessor;
