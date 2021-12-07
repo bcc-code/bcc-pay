@@ -66,7 +66,7 @@ namespace BccPay.Core.Cqrs.Commands
         }
     }
 
-    public class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand, string>
+    internal class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentCommand, string>
     {
         private readonly IAsyncDocumentSession _documentSession;
         private readonly InternalSettings _internalSettings;

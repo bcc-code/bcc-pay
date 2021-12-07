@@ -28,8 +28,7 @@ namespace BccPay.Core.Cqrs.Commands
                 .WithMessage("Not valid amount");
 
             RuleFor(x => x.TicketId)
-                .MustAsync(
-                    async (ticketId, cancellationToken) => await IsTicketValidToUse(ticketId, cancellationToken))
+                .MustAsync(IsTicketValidToUse)
                 .WithMessage("Ticket is not valid");
         }
 
@@ -51,7 +50,7 @@ namespace BccPay.Core.Cqrs.Commands
         }
     }
 
-    public class
+    internal class
         UpdatePaymentTicketCommandHandler : IRequestHandler<UpdatePaymentTicketCommand, PaymentTicketResponse>
     {
         private readonly IAsyncDocumentSession _documentSession;

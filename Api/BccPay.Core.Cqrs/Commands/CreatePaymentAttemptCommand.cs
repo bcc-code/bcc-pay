@@ -49,7 +49,7 @@ namespace BccPay.Core.Cqrs.Commands
         }
     }
 
-    public class CreatePaymentAttemptCommandHandler : IRequestHandler<CreatePaymentAttemptCommand, IStatusDetails>
+    internal class CreatePaymentAttemptCommandHandler : IRequestHandler<CreatePaymentAttemptCommand, IStatusDetails>
     {
         private readonly IAsyncDocumentSession _documentSession;
         private readonly IPaymentProviderFactory _paymentProviderFactory;

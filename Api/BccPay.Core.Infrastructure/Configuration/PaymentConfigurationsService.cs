@@ -56,6 +56,8 @@ namespace BccPay.Core.Infrastructure.Configuration
                     oldDefinition.Settings.Currency = definition.Settings.Currency;
                     oldDefinition.Settings.PaymentMethod = definition.Settings.PaymentMethod;
                     oldDefinition.Settings.Markup = definition.Settings.Markup;
+                    oldDefinition.Settings.MaximumAmount = definition.Settings.MaximumAmount;
+                    oldDefinition.Settings.MinimumAmount = definition.Settings.MinimumAmount;
                 }
                 else
                 {
@@ -67,7 +69,9 @@ namespace BccPay.Core.Infrastructure.Configuration
                         {
                             Currency = definition.Settings.Currency,
                             PaymentMethod = definition.Settings.PaymentMethod,
-                            Markup = definition.Settings.Markup
+                            Markup = definition.Settings.Markup,
+                            MaximumAmount = definition.Settings.MaximumAmount,
+                            MinimumAmount = definition.Settings.MinimumAmount
                         }
                     });
                 }

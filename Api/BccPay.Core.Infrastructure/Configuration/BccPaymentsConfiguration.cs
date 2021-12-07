@@ -23,8 +23,9 @@ namespace BccPay.Core.Infrastructure.Configuration
     {
         public decimal Markup { get; set; }
         public PaymentMethod PaymentMethod { get; init; }
-
         public Currencies Currency { get; init; }
+        public decimal? MaximumAmount { get; set; }
+        public decimal? MinimumAmount { get; set; }
     }
 
     public class PaymentConfigurationModel

@@ -58,11 +58,11 @@ namespace BccPay.Core.Cqrs.Commands
                 .Where(x => x.PaymentProviderDefinitionIds.Contains(definitionId))
                 .ToListAsync(cancellationToken);
 
-            return availableConfigurations.Where(x => x.CountryCode == BccPayConstants.Default || x.CountryCode == countryCode).Any();
+            return availableConfigurations.Any(x => x.CountryCode == BccPayConstants.Default || x.CountryCode == countryCode);
         }
     }
 
-    public class
+    internal class
         CreatePaymentTicketCommandHandler : IRequestHandler<CreatePaymentTicketCommand,
             Guid>
     {
