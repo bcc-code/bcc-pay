@@ -41,6 +41,9 @@ namespace BccPay.Core.Cqrs.Queries
         public PaymentProvider PaymentProvider { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
         public Currencies Currency { get; set; }
+        public decimal? MinimumAmount { get; set; }
+        public decimal? MaximumAmount { get; set; }
+
 
         internal decimal Markup { get; set; }
     }
@@ -105,7 +108,9 @@ namespace BccPay.Core.Cqrs.Queries
                         PaymentProvider = providerDefinition.Provider,
                         PaymentMethod = providerDefinition.Settings.PaymentMethod,
                         Markup = providerDefinition.Settings.Markup,
-                        Currency = providerDefinition.Settings.Currency
+                        Currency = providerDefinition.Settings.Currency,
+                        MaximumAmount = providerDefinition.Settings.MaximumAmount,
+                        MinimumAmount = providerDefinition.Settings.MinimumAmount
                     })
                 .ToListAsync(cancellationToken);
 
