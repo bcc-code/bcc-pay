@@ -15,7 +15,9 @@ namespace BccPay.Core.Shared.Helpers
         private static string ClearReferrer(string referer)
         {
             var url = new Uri(referer);
-            return $"{url.Scheme}://{url.Host}";
+            return url.Port > 999
+                 ? $"{url.Scheme}://{url.Host}:{url.Port}"
+                 : $"{url.Scheme}://{url.Host}";
         }
 
         public static void Configure(IHttpContextAccessor contextAccessor)
