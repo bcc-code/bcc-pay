@@ -97,7 +97,9 @@ namespace BccPay.Core.Cqrs.Commands
                 request.PaymentDefinitionId,
                 request.PayerId,
                 request.CountryCode,
-                exchangeRate);
+                exchangeRate,
+                definition.Settings.MinimumAmount,
+                definition.Settings.MaximumAmount);
 
             await _documentSession.StoreAsync(ticket, cancellationToken);
 

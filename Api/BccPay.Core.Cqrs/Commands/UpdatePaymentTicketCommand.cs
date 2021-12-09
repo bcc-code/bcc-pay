@@ -101,7 +101,9 @@ namespace BccPay.Core.Cqrs.Commands
                 ticket.OtherCurrencyAmount.ToAmountOfDigitsAfterPoint(),
                 ticket.ExchangeRate.ToAmountOfDigitsAfterPoint(6),
                 (1 / ticket.ExchangeRate).ToAmountOfDigitsAfterPoint(6), ticket.Updated, ticket.PaymentDefinitionId,
-                ticket.CountryCode);
+                ticket.CountryCode,
+                providerDefinition.Settings.MinimumAmount, 
+                providerDefinition.Settings.MaximumAmount);
         }
     }
 }

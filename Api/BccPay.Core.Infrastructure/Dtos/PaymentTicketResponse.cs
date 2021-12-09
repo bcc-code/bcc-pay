@@ -13,5 +13,7 @@ namespace BccPay.Core.Infrastructure.Dtos
         decimal? OppositeExchangeRate,
         DateTime? LastUpdate,
         string PaymentDefinition,
-        string CountryCode);
+        string CountryCode,
+        decimal? MinimumAmount,
+        decimal? MaximumAmount);
 }
