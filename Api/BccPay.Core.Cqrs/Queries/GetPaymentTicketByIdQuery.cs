@@ -33,7 +33,9 @@ namespace BccPay.Core.Cqrs.Queries
                     ticket.ExchangeRate.ToAmountOfDigitsAfterPoint(6),
                     (1 / ticket.ExchangeRate).ToAmountOfDigitsAfterPoint(6), ticket.Updated ?? ticket.Created,
                     ticket.PaymentDefinitionId,
-                    ticket.CountryCode);
+                    ticket.CountryCode,
+                    ticket.PaymentMethodMinimumAmount.ToAmountOfDigitsAfterPoint(2), 
+                    ticket.PaymentMethodMaximumAmount.ToAmountOfDigitsAfterPoint(2));
 
             throw new Exception("Ticket is not valid");
         }

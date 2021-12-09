@@ -22,6 +22,8 @@ namespace BccPay.Core.Domain.Entities
         public decimal? BaseCurrencyAmount { get; set; }
         public decimal? OtherCurrencyAmount { get; set; }
         public decimal ExchangeRate { get; set; }
+        public decimal? PaymentMethodMaximumAmount { get; set; }
+        public decimal? PaymentMethodMinimumAmount { get; set; }
 
         public DateTime Created { get; set; }
         public DateTime? Updated { get; set; }
@@ -32,7 +34,9 @@ namespace BccPay.Core.Domain.Entities
             string paymentDefinitionId,
             string payerId,
             string countryCode,
-            decimal exchangeRate)
+            decimal exchangeRate,
+            decimal? paymentMethodMinimumAmount,
+            decimal? paymentMethodMaximumAmount)
         {
             TicketId = Guid.NewGuid();
             Created = DateTime.UtcNow;
@@ -44,6 +48,8 @@ namespace BccPay.Core.Domain.Entities
             CountryCode = countryCode;
             OtherCurrency = definedCurrency;
             ExchangeRate = exchangeRate;
+            PaymentMethodMinimumAmount = paymentMethodMinimumAmount;
+            PaymentMethodMaximumAmount = paymentMethodMaximumAmount;
         }
 
         public void Update(
