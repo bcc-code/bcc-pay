@@ -1,10 +1,9 @@
 ﻿using System;
 using MediatR;
 
-namespace BccPay.Core.Notifications.Contracts
+namespace BccPay.Core.Notifications.Contracts;
+
+public interface IBccPayNotification : INotification
 {
-    public interface IBccPayNotification : INotification
-    {
-        DateTime When { get; }
-    }
+    DateTime When { get; }
 }

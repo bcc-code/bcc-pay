@@ -9,116 +9,115 @@ using BccPay.Core.Shared.Helpers;
 using Microsoft.Extensions.Options;
 using Raven.Client.Documents.Session;
 
-namespace BccPay.Core.Infrastructure.Configuration
+namespace BccPay.Core.Infrastructure.Configuration;
+
+public interface IPaymentConfigurationsService
 {
-    public interface IPaymentConfigurationsService
+    void InitPaymentsConfiguration();
+}
+
+internal class PaymentConfigurationsService : IPaymentConfigurationsService
+{
+    private readonly IDocumentSession _documentSession;
+    private readonly IOptions<BccPaymentsConfiguration> _bccPaymentsConfiguration;
+    private readonly InternalSettings _internalSettings;
+
+    public PaymentConfigurationsService(IDocumentSession documentSession,
+        IOptions<BccPaymentsConfiguration> bccPaymentsConfiguration, InternalSettings internalSettings)
     {
-        void InitPaymentsConfiguration();
+        _documentSession = documentSession
+                           ?? throw new ArgumentNullException(nameof(documentSession));
+
+        _bccPaymentsConfiguration = bccPaymentsConfiguration;
+
+        _internalSettings = internalSettings;
     }
 
-    internal class PaymentConfigurationsService : IPaymentConfigurationsService
+    public void InitPaymentsConfiguration()
     {
-        private readonly IDocumentSession _documentSession;
-        private readonly IOptions<BccPaymentsConfiguration> _bccPaymentsConfiguration;
-        private readonly InternalSettings _internalSettings;
+        UpdatePaymentProviderDefinitions(_bccPaymentsConfiguration.Value.PaymentProviderDefinitions);
 
-        public PaymentConfigurationsService(IDocumentSession documentSession,
-            IOptions<BccPaymentsConfiguration> bccPaymentsConfiguration, InternalSettings internalSettings)
+        UpdatePaymentConfigurations(_bccPaymentsConfiguration.Value.PaymentConfigurations);
+
+        _documentSession.SaveChanges();
+    }
+
+    private void UpdatePaymentProviderDefinitions(List<PaymentProviderDefinitionModel> paymentDefinitions)
+    {
+        var oldPaymentDefinitions = _documentSession.Query<PaymentProviderDefinition>().ToList();
+
+        // add/update payment provider definition
+        foreach (var definition in paymentDefinitions)
         {
-            _documentSession = documentSession
-                               ?? throw new ArgumentNullException(nameof(documentSession));
-
-            _bccPaymentsConfiguration = bccPaymentsConfiguration;
-
-            _internalSettings = internalSettings;
-        }
-
-        public void InitPaymentsConfiguration()
-        {
-            UpdatePaymentProviderDefinitions(_bccPaymentsConfiguration.Value.PaymentProviderDefinitions);
-
-            UpdatePaymentConfigurations(_bccPaymentsConfiguration.Value.PaymentConfigurations);
-
-            _documentSession.SaveChanges();
-        }
-
-        private void UpdatePaymentProviderDefinitions(List<PaymentProviderDefinitionModel> paymentDefinitions)
-        {
-            var oldPaymentDefinitions = _documentSession.Query<PaymentProviderDefinition>().ToList();
-
-            // add/update payment provider definition
-            foreach (var definition in paymentDefinitions)
+            var oldDefinition = oldPaymentDefinitions.FirstOrDefault(x => x.PaymentDefinitionCode == definition.Id);
+            if (oldDefinition != null)
             {
-                var oldDefinition = oldPaymentDefinitions.FirstOrDefault(x => x.PaymentDefinitionCode == definition.Id);
-                if (oldDefinition != null)
+                oldDefinition.Provider = definition.Provider;
+                oldDefinition.Settings.Currency = definition.Settings.Currency;
+                oldDefinition.Settings.PaymentMethod = definition.Settings.PaymentMethod;
+                oldDefinition.Settings.Markup = definition.Settings.Markup;
+                oldDefinition.Settings.MaximumAmount = definition.Settings.MaximumAmount;
+                oldDefinition.Settings.MinimumAmount = definition.Settings.MinimumAmount;
+            }
+            else
+            {
+                _documentSession.Store(new PaymentProviderDefinition
                 {
-                    oldDefinition.Provider = definition.Provider;
-                    oldDefinition.Settings.Currency = definition.Settings.Currency;
-                    oldDefinition.Settings.PaymentMethod = definition.Settings.PaymentMethod;
-                    oldDefinition.Settings.Markup = definition.Settings.Markup;
-                    oldDefinition.Settings.MaximumAmount = definition.Settings.MaximumAmount;
-                    oldDefinition.Settings.MinimumAmount = definition.Settings.MinimumAmount;
-                }
-                else
-                {
-                    _documentSession.Store(new PaymentProviderDefinition
+                    PaymentDefinitionCode = definition.Id,
+                    Provider = definition.Provider,
+                    Settings = new PaymentSetting
                     {
-                        PaymentDefinitionCode = definition.Id,
-                        Provider = definition.Provider,
-                        Settings = new PaymentSetting
-                        {
-                            Currency = definition.Settings.Currency,
-                            PaymentMethod = definition.Settings.PaymentMethod,
-                            Markup = definition.Settings.Markup,
-                            MaximumAmount = definition.Settings.MaximumAmount,
-                            MinimumAmount = definition.Settings.MinimumAmount
-                        }
-                    });
-                }
+                        Currency = definition.Settings.Currency,
+                        PaymentMethod = definition.Settings.PaymentMethod,
+                        Markup = definition.Settings.Markup,
+                        MaximumAmount = definition.Settings.MaximumAmount,
+                        MinimumAmount = definition.Settings.MinimumAmount
+                    }
+                });
+            }
+        }
+
+        // remove old configurations
+        oldPaymentDefinitions
+            .Where(x => !paymentDefinitions.Any(c => c.Id == x.PaymentDefinitionCode))
+            .ToList()
+            .ForEach(_documentSession.Delete);
+    }
+
+    private void UpdatePaymentConfigurations(List<PaymentConfigurationModel> paymentConfigurations)
+    {
+        var existingConfigurations = _documentSession.Query<PaymentConfiguration>().ToList();
+
+        foreach (var paymentConfiguration in paymentConfigurations)
+        {
+            paymentConfiguration.CountryCode = AddressConverter.ConvertCountry(paymentConfiguration.CountryCode,
+                _internalSettings.StoreCountryCodeFormat);
+            
+            var existingPaymentConfiguration =
+                existingConfigurations.FirstOrDefault(x => x.CountryCode == paymentConfiguration.CountryCode);
+
+            if (existingPaymentConfiguration != null &&
+                !existingPaymentConfiguration.EqualsInJson(paymentConfiguration))
+            {
+                existingPaymentConfiguration.Conditions.CurrencyCodes =
+                    paymentConfiguration.Conditions.CurrencyCodes;
+                existingPaymentConfiguration.Conditions.PaymentTypes = paymentConfiguration.Conditions.PaymentTypes;
+                existingPaymentConfiguration.PaymentProviderDefinitionIds =
+                    paymentConfiguration.PaymentProviderDefinitionIds;
             }
 
-            // remove old configurations
-            oldPaymentDefinitions
-                .Where(x => !paymentDefinitions.Any(c => c.Id == x.PaymentDefinitionCode))
-                .ToList()
-                .ForEach(_documentSession.Delete);
-        }
-
-        private void UpdatePaymentConfigurations(List<PaymentConfigurationModel> paymentConfigurations)
-        {
-            var existingConfigurations = _documentSession.Query<PaymentConfiguration>().ToList();
-
-            foreach (var paymentConfiguration in paymentConfigurations)
+            if (existingPaymentConfiguration is null)
             {
-                paymentConfiguration.CountryCode = AddressConverter.ConvertCountry(paymentConfiguration.CountryCode,
-                    _internalSettings.StoreCountryCodeFormat);
-                
-                var existingPaymentConfiguration =
-                    existingConfigurations.FirstOrDefault(x => x.CountryCode == paymentConfiguration.CountryCode);
-
-                if (existingPaymentConfiguration != null &&
-                    !existingPaymentConfiguration.EqualsInJson(paymentConfiguration))
+                _documentSession.Store(new PaymentConfiguration
                 {
-                    existingPaymentConfiguration.Conditions.CurrencyCodes =
-                        paymentConfiguration.Conditions.CurrencyCodes;
-                    existingPaymentConfiguration.Conditions.PaymentTypes = paymentConfiguration.Conditions.PaymentTypes;
-                    existingPaymentConfiguration.PaymentProviderDefinitionIds =
-                        paymentConfiguration.PaymentProviderDefinitionIds;
-                }
-
-                if (existingPaymentConfiguration is null)
-                {
-                    _documentSession.Store(new PaymentConfiguration
+                    CountryCode = paymentConfiguration.CountryCode,
+                    Conditions = new PaymentConditions
                     {
-                        CountryCode = paymentConfiguration.CountryCode,
-                        Conditions = new PaymentConditions
-                        {
-                            CurrencyCodes = paymentConfiguration.Conditions.CurrencyCodes,
-                            PaymentTypes = paymentConfiguration.Conditions.PaymentTypes
-                        },
-                        PaymentProviderDefinitionIds = paymentConfiguration.PaymentProviderDefinitionIds
-                    });
-                }
+                        CurrencyCodes = paymentConfiguration.Conditions.CurrencyCodes,
+                        PaymentTypes = paymentConfiguration.Conditions.PaymentTypes
+                    },
+                    PaymentProviderDefinitionIds = paymentConfiguration.PaymentProviderDefinitionIds
+                });
             }
         }
     }

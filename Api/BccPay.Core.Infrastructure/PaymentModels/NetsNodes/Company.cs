@@ -1,10 +1,9 @@
-﻿namespace BccPay.Core.Infrastructure.PaymentModels.NetsNodes
+﻿namespace BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
+
+public class Company
 {
-    public class Company
-    {
-        public string MerchantReference { get; set; }
-        public string Name { get; set; }
-        public string RegistrationNumber { get; set; }
-        public ContactDetails ContactDetails { get; set; }
-    }
+    public string MerchantReference { get; set; }
+    public string Name { get; set; }
+    public string RegistrationNumber { get; set; }
+    public ContactDetails ContactDetails { get; set; }
 }

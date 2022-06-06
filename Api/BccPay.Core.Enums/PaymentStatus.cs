@@ -1,10 +1,9 @@
-﻿namespace BccPay.Core.Enums
+﻿namespace BccPay.Core.Enums;
+
+public enum PaymentStatus
 {
-    public enum PaymentStatus
-    {
-        Pending,
-        Closed,
-        Paid,
-        Refunded
-    }
+    Pending,
+    Closed,
+    Paid,
+    Refunded
 }

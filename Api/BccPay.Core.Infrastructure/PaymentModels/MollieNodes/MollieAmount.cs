@@ -1,11 +1,10 @@
-﻿namespace BccPay.Core.Infrastructure.PaymentModels.MollieNodes
+﻿namespace BccPay.Core.Infrastructure.PaymentModels.MollieNodes;
+
+public class MollieAmount
 {
-    public class MollieAmount
-    {
-        /// <summary>
-        /// https://help.mollie.com/hc/en-us/articles/115000667365
-        /// </summary>
-        public string Currency { get; set; }
-        public string Value { get; set; }
-    }
+    /// <summary>
+    /// https://help.mollie.com/hc/en-us/articles/115000667365
+    /// </summary>
+    public string Currency { get; set; }
+    public string Value { get; set; }
 }

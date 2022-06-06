@@ -1,7 +1,6 @@
-﻿namespace BccPay.Core.Infrastructure.PaymentModels.Webhooks
+﻿namespace BccPay.Core.Infrastructure.PaymentModels.Webhooks;
+
+public class MollieWebhook
 {
-    public class MollieWebhook
-    {
-        public string Id { get; set; }
-    }
+    public string Id { get; set; }
 }

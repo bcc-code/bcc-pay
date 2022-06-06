@@ -1,7 +1,6 @@
-﻿namespace BccPay.Core.Infrastructure.PaymentModels.NetsNodes
+﻿namespace BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
+
+public class Subscription
 {
-    public class Subscription
-    {
-        public string Id { get; set; }
-    }
+    public string Id { get; set; }
 }

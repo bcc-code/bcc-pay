@@ -1,8 +1,7 @@
-﻿namespace BccPay.Core.Enums
+﻿namespace BccPay.Core.Enums;
+
+public enum TicketStatus
 {
-    public enum TicketStatus
-    {
-        Initialized,
-        Stored
-    }
+    Initialized,
+    Stored
 }

@@ -1,8 +1,7 @@
-﻿namespace BccPay.Core.Infrastructure.PaymentModels.NetsNodes
+﻿namespace BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
+
+public class PaymentMethod
 {
-    public class PaymentMethod
-    {
-        public string Name { get; set; }
-        public Fee Fee { get; set; }
-    }
+    public string Name { get; set; }
+    public Fee Fee { get; set; }
 }

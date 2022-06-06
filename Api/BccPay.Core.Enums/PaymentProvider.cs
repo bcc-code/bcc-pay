@@ -1,8 +1,7 @@
-﻿namespace BccPay.Core.Enums
+﻿namespace BccPay.Core.Enums;
+
+public enum PaymentProvider
 {
-    public enum PaymentProvider
-    {
-        Nets,
-        Mollie
-    }
+    Nets,
+    Mollie
 }

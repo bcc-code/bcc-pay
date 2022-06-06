@@ -10,38 +10,37 @@ using BccPay.Core.Infrastructure.PaymentModels.Request.Mollie;
 using BccPay.Core.Shared.Converters;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations
+namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations;
+
+internal class MollieRequestBuilder : BaseRequestBuilder, IMollieRequestBuilder
 {
-    internal class MollieRequestBuilder : BaseRequestBuilder, IMollieRequestBuilder
+    private readonly MollieProviderOptions _options;
+
+    public MollieRequestBuilder(MollieProviderOptions options)
     {
-        private readonly MollieProviderOptions _options;
+        _options = options;
+    }
 
-        public MollieRequestBuilder(MollieProviderOptions options)
+    public MolliePaymentRequest BuildMolliePaymentRequest(PaymentRequestDto paymentRequest,
+        PaymentMethod paymentMethod)
+    {
+        return new MolliePaymentRequest
         {
-            _options = options;
-        }
-
-        public MolliePaymentRequest BuildMolliePaymentRequest(PaymentRequestDto paymentRequest,
-            PaymentMethod paymentMethod)
-        {
-            return new MolliePaymentRequest
+            Amount = new MollieAmount
             {
-                Amount = new MollieAmount
-                {
-                    Currency = Currencies.EUR.ToString(),
-                    Value =
-                        $"{paymentRequest.Ticket?.OtherCurrencyAmount?.ToAmountOfDigitsAfterPoint() ?? paymentRequest.Amount.ToAmountOfDigitsAfterPoint():0.00}"
-                },
-                Locale = GetLocale(paymentRequest.AcceptLanguage),
-                Method = new[] {paymentMethod.ToString().ToLower()},
-                Description = paymentRequest.Description,
-                RedirectUrl = GetRedirectUrl(
-                    _options.RedirectUrl,
-                    paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null ? null : paymentRequest.PaymentId,
-                paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null ? null : paymentRequest.AttemptId),
-                WebhookUrl = _options.WebhookUrl + $"/{paymentRequest.PaymentId}",
-                Links = new { }
-            };
-        }
+                Currency = Currencies.EUR.ToString(),
+                Value =
+                    $"{paymentRequest.Ticket?.OtherCurrencyAmount?.ToAmountOfDigitsAfterPoint() ?? paymentRequest.Amount.ToAmountOfDigitsAfterPoint():0.00}"
+            },
+            Locale = GetLocale(paymentRequest.AcceptLanguage),
+            Method = new[] {paymentMethod.ToString().ToLower()},
+            Description = paymentRequest.Description,
+            RedirectUrl = GetRedirectUrl(
+                _options.RedirectUrl,
+                paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null ? null : paymentRequest.PaymentId,
+            paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null ? null : paymentRequest.AttemptId),
+            WebhookUrl = _options.WebhookUrl + $"/{paymentRequest.PaymentId}",
+            Links = new { }
+        };
     }
 }

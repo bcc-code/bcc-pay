@@ -1,8 +1,7 @@
-﻿namespace BccPay.Core.Infrastructure.PaymentModels.MollieNodes
+﻿namespace BccPay.Core.Infrastructure.PaymentModels.MollieNodes;
+
+public class Dashboard
 {
-    public class Dashboard
-    {
-        public string Href { get; set; }
-        public string Type { get; set; }
-    }
+    public string Href { get; set; }
+    public string Type { get; set; }
 }

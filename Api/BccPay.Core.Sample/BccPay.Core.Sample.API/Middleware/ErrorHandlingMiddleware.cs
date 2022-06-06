@@ -1,40 +1,39 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Mime;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
-namespace BccPay.Core.Sample.Middleware
+namespace BccPay.Core.Sample.Middleware;
+
+public class ErrorHandlingMiddleware
 {
-    public class ErrorHandlingMiddleware
+    private readonly RequestDelegate _next;
+
+    public ErrorHandlingMiddleware(RequestDelegate next)
+        => _next = next;
+
+    public async Task Invoke(HttpContext context)
     {
-        private readonly RequestDelegate _next;
-
-        public ErrorHandlingMiddleware(RequestDelegate next)
-            => _next = next;
-
-        public async Task Invoke(HttpContext context)
+        try
         {
-            try
+            await _next.Invoke(context);
+        }
+        catch (Exception exception)
+        {
+            var response = context.Response;
+            response.ContentType = MediaTypeNames.Application.Json;
+            response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+            var errorResponse = new
             {
-                await _next.Invoke(context);
-            }
-            catch (Exception exception)
-            {
-                var response = context.Response;
-                response.ContentType = MediaTypeNames.Application.Json;
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                message = exception?.Message
+            };
 
-                var errorResponse = new
-                {
-                    message = exception?.Message
-                };
+            var errorJson = JsonSerializer.Serialize(errorResponse);
 
-                var errorJson = JsonSerializer.Serialize(errorResponse);
-
-                await response.WriteAsync(errorJson);
-            }
+            await response.WriteAsync(errorJson);
         }
     }
 }

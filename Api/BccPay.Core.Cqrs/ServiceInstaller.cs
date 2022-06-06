@@ -2,17 +2,16 @@
 using BccPay.Core.Domain.Entities;
 using MediatR;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection;
+
+public static class ServiceInstaller
 {
-    public static class ServiceInstaller
+    public static IServiceCollection ConfigureBccCoreCqrs(this IServiceCollection services)
     {
-        public static IServiceCollection ConfigureBccCoreCqrs(this IServiceCollection services)
-        {
-            services.AddMediatR(typeof(CreatePaymentCommand).Assembly);
+        services.AddMediatR(typeof(CreatePaymentCommand).Assembly);
 
-            services.AddTransient(typeof(IRequestHandler<CreatePaymentAttemptCommand, IStatusDetails>), typeof(CreatePaymentAttemptCommandHandler));
+        services.AddTransient(typeof(IRequestHandler<CreatePaymentAttemptCommand, IStatusDetails>), typeof(CreatePaymentAttemptCommandHandler));
 
-            return services;
-        }
+        return services;
     }
 }

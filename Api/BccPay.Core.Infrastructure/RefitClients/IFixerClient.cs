@@ -2,11 +2,10 @@
 using BccPay.Core.Infrastructure.Dtos;
 using Refit;
 
-namespace BccPay.Core.Infrastructure.RefitClients
+namespace BccPay.Core.Infrastructure.RefitClients;
+
+public interface IFixerClient
 {
-    public interface IFixerClient
-    {
-        [Get("/latest")]
-        public Task<FixerCurrencyRateResponse> GetRatesByBaseCurrency([AliasAs("access_key")] string accessKey, [AliasAs("base")] string baseCurrency);
-    }
+    [Get("/latest")]
+    public Task<FixerCurrencyRateResponse> GetRatesByBaseCurrency([AliasAs("access_key")] string accessKey, [AliasAs("base")] string baseCurrency);
 }

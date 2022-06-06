@@ -5,37 +5,36 @@ using BccPay.Core.Sample.Contracts.Requests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BccPay.Core.Sample.API.Controllers
+namespace BccPay.Core.Sample.API.Controllers;
+
+[ApiController]
+[Route("payment-configurations")]
+public class PaymentConfigurationsController : BaseController
 {
-    [ApiController]
-    [Route("payment-configurations")]
-    public class PaymentConfigurationsController : BaseController
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<PaymentConfigurationResult>))]
+    public async Task<IActionResult> GetPaymentConfigurations(
+        [FromQuery] PaymentConfigurationRequest paymentConfiguration)
     {
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<PaymentConfigurationResult>))]
-        public async Task<IActionResult> GetPaymentConfigurations(
-            [FromQuery] PaymentConfigurationRequest paymentConfiguration)
-        {
-            var query = new GetPaymentConfigurationsByQuery(paymentConfiguration.CountryCode,
-                paymentConfiguration.PaymentType, paymentConfiguration.CurrencyCode);
+        var query = new GetPaymentConfigurationsByQuery(paymentConfiguration.CountryCode,
+            paymentConfiguration.PaymentType, paymentConfiguration.CurrencyCode);
 
-            var result = await Mediator.Send(query);
+        var result = await Mediator.Send(query);
 
-            return Ok(result);
-        }
+        return Ok(result);
+    }
 
-        [HttpGet("with-exchange")]
-        [ProducesResponseType(StatusCodes.Status200OK,
-            Type = typeof(GetConfigurationsWithExchangedCurrencyQueryResult))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetConfigurationsWithExchangedCurrency(
-            [FromQuery] ExchangeWithConfigurationsRequestModel request)
-        {
-            var query = Mapper.Map<GetConfigurationsWithExchangedCurrencyQuery>(request);
+    [HttpGet("with-exchange")]
+    [ProducesResponseType(StatusCodes.Status200OK,
+        Type = typeof(GetConfigurationsWithExchangedCurrencyQueryResult))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetConfigurationsWithExchangedCurrency(
+        [FromQuery] ExchangeWithConfigurationsRequestModel request)
+    {
+        var query = Mapper.Map<GetConfigurationsWithExchangedCurrencyQuery>(request);
 
-            var result = await Mediator.Send(query);
+        var result = await Mediator.Send(query);
 
-            return Ok(result);
-        }
+        return Ok(result);
     }
 }

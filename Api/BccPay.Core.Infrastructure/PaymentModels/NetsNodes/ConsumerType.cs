@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace BccPay.Core.Infrastructure.PaymentModels.NetsNodes
-{
-    public class ConsumerType
-    {
-        public List<string> SupportedTypes { get; set; }
+namespace BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
 
-        public string Default { get; set; }
-    }
+public class ConsumerType
+{
+    public List<string> SupportedTypes { get; set; }
+
+    public string Default { get; set; }
 }

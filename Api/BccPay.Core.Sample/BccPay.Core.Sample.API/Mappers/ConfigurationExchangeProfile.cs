@@ -2,13 +2,12 @@
 using BccPay.Core.Cqrs.Queries;
 using BccPay.Core.Sample.Contracts.Requests;
 
-namespace BccPay.Core.Sample.API.Mappers
+namespace BccPay.Core.Sample.API.Mappers;
+
+public class ConfigurationExchangeProfile : Profile
 {
-    public class ConfigurationExchangeProfile : Profile
+    public ConfigurationExchangeProfile()
     {
-        public ConfigurationExchangeProfile()
-        {
-            CreateMap<ExchangeWithConfigurationsRequestModel, GetConfigurationsWithExchangedCurrencyQuery>();
-        }
+        CreateMap<ExchangeWithConfigurationsRequestModel, GetConfigurationsWithExchangedCurrencyQuery>();
     }
 }

@@ -1,8 +1,7 @@
-﻿namespace BccPay.Core.Enums
+﻿namespace BccPay.Core.Enums;
+
+public enum Currencies
 {
-    public enum Currencies
-    {
-        NOK = 0,
-        EUR = 1
-    }
+    NOK = 0,
+    EUR = 1
 }

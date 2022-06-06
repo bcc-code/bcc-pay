@@ -1,7 +1,6 @@
-﻿namespace BccPay.Core.Infrastructure.PaymentModels.Request.Nets
+﻿namespace BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
+
+public class NetsChargeRequest
 {
-    public class NetsChargeRequest
-    {
-        public int Amount { get; set; }
-    }
+    public int Amount { get; set; }
 }

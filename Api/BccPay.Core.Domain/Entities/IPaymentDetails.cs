@@ -1,6 +1,5 @@
-﻿namespace BccPay.Core.Domain.Entities
+﻿namespace BccPay.Core.Domain.Entities;
+
+public interface IPaymentDetails
 {
-    public interface IPaymentDetails
-    {
-    }
 }

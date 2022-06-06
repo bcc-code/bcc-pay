@@ -1,9 +1,8 @@
-﻿namespace BccPay.Core.Enums
+﻿namespace BccPay.Core.Enums;
+
+public enum AttemptCancellationResult
 {
-    public enum AttemptCancellationResult
-    {
-        SuccessfullyCancelled,
-        ProviderFailedCancellation,
-        AlreadyCompleted
-    }
+    SuccessfullyCancelled,
+    ProviderFailedCancellation,
+    AlreadyCompleted
 }
