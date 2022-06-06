@@ -1,15 +1,14 @@
-﻿namespace BccPay.Core.Enums
-{
-    public enum AttemptStatus
-    {
-        Processing,
-        WaitingForCharge,
-        RefundedInitiated,
+﻿namespace BccPay.Core.Enums;
 
-        Failed,
-        Canceled,
-        Expired,
-        PaidSucceeded,
-        RefundedSucceeded
-    }
+public enum AttemptStatus
+{
+    Processing,
+    WaitingForCharge,
+    RefundedInitiated,
+
+    Failed,
+    Canceled,
+    Expired,
+    PaidSucceeded,
+    RefundedSucceeded
 }

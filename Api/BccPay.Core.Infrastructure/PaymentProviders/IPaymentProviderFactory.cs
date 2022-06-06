@@ -1,9 +1,8 @@
 ﻿using BccPay.Core.Enums;
 
-namespace BccPay.Core.Infrastructure.PaymentProviders
+namespace BccPay.Core.Infrastructure.PaymentProviders;
+
+public interface IPaymentProviderFactory
 {
-    public interface IPaymentProviderFactory
-    {
-        IPaymentProvider GetPaymentProvider(PaymentProvider paymentProvider);
-    }
+    IPaymentProvider GetPaymentProvider(PaymentProvider paymentProvider);
 }

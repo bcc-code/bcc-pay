@@ -1,11 +1,10 @@
-﻿namespace BccPay.Core.Infrastructure.Dtos
+﻿namespace BccPay.Core.Infrastructure.Dtos;
+
+public class AddressDto
 {
-    public class AddressDto
-    {
-        public string AddressLine1 { get; set; }
-        public string AddressLine2 { get; set; }
-        public string Country { get; set; }
-        public string City { get; set; }
-        public string PostalCode { get; set; }
-    }
+    public string AddressLine1 { get; set; }
+    public string AddressLine2 { get; set; }
+    public string Country { get; set; }
+    public string City { get; set; }
+    public string PostalCode { get; set; }
 }

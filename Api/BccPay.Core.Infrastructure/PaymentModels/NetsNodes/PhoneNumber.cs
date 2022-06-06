@@ -1,8 +1,7 @@
-﻿namespace BccPay.Core.Infrastructure.PaymentModels.NetsNodes
+﻿namespace BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
+
+public class PhoneNumber
 {
-    public class PhoneNumber
-    {
-        public string Prefix { get; set; }
-        public string Number { get; set; }
-    }
+    public string Prefix { get; set; }
+    public string Number { get; set; }
 }

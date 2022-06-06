@@ -1,8 +1,7 @@
-﻿namespace BccPay.Core.Sample.Contracts.Requests
+﻿namespace BccPay.Core.Sample.Contracts.Requests;
+
+public class BasePaging
 {
-    public class BasePaging
-    {
-        public int Page { get; set; }
-        public int Size { get; set; }
-    }
+    public int Page { get; set; }
+    public int Size { get; set; }
 }

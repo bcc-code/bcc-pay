@@ -1,12 +1,11 @@
-﻿namespace BccPay.Core.Domain.Entities
+﻿namespace BccPay.Core.Domain.Entities;
+
+public class Country
 {
-    public class Country
-    {
 
-        public static string GetDocumentId(string countryCode) => $"countries/{countryCode}";
+    public static string GetDocumentId(string countryCode) => $"countries/{countryCode}";
 
-        public string Id => GetDocumentId(CountryCode);
+    public string Id => GetDocumentId(CountryCode);
 
-        public string CountryCode { get; set; }
-    }
+    public string CountryCode { get; set; }
 }

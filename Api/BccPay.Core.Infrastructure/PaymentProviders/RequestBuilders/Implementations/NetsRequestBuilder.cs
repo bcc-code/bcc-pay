@@ -7,125 +7,124 @@ using BccPay.Core.Infrastructure.Dtos;
 using BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
 using BccPay.Core.Infrastructure.PaymentModels.Request.Nets;
 
-namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations
+namespace BccPay.Core.Infrastructure.PaymentProviders.RequestBuilders.Implementations;
+
+internal class NetsRequestBuilder : BaseRequestBuilder, INetsPaymentRequestBuilder
 {
-    internal class NetsRequestBuilder : BaseRequestBuilder, INetsPaymentRequestBuilder
+    private readonly NetsProviderOptions _options;
+
+    public NetsRequestBuilder(NetsProviderOptions options)
     {
-        private readonly NetsProviderOptions _options;
+        _options = options;
+    }
 
-        public NetsRequestBuilder(NetsProviderOptions options)
+    public NetsPaymentRequest BuildNetsPaymentRequest(PaymentRequestDto paymentRequest, string originUrl,
+        bool isUserDataValid = true)
+    {
+        int amountInCoins = Convert.ToInt32(paymentRequest.Amount * 100);
+
+        List<Webhook> webhooks = PaymentProviderConstants.Nets.Webhooks.Messages.Select(webhookEvent => new Webhook
         {
-            _options = options;
-        }
+            Authorization = paymentRequest.NotificationAccessToken,
+            EventName = webhookEvent.Key,
+            Url = _options.NotificationUrl + $"/{paymentRequest.PaymentId}"
+        }).ToList();
 
-        public NetsPaymentRequest BuildNetsPaymentRequest(PaymentRequestDto paymentRequest, string originUrl,
-            bool isUserDataValid = true)
+        PaymentModels.NetsNodes.Notifications notifications = new()
         {
-            int amountInCoins = Convert.ToInt32(paymentRequest.Amount * 100);
+            Webhooks = webhooks
+        };
 
-            List<Webhook> webhooks = PaymentProviderConstants.Nets.Webhooks.Messages.Select(webhookEvent => new Webhook
-            {
-                Authorization = paymentRequest.NotificationAccessToken,
-                EventName = webhookEvent.Key,
-                Url = _options.NotificationUrl + $"/{paymentRequest.PaymentId}"
-            }).ToList();
-
-            PaymentModels.NetsNodes.Notifications notifications = new()
-            {
-                Webhooks = webhooks
-            };
-
-            Order order = new()
-            {
-                Amount = amountInCoins,
-                Currency = paymentRequest.BaseCurrency,
-                Items =
-                    new List<Item>
+        Order order = new()
+        {
+            Amount = amountInCoins,
+            Currency = paymentRequest.BaseCurrency,
+            Items =
+                new List<Item>
+                {
+                    new Item
                     {
-                        new Item
+                        Reference = PaymentProviderConstants.Nets.Order.ItemReference,
+                        Name = $"DONATION-{paymentRequest.Amount}",
+                        Quantity = 1,
+                        Unit = PaymentProviderConstants.Nets.Order.ItemUnit,
+                        UnitPrice = amountInCoins,
+                        GrossTotalAmount = amountInCoins,
+                        NetTotalAmount = amountInCoins
+                    }
+                }
+        };
+
+
+        string integrationType = paymentRequest.IsHostedCheckout
+            ? PaymentProviderConstants.Nets.IntegrationType.HostedPaymentPage
+            : PaymentProviderConstants.Nets.IntegrationType.EmbeddedCheckout;
+
+        var hostedUrl = GetRedirectUrl(
+            _options.ReturnUrl,
+            paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null ? null : paymentRequest.PaymentId,
+            paymentRequest.AttemptId);
+
+        string hostedReturnUrl = paymentRequest.IsHostedCheckout ? hostedUrl : null;
+
+        string embeddedUrl = paymentRequest.IsHostedCheckout ? null : $"{originUrl}{_options.CheckoutPageUrl}";
+
+        if (isUserDataValid)
+        {
+            return new NetsPaymentRequest()
+            {
+                Checkout = new CheckoutOnCreate
+                {
+                    IntegrationType = integrationType,
+                    Charge = true,
+                    MerchantHandlesConsumerData = true,
+                    Url = embeddedUrl,
+                    ReturnUrl = hostedReturnUrl,
+                    TermsUrl = _options.TermsUrl,
+                    Consumer = new ConsumerOnCreate
+                    {
+                        Email = paymentRequest.Email,
+                        PhoneNumber = new PhoneNumber
                         {
-                            Reference = PaymentProviderConstants.Nets.Order.ItemReference,
-                            Name = $"DONATION-{paymentRequest.Amount}",
-                            Quantity = 1,
-                            Unit = PaymentProviderConstants.Nets.Order.ItemUnit,
-                            UnitPrice = amountInCoins,
-                            GrossTotalAmount = amountInCoins,
-                            NetTotalAmount = amountInCoins
+                            Prefix = paymentRequest.PhoneNumberPrefix,
+                            Number = paymentRequest.PhoneNumberBody
+                        },
+                        PrivatePerson = new PrivatePersonOnCreate
+                        {
+                            FirstName = paymentRequest.FirstName,
+                            LastName = paymentRequest.LastName
+                        },
+                        ShippingAddress = new Address
+                        {
+                            AddressLine1 = paymentRequest.Address.AddressLine1,
+                            AddressLine2 = paymentRequest.Address.AddressLine2,
+                            City = paymentRequest.Address.City,
+                            Country = paymentRequest.Address.Country,
+                            PostalCode = paymentRequest.Address.PostalCode
                         }
                     }
+                },
+                Order = order,
+                Notifications = notifications,
             };
-
-
-            string integrationType = paymentRequest.IsHostedCheckout
-                ? PaymentProviderConstants.Nets.IntegrationType.HostedPaymentPage
-                : PaymentProviderConstants.Nets.IntegrationType.EmbeddedCheckout;
-
-            var hostedUrl = GetRedirectUrl(
-                _options.ReturnUrl,
-                paymentRequest.UsePaymentIdAsRouteInRedirectUrl is null ? null : paymentRequest.PaymentId,
-                paymentRequest.AttemptId);
-
-            string hostedReturnUrl = paymentRequest.IsHostedCheckout ? hostedUrl : null;
-
-            string embeddedUrl = paymentRequest.IsHostedCheckout ? null : $"{originUrl}{_options.CheckoutPageUrl}";
-
-            if (isUserDataValid)
+        }
+        else
+        {
+            return new NetsPaymentRequest()
             {
-                return new NetsPaymentRequest()
-                {
-                    Checkout = new CheckoutOnCreate
+                Checkout =
+                    new CheckoutOnCreate
                     {
                         IntegrationType = integrationType,
-                        Charge = true,
-                        MerchantHandlesConsumerData = true,
-                        Url = embeddedUrl,
                         ReturnUrl = hostedReturnUrl,
+                        Charge = false,
+                        MerchantHandlesConsumerData = false,
+                        Url = embeddedUrl,
                         TermsUrl = _options.TermsUrl,
-                        Consumer = new ConsumerOnCreate
-                        {
-                            Email = paymentRequest.Email,
-                            PhoneNumber = new PhoneNumber
-                            {
-                                Prefix = paymentRequest.PhoneNumberPrefix,
-                                Number = paymentRequest.PhoneNumberBody
-                            },
-                            PrivatePerson = new PrivatePersonOnCreate
-                            {
-                                FirstName = paymentRequest.FirstName,
-                                LastName = paymentRequest.LastName
-                            },
-                            ShippingAddress = new Address
-                            {
-                                AddressLine1 = paymentRequest.Address.AddressLine1,
-                                AddressLine2 = paymentRequest.Address.AddressLine2,
-                                City = paymentRequest.Address.City,
-                                Country = paymentRequest.Address.Country,
-                                PostalCode = paymentRequest.Address.PostalCode
-                            }
-                        }
                     },
-                    Order = order,
-                    Notifications = notifications,
-                };
-            }
-            else
-            {
-                return new NetsPaymentRequest()
-                {
-                    Checkout =
-                        new CheckoutOnCreate
-                        {
-                            IntegrationType = integrationType,
-                            ReturnUrl = hostedReturnUrl,
-                            Charge = false,
-                            MerchantHandlesConsumerData = false,
-                            Url = embeddedUrl,
-                            TermsUrl = _options.TermsUrl,
-                        },
-                    Order = order,
-                    Notifications = notifications,
-                };
-            }
+                Order = order,
+                Notifications = notifications,
+            };
         }
     }
 }

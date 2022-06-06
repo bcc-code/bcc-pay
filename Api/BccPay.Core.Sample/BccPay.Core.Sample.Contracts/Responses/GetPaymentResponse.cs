@@ -2,29 +2,28 @@
 using System.Collections.Generic;
 using BccPay.Core.Enums;
 
-namespace BccPay.Core.Sample.Contracts.Responses
+namespace BccPay.Core.Sample.Contracts.Responses;
+
+public class GetPaymentResponse
 {
-    public class GetPaymentResponse
-    {
-        public Guid PaymentId { get; set; }
-        public string PayerId { get; set; }
-        public string CurrencyCode { get; set; }
-        public string CountryCode { get; set; }
-        public decimal Amount { get; set; }
+    public Guid PaymentId { get; set; }
+    public string PayerId { get; set; }
+    public string CurrencyCode { get; set; }
+    public string CountryCode { get; set; }
+    public decimal Amount { get; set; }
 
-        public DateTime Created { get; set; }
-        public DateTime? Updated { get; set; }
-        public PaymentStatus PaymentStatus { get; set; }
-        public object PaymentDetails { get; set; }
-        public List<AttemptResponseModel> Attempts { get; set; }
-    }
+    public DateTime Created { get; set; }
+    public DateTime? Updated { get; set; }
+    public PaymentStatus PaymentStatus { get; set; }
+    public object PaymentDetails { get; set; }
+    public List<AttemptResponseModel> Attempts { get; set; }
+}
 
-    public class AttemptResponseModel
-    {
-        public Guid PaymentAttemptId { get; set; }
-        public PaymentMethod PaymentMethod { get; set; }
-        public DateTime Created { get; set; }
-        public AttemptStatus PaymentStatus { get; set; }
-        public object StatusDetails { get; set; }
-    }
+public class AttemptResponseModel
+{
+    public Guid PaymentAttemptId { get; set; }
+    public PaymentMethod PaymentMethod { get; set; }
+    public DateTime Created { get; set; }
+    public AttemptStatus PaymentStatus { get; set; }
+    public object StatusDetails { get; set; }
 }

@@ -16,95 +16,94 @@ using BccPay.Core.Infrastructure.PaymentProviders;
 using MediatR;
 using Raven.Client.Documents.Session;
 
-namespace BccPay.Core.Cqrs.Commands.Mollie
-{
-    public class UpdateMolliePaymentStatusCommand : IRequest<bool>
-    {
-        public UpdateMolliePaymentStatusCommand(MollieWebhook webhook, Guid paymentId)
-        {
-            PaymentId = paymentId;
-            Webhook = webhook;
-        }
+namespace BccPay.Core.Cqrs.Commands.Mollie;
 
-        public Guid PaymentId { get; set; }
-        public MollieWebhook Webhook { get; set; }
+public class UpdateMolliePaymentStatusCommand : IRequest<bool>
+{
+    public UpdateMolliePaymentStatusCommand(MollieWebhook webhook, Guid paymentId)
+    {
+        PaymentId = paymentId;
+        Webhook = webhook;
     }
 
-    public class UpdateMolliePaymentStatusCommandHandler : IRequestHandler<UpdateMolliePaymentStatusCommand, bool>
+    public Guid PaymentId { get; set; }
+    public MollieWebhook Webhook { get; set; }
+}
+
+public class UpdateMolliePaymentStatusCommandHandler : IRequestHandler<UpdateMolliePaymentStatusCommand, bool>
+{
+    private readonly IAsyncDocumentSession _documentSession;
+    private readonly IPaymentProviderFactory _paymentProviderFactory;
+
+    public UpdateMolliePaymentStatusCommandHandler(IAsyncDocumentSession documentSession,
+        IPaymentProviderFactory paymentProviderFactory)
     {
-        private readonly IAsyncDocumentSession _documentSession;
-        private readonly IPaymentProviderFactory _paymentProviderFactory;
+        _documentSession = documentSession
+            ?? throw new ArgumentNullException(nameof(documentSession));
+        _paymentProviderFactory = paymentProviderFactory
+            ?? throw new ArgumentNullException(nameof(paymentProviderFactory));
+    }
 
-        public UpdateMolliePaymentStatusCommandHandler(IAsyncDocumentSession documentSession,
-            IPaymentProviderFactory paymentProviderFactory)
+    public async Task<bool> Handle(UpdateMolliePaymentStatusCommand request, CancellationToken cancellationToken)
+    {
+        var payment = await _documentSession.LoadAsync<Payment>(
+                Payment.GetDocumentId(request.PaymentId), cancellationToken)
+            ?? throw new NotFoundException($"Invalid payment ID {request.PaymentId}");
+
+        var actualAttempt = payment.Attempts
+                .OrderByDescending(x => x.Created)
+                .FirstOrDefault()
+                ?? throw new UpdatePaymentAttemptForbiddenException("Attempt is inactive.");
+
+        var provider = _paymentProviderFactory.GetPaymentProvider(PaymentProvider.Mollie);
+
+        var paymentResponse = await provider.GetPayment(request.Webhook.Id);
+
+        var mollieStatusDetails = (MollieStatusDetails)actualAttempt.StatusDetails;
+
+        if (mollieStatusDetails.MolliePaymentId != request.Webhook.Id)
+            throw new InvalidPaymentException("Invalid mollie payment id");
+
+        var molliePaymentResponse = ReverseAbstraction<MollieGetPaymentResponse, IPaymentResponse>.GetImplementationFromAbstraction(paymentResponse);
+
+        if (molliePaymentResponse is not null)
         {
-            _documentSession = documentSession
-                ?? throw new ArgumentNullException(nameof(documentSession));
-            _paymentProviderFactory = paymentProviderFactory
-                ?? throw new ArgumentNullException(nameof(paymentProviderFactory));
-        }
-
-        public async Task<bool> Handle(UpdateMolliePaymentStatusCommand request, CancellationToken cancellationToken)
-        {
-            var payment = await _documentSession.LoadAsync<Payment>(
-                    Payment.GetDocumentId(request.PaymentId), cancellationToken)
-                ?? throw new NotFoundException($"Invalid payment ID {request.PaymentId}");
-
-            var actualAttempt = payment.Attempts
-                    .OrderByDescending(x => x.Created)
-                    .FirstOrDefault()
-                    ?? throw new UpdatePaymentAttemptForbiddenException("Attempt is inactive.");
-
-            var provider = _paymentProviderFactory.GetPaymentProvider(PaymentProvider.Mollie);
-
-            var paymentResponse = await provider.GetPayment(request.Webhook.Id);
-
-            var mollieStatusDetails = (MollieStatusDetails)actualAttempt.StatusDetails;
-
-            if (mollieStatusDetails.MolliePaymentId != request.Webhook.Id)
-                throw new InvalidPaymentException("Invalid mollie payment id");
-
-            var molliePaymentResponse = ReverseAbstraction<MollieGetPaymentResponse, IPaymentResponse>.GetImplementationFromAbstraction(paymentResponse);
-
-            if (molliePaymentResponse is not null)
+            actualAttempt.AttemptStatus = molliePaymentResponse.Status switch
             {
-                actualAttempt.AttemptStatus = molliePaymentResponse.Status switch
-                {
-                    PaymentProviderConstants.Mollie.Webhook.Paid => AttemptStatus.PaidSucceeded,
-                    PaymentProviderConstants.Mollie.Webhook.Canceled => AttemptStatus.Canceled,
-                    PaymentProviderConstants.Mollie.Webhook.Pending => AttemptStatus.Processing,
-                    PaymentProviderConstants.Mollie.Webhook.Open => AttemptStatus.WaitingForCharge,
-                    PaymentProviderConstants.Mollie.Webhook.Failed => AttemptStatus.Failed,
-                    PaymentProviderConstants.Mollie.Webhook.Expired => AttemptStatus.Expired,
-                    _ => AttemptStatus.Processing
-                };
-                mollieStatusDetails.WebhookStatus = PaymentProviderConstants.Mollie.Webhook.Messages[molliePaymentResponse.Status];
+                PaymentProviderConstants.Mollie.Webhook.Paid => AttemptStatus.PaidSucceeded,
+                PaymentProviderConstants.Mollie.Webhook.Canceled => AttemptStatus.Canceled,
+                PaymentProviderConstants.Mollie.Webhook.Pending => AttemptStatus.Processing,
+                PaymentProviderConstants.Mollie.Webhook.Open => AttemptStatus.WaitingForCharge,
+                PaymentProviderConstants.Mollie.Webhook.Failed => AttemptStatus.Failed,
+                PaymentProviderConstants.Mollie.Webhook.Expired => AttemptStatus.Expired,
+                _ => AttemptStatus.Processing
+            };
+            mollieStatusDetails.WebhookStatus = PaymentProviderConstants.Mollie.Webhook.Messages[molliePaymentResponse.Status];
 
-                if (mollieStatusDetails.Errors != null)
-                {
-                    mollieStatusDetails.Errors.Add(molliePaymentResponse.Error);
-                }
-                else
-                {
-                    mollieStatusDetails.Errors = new List<string> { molliePaymentResponse.Error };
-                }
-
-                // NOTE: mollie removed "refund" status and force to check other
-                // properties like "amountRefunded" to know, that Refund is triggered
-                if (IsAmountValueGreaterThanZero(molliePaymentResponse.AmountRefunded?.Value))
-                {
-                    actualAttempt.AttemptStatus = AttemptStatus.RefundedSucceeded;
-                }
+            if (mollieStatusDetails.Errors != null)
+            {
+                mollieStatusDetails.Errors.Add(molliePaymentResponse.Error);
+            }
+            else
+            {
+                mollieStatusDetails.Errors = new List<string> { molliePaymentResponse.Error };
             }
 
-            actualAttempt.StatusDetails = mollieStatusDetails;
-            payment.UpdateAttempt(actualAttempt);
-            await _documentSession.SaveChangesAsync(cancellationToken);
-
-            return true;
+            // NOTE: mollie removed "refund" status and force to check other
+            // properties like "amountRefunded" to know, that Refund is triggered
+            if (IsAmountValueGreaterThanZero(molliePaymentResponse.AmountRefunded?.Value))
+            {
+                actualAttempt.AttemptStatus = AttemptStatus.RefundedSucceeded;
+            }
         }
 
-        private static bool IsAmountValueGreaterThanZero(string value)
-            => Decimal.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal result) && result > 0;
+        actualAttempt.StatusDetails = mollieStatusDetails;
+        payment.UpdateAttempt(actualAttempt);
+        await _documentSession.SaveChangesAsync(cancellationToken);
+
+        return true;
     }
+
+    private static bool IsAmountValueGreaterThanZero(string value)
+        => Decimal.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal result) && result > 0;
 }

@@ -5,36 +5,38 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents.Session;
 
-namespace BccPay.Core.DataAccess
+namespace BccPay.Core.DataAccess;
+
+public interface IDocumentStoreListener
 {
-    public interface IDocumentStoreListener
+    void OnAfterRavenDbSaveChanges(object sender, AfterSaveChangesEventArgs e);
+}
+
+internal class DocumentStoreListener : IDocumentStoreListener
+{
+    private readonly IServiceProvider _serviceProvider;
+
+    public DocumentStoreListener(IServiceProvider serviceProvider)
     {
-        void OnAfterRavenDbSaveChanges(object sender, AfterSaveChangesEventArgs e);
+        _serviceProvider = serviceProvider;
     }
 
-    internal class DocumentStoreListener : IDocumentStoreListener
+    public void OnAfterRavenDbSaveChanges(object sender, AfterSaveChangesEventArgs e)
     {
-        private readonly IServiceProvider _serviceProvider;
+        using var serviceScope = _serviceProvider.CreateScope();
+        var mediator = serviceScope.ServiceProvider.GetService<IMediator>();
 
-        public DocumentStoreListener(IServiceProvider serviceProvider)
+        if (mediator == null)
         {
-            _serviceProvider = serviceProvider;
+            return;
         }
 
-        public void OnAfterRavenDbSaveChanges(object sender, AfterSaveChangesEventArgs e)
+        if (e.Entity is IBccPayNotificationsStore notifications)
         {
-            using var serviceScope = _serviceProvider.CreateScope();
-            var mediator = serviceScope.ServiceProvider.GetService<IMediator>();
+            notifications.Notifications?.ForEach(
+                notification => Task.Run(async () => await mediator.Publish(notification)).Wait());
 
-            if (mediator == null) return;
-
-            if (e.Entity is IBccPayNotificationsStore notifications)
-            {
-                notifications.Notifications?.ForEach(
-                    notification => Task.Run(async () => await mediator.Publish(notification)).Wait());
-
-                notifications.Notifications?.Clear();
-            }
+            notifications.Notifications?.Clear();
         }
     }
 }

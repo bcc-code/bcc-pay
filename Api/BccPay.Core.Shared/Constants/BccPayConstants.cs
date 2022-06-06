@@ -1,7 +1,6 @@
-﻿namespace BccPay.Core.Shared.Constants
+﻿namespace BccPay.Core.Shared.Constants;
+
+public static class BccPayConstants
 {
-    public static class BccPayConstants
-    {
-        public const string Default = "default";
-    }
+    public const string Default = "default";
 }

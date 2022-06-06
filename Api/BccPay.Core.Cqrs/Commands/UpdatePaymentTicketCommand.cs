@@ -10,100 +10,99 @@ using FluentValidation;
 using MediatR;
 using Raven.Client.Documents.Session;
 
-namespace BccPay.Core.Cqrs.Commands
+namespace BccPay.Core.Cqrs.Commands;
+
+public record UpdatePaymentTicketCommand
+    (Guid TicketId, decimal? BaseCurrencyAmount, decimal? OtherCurrencyAmount) : IRequest<PaymentTicketResponse>;
+
+public class UpdatePaymentTicketCommandAbstractValidator : AbstractValidator<UpdatePaymentTicketCommand>
 {
-    public record UpdatePaymentTicketCommand
-        (Guid TicketId, decimal? BaseCurrencyAmount, decimal? OtherCurrencyAmount) : IRequest<PaymentTicketResponse>;
+    private readonly IAsyncDocumentSession _documentSession;
 
-    public class UpdatePaymentTicketCommandAbstractValidator : AbstractValidator<UpdatePaymentTicketCommand>
+    public UpdatePaymentTicketCommandAbstractValidator(IAsyncDocumentSession documentSession)
     {
-        private readonly IAsyncDocumentSession _documentSession;
+        _documentSession = documentSession;
 
-        public UpdatePaymentTicketCommandAbstractValidator(IAsyncDocumentSession documentSession)
-        {
-            _documentSession = documentSession;
+        RuleFor(x => new {x.BaseCurrencyAmount, x.OtherCurrencyAmount})
+            .Must(x => IsAmountsValid(x.BaseCurrencyAmount, x.OtherCurrencyAmount))
+            .WithMessage("Not valid amount");
 
-            RuleFor(x => new {x.BaseCurrencyAmount, x.OtherCurrencyAmount})
-                .Must(x => IsAmountsValid(x.BaseCurrencyAmount, x.OtherCurrencyAmount))
-                .WithMessage("Not valid amount");
-
-            RuleFor(x => x.TicketId)
-                .MustAsync(IsTicketValidToUse)
-                .WithMessage("Ticket is not valid");
-        }
-
-        private static bool IsAmountsValid(decimal? first, decimal? second)
-        {
-            if ((first is null or 0) && second > 0)
-                return true;
-
-            return (second is null or 0) && first > 0;
-        }
-
-        private async Task<bool> IsTicketValidToUse(Guid ticketId, CancellationToken cancellationToken)
-        {
-            var ticket =
-                await _documentSession.LoadAsync<PaymentTicket>(PaymentTicket.GetDocumentId(ticketId),
-                    cancellationToken);
-
-            return ticket is not null && !((ticket.Updated ?? ticket.Created) < DateTime.UtcNow.AddHours(-1));
-        }
+        RuleFor(x => x.TicketId)
+            .MustAsync(IsTicketValidToUse)
+            .WithMessage("Ticket is not valid");
     }
 
-    internal class
-        UpdatePaymentTicketCommandHandler : IRequestHandler<UpdatePaymentTicketCommand, PaymentTicketResponse>
+    private static bool IsAmountsValid(decimal? first, decimal? second)
     {
-        private readonly IAsyncDocumentSession _documentSession;
-        private readonly ICurrencyService _currencyService;
+        if ((first is null or 0) && second > 0)
+            return true;
 
-        public UpdatePaymentTicketCommandHandler(IAsyncDocumentSession documentSession,
-            ICurrencyService currencyService)
-        {
-            _documentSession = documentSession;
-            _currencyService = currencyService;
-        }
+        return (second is null or 0) && first > 0;
+    }
 
-        public async Task<PaymentTicketResponse> Handle(UpdatePaymentTicketCommand request,
-            CancellationToken cancellationToken)
-        {
-            var ticket = await _documentSession.LoadAsync<PaymentTicket>(PaymentTicket.GetDocumentId(request.TicketId),
+    private async Task<bool> IsTicketValidToUse(Guid ticketId, CancellationToken cancellationToken)
+    {
+        var ticket =
+            await _documentSession.LoadAsync<PaymentTicket>(PaymentTicket.GetDocumentId(ticketId),
                 cancellationToken);
 
-            bool isOppositeConversion = request.BaseCurrencyAmount is 0 or null;
-            var amount = isOppositeConversion
-                ? request.OtherCurrencyAmount
-                : request.BaseCurrencyAmount;
+        return ticket is not null && !((ticket.Updated ?? ticket.Created) < DateTime.UtcNow.AddHours(-1));
+    }
+}
 
-            if (amount is null)
-                throw new InvalidOperationException();
+internal class
+    UpdatePaymentTicketCommandHandler : IRequestHandler<UpdatePaymentTicketCommand, PaymentTicketResponse>
+{
+    private readonly IAsyncDocumentSession _documentSession;
+    private readonly ICurrencyService _currencyService;
 
-            var providerDefinition = await _documentSession.LoadAsync<PaymentProviderDefinition>(
-                PaymentProviderDefinition.GetDocumentId(ticket.PaymentDefinitionId),
-                cancellationToken);
+    public UpdatePaymentTicketCommandHandler(IAsyncDocumentSession documentSession,
+        ICurrencyService currencyService)
+    {
+        _documentSession = documentSession;
+        _currencyService = currencyService;
+    }
 
-            (decimal exchangeRate, _) =
-                await _currencyService.GetExchangeRateByCurrency(ticket.BaseCurrency, ticket.OtherCurrency);
+    public async Task<PaymentTicketResponse> Handle(UpdatePaymentTicketCommand request,
+        CancellationToken cancellationToken)
+    {
+        var ticket = await _documentSession.LoadAsync<PaymentTicket>(PaymentTicket.GetDocumentId(request.TicketId),
+            cancellationToken);
 
-            exchangeRate *= (1 + providerDefinition.Settings.Markup);
+        bool isOppositeConversion = request.BaseCurrencyAmount is 0 or null;
+        var amount = isOppositeConversion
+            ? request.OtherCurrencyAmount
+            : request.BaseCurrencyAmount;
 
-            decimal exchangeResult = isOppositeConversion
-                ? Decimal.Divide(amount.Value, exchangeRate)
-                : Decimal.Multiply(amount.Value, exchangeRate);
+        if (amount is null)
+            throw new InvalidOperationException();
 
-            ticket.Update(isOppositeConversion, amount.ToAmountOfDigitsAfterPoint(),
-                exchangeResult.ToAmountOfDigitsAfterPoint(),
-                exchangeRate);
+        var providerDefinition = await _documentSession.LoadAsync<PaymentProviderDefinition>(
+            PaymentProviderDefinition.GetDocumentId(ticket.PaymentDefinitionId),
+            cancellationToken);
 
-            await _documentSession.SaveChangesAsync(cancellationToken);
+        (decimal exchangeRate, _) =
+            await _currencyService.GetExchangeRateByCurrency(ticket.BaseCurrency, ticket.OtherCurrency);
 
-            return new PaymentTicketResponse(ticket.TicketId, ticket.BaseCurrency, ticket.OtherCurrency,
-                ticket.BaseCurrencyAmount.ToAmountOfDigitsAfterPoint(),
-                ticket.OtherCurrencyAmount.ToAmountOfDigitsAfterPoint(),
-                ticket.ExchangeRate.ToAmountOfDigitsAfterPoint(6),
-                (1 / ticket.ExchangeRate).ToAmountOfDigitsAfterPoint(6), ticket.Updated, ticket.PaymentDefinitionId,
-                ticket.CountryCode,
-                providerDefinition.Settings.MinimumAmount, 
-                providerDefinition.Settings.MaximumAmount);
-        }
+        exchangeRate *= (1 + providerDefinition.Settings.Markup);
+
+        decimal exchangeResult = isOppositeConversion
+            ? Decimal.Divide(amount.Value, exchangeRate)
+            : Decimal.Multiply(amount.Value, exchangeRate);
+
+        ticket.Update(isOppositeConversion, amount.ToAmountOfDigitsAfterPoint(),
+            exchangeResult.ToAmountOfDigitsAfterPoint(),
+            exchangeRate);
+
+        await _documentSession.SaveChangesAsync(cancellationToken);
+
+        return new PaymentTicketResponse(ticket.TicketId, ticket.BaseCurrency, ticket.OtherCurrency,
+            ticket.BaseCurrencyAmount.ToAmountOfDigitsAfterPoint(),
+            ticket.OtherCurrencyAmount.ToAmountOfDigitsAfterPoint(),
+            ticket.ExchangeRate.ToAmountOfDigitsAfterPoint(6),
+            (1 / ticket.ExchangeRate).ToAmountOfDigitsAfterPoint(6), ticket.Updated, ticket.PaymentDefinitionId,
+            ticket.CountryCode,
+            providerDefinition.Settings.MinimumAmount, 
+            providerDefinition.Settings.MaximumAmount);
     }
 }

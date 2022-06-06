@@ -4,20 +4,19 @@ using System.Threading.Tasks;
 using BccPay.Core.Domain.Entities;
 using BccPay.Core.Enums;
 
-namespace BccPay.Core.Infrastructure.Helpers
+namespace BccPay.Core.Infrastructure.Helpers;
+
+public interface ICurrencyService
 {
-    public interface ICurrencyService
-    {
-        Task<CurrencyConversionRecord> Exchange(string fromCurrency, string toCurrency, decimal amount,
-            decimal exchangeRateMarkup = 0);
+    Task<CurrencyConversionRecord> Exchange(string fromCurrency, string toCurrency, decimal amount,
+        decimal exchangeRateMarkup = 0);
 
-        Task<CurrencyConversionRecord> Exchange(Currencies fromCurrency, Currencies toCurrency, decimal amount,
-            decimal exchangeRateMarkup = 0);
+    Task<CurrencyConversionRecord> Exchange(Currencies fromCurrency, Currencies toCurrency, decimal amount,
+        decimal exchangeRateMarkup = 0);
 
-        Task UpsertByBaseCurrencyRate(Currencies currency = Currencies.NOK,
-            CancellationToken cancellationToken = default);
+    Task UpsertByBaseCurrencyRate(Currencies currency = Currencies.NOK,
+        CancellationToken cancellationToken = default);
 
-        Task<(decimal, DateTime?)> GetExchangeRateByCurrency(Currencies fromCurrency,
-            Currencies toCurrency);
-    }
+    Task<(decimal, DateTime?)> GetExchangeRateByCurrency(Currencies fromCurrency,
+        Currencies toCurrency);
 }

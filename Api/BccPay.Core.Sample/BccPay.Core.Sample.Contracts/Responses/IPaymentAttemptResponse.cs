@@ -1,10 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace BccPay.Core.Sample.Contracts.Responses
+namespace BccPay.Core.Sample.Contracts.Responses;
+
+public interface IPaymentAttemptResponse
 {
-    public interface IPaymentAttemptResponse
-    {
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string Error { get; set; }
-    }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string Error { get; set; }
 }

@@ -1,7 +1,6 @@
-﻿namespace BccPay.Core.Infrastructure.BccPaymentSettings
+﻿namespace BccPay.Core.Infrastructure.BccPaymentSettings;
+
+public class FixerProviderOptions
 {
-    public class FixerProviderOptions
-    {
-        public string BaseAddress { get; set; }
-    }
+    public string BaseAddress { get; set; }
 }

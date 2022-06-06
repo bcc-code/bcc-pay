@@ -8,66 +8,65 @@ using BccPay.Core.Infrastructure.Helpers;
 using BccPay.Core.Shared.Converters;
 using MediatR;
 
-namespace BccPay.Core.Cqrs.Queries
+namespace BccPay.Core.Cqrs.Queries;
+
+public record GetConfigurationsWithExchangedCurrencyQuery(decimal Amount,
+    Currencies? FromCurrency,
+    Currencies? ToCurrency,
+    string CountryCode,
+    string PaymentType) : IRequest<GetConfigurationsWithExchangedCurrencyQueryResult>;
+
+public record GetConfigurationsWithExchangedCurrencyQueryResult(HashSet<ProviderDefinitionExchangeDefinition> ProviderDefinitionExchangeDefinition);
+
+public record ProviderDefinitionExchangeDefinition(string DefinitionId,
+    PaymentProvider PaymentProvider,
+    PaymentMethod PaymentMethod,
+    Currencies? FromCurrency,
+    Currencies? ToCurrency,
+    decimal FromAmount,
+    decimal ToAmount);
+
+public class GetConfigurationsWithExchangedCurrencyQueryResultHandler : IRequestHandler<GetConfigurationsWithExchangedCurrencyQuery, GetConfigurationsWithExchangedCurrencyQueryResult>
 {
-    public record GetConfigurationsWithExchangedCurrencyQuery(decimal Amount,
-        Currencies? FromCurrency,
-        Currencies? ToCurrency,
-        string CountryCode,
-        string PaymentType) : IRequest<GetConfigurationsWithExchangedCurrencyQueryResult>;
+    private readonly ICurrencyService _currencyService;
+    private readonly IMediator _mediator;
 
-    public record GetConfigurationsWithExchangedCurrencyQueryResult(HashSet<ProviderDefinitionExchangeDefinition> ProviderDefinitionExchangeDefinition);
-
-    public record ProviderDefinitionExchangeDefinition(string DefinitionId,
-        PaymentProvider PaymentProvider,
-        PaymentMethod PaymentMethod,
-        Currencies? FromCurrency,
-        Currencies? ToCurrency,
-        decimal FromAmount,
-        decimal ToAmount);
-
-    public class GetConfigurationsWithExchangedCurrencyQueryResultHandler : IRequestHandler<GetConfigurationsWithExchangedCurrencyQuery, GetConfigurationsWithExchangedCurrencyQueryResult>
+    public GetConfigurationsWithExchangedCurrencyQueryResultHandler(ICurrencyService currencyService,
+        IMediator mediator)
     {
-        private readonly ICurrencyService _currencyService;
-        private readonly IMediator _mediator;
+        _currencyService = currencyService;
+        _mediator = mediator;
+    }
 
-        public GetConfigurationsWithExchangedCurrencyQueryResultHandler(ICurrencyService currencyService,
-            IMediator mediator)
+    public async Task<GetConfigurationsWithExchangedCurrencyQueryResult> Handle(GetConfigurationsWithExchangedCurrencyQuery request, CancellationToken cancellationToken)
+    {
+        var configurationQuery = new GetPaymentConfigurationsByQuery(request.CountryCode, request.PaymentType, request.ToCurrency);
+        var configurationResult = await _mediator.Send(configurationQuery, cancellationToken);
+
+        var combinedResult = new HashSet<ProviderDefinitionExchangeDefinition>();
+
+        foreach (var configurations in configurationResult.PaymentConfigurations)
         {
-            _currencyService = currencyService;
-            _mediator = mediator;
-        }
-
-        public async Task<GetConfigurationsWithExchangedCurrencyQueryResult> Handle(GetConfigurationsWithExchangedCurrencyQuery request, CancellationToken cancellationToken)
-        {
-            var configurationQuery = new GetPaymentConfigurationsByQuery(request.CountryCode, request.PaymentType, request.ToCurrency);
-            var configurationResult = await _mediator.Send(configurationQuery, cancellationToken);
-
-            var combinedResult = new HashSet<ProviderDefinitionExchangeDefinition>();
-
-            foreach (var configurations in configurationResult.PaymentConfigurations)
+            foreach (var definitionId in configurations.PaymentProviderDefinitionIds)
             {
-                foreach (var definitionId in configurations.PaymentProviderDefinitionIds)
-                {
-                    var details = configurations.ProviderDefinitionDetails.First(x => x.Id == definitionId);
+                var details = configurations.ProviderDefinitionDetails.First(x => x.Id == definitionId);
 
-                    CurrencyConversionRecord currencyConversionResult = null;
+                CurrencyConversionRecord currencyConversionResult = null;
 
-                    var fromCurrencyValue = request.FromCurrency ?? default;
-                    if (request.Amount > 0)
-                        currencyConversionResult = await _currencyService.Exchange(fromCurrencyValue, details.Currency, request.Amount, details.Markup);
+                var fromCurrencyValue = request.FromCurrency ?? default;
+                if (request.Amount > 0)
+                    currencyConversionResult = await _currencyService.Exchange(fromCurrencyValue, details.Currency, request.Amount, details.Markup);
 
-                    combinedResult.Add(new ProviderDefinitionExchangeDefinition(definitionId,
-                        details.PaymentProvider,
-                        details.PaymentMethod,
-                        fromCurrencyValue,
-                        details.Currency,
-                        request.Amount.ToAmountOfDigitsAfterPoint(),
-                        currencyConversionResult?.ToAmount.ToAmountOfDigitsAfterPoint() ?? request.Amount.ToAmountOfDigitsAfterPoint()));
-                }
+                combinedResult.Add(new ProviderDefinitionExchangeDefinition(definitionId,
+                    details.PaymentProvider,
+                    details.PaymentMethod,
+                    fromCurrencyValue,
+                    details.Currency,
+                    request.Amount.ToAmountOfDigitsAfterPoint(),
+                    currencyConversionResult?.ToAmount.ToAmountOfDigitsAfterPoint() ?? request.Amount.ToAmountOfDigitsAfterPoint()));
             }
-
-            return new GetConfigurationsWithExchangedCurrencyQueryResult(combinedResult);
         }
+
+        return new GetConfigurationsWithExchangedCurrencyQueryResult(combinedResult);
     }
 }

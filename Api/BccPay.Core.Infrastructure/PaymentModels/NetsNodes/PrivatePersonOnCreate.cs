@@ -1,8 +1,7 @@
-﻿namespace BccPay.Core.Infrastructure.PaymentModels.NetsNodes
+﻿namespace BccPay.Core.Infrastructure.PaymentModels.NetsNodes;
+
+public class PrivatePersonOnCreate
 {
-    public class PrivatePersonOnCreate
-    {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-    }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
 }
